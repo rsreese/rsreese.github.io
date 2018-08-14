@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en"
+>
+<head>
+    <title>Running SnortAD - Stephen Reese</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index,follow" />
+<link rel="canonical" href="/running-snortad/">
+        <meta name="author" content="Stephen Reese" />
+        <meta name="keywords" content="anomaly detection" />
+        <meta name="description" content="I recently fired up a Snort Anomaly Detection instance provided by the SnortAD project and wanted to share my experience for those who might be interested in trying it on your network. SnortAD is the third generation anomaly detection preprocessor for Snort and is a little different than its predecessors …" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Stephen Reese ATOM Feed"/>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+rsreese.com            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/archives/">Archives</a></li>
+                         <li><a href="/about/">
+                             About
+                          </a></li>
+                         <li><a href="/contact/">
+                             Contact
+                          </a></li>
+                         <li><a href="/web-stack/">
+                             Web&nbsp;Stack
+                          </a></li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<div id="site-banner">
+        <div id="site-banner-brand">
+            <div>
+                <a href="/"><h1 class="center-block">Stephen Reese</h1></a>
+            </div>
+
+                <div id="social-banner">
+                    <ul class="list-group list-inline">
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="/contact/"><i class="fa fa-envelope fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://github.com/rsreese"><i class="fa fa-github fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://twitter.com/rsreese"><i class="fa fa-twitter fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.google.com/profiles/rsreese"><i class="fa fa-google-plus fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://facebook.com/rsreese"><i class="fa fa-facebook fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.linkedin.com/in/rsreese"><i class="fa fa-linkedin fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://feeds.feedburner.com/rsreese"><i class="fa fa-rss fa-lg"></i></a>
+                            </li>
+                    </ul>
+                </div>
+
+        </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/running-snortad/"
+                       rel="bookmark"
+                       title="Permalink to Running SnortAD">
+                        Running&nbsp;SnortAD
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+            <span>By</span>
+            <a href="/author/stephen-reese.html">Stephen Reese</a>
+
+    <span>on</span>
+    <span class="published">
+        <time datetime="2013-01-10T03:00:00-05:00"> Thu 10 January 2013</time>
+    </span>
+
+        <span><a href="/categories/">Category</a>:</span>
+        <a href="/category/security/">security</a>
+
+
+<span><a href="/tags/">Tags:</a></span>
+	<a href="/tag/anomaly-detection/">anomaly detection</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I recently fired up a Snort Anomaly Detection instance provided by the
+<a href="http://anomalydetection.info/">SnortAD</a> project and wanted to share my experience for those who
+might be interested in trying it on your network. SnortAD is the third
+generation anomaly detection preprocessor for Snort and is a little
+different than its predecessors but don&#8217;t take my word for it, check out
+their <a href="http://anomalydetection.info/">site</a>.</p>
+<p>First you need to create a log file based on your network, the log file
+will contain a profile of your network traffics characteristics.
+Although a log file has been provided with the SnortAD virtual machine
+(<span class="caps">VM</span>) that contains null entries it will not do you much good aside from
+alerting on everything. In order to characterize your network, you will
+need to create a log file with enough data to be statistically relevant.
+For the impatient, you can create a day or two worth of data and
+duplicate the data. Duplicating the data will have adverse effects
+though. Think about a university in which a majority of classes occur on
+Monday and Wednesday. If you only create a profile for Monday and
+duplicate it for the rest of the week, you can quickly understand how
+your results might be&nbsp;skewed.</p>
+<p>To get going, use the snort.conf included on SnortAD <span class="caps">VM</span> and begin
+creating a log file but remember to backup or remove the original log
+file in the event you need it for reference. Also, always backup your
+configuration files before making changes for good&nbsp;measure.</p>
+<p>Configure the snort.conf file to log. Something like the following
+should work&nbsp;fine:</p>
+<div class="highlight"><pre><span></span>preprocessor AnomalyDetection: LogPath /var/log/snort log time 60
+</pre></div>
+
+
+<p></code></p>
+<p>Next, run Snort to generate log data. As mentioned, you should create
+enough data to make it statistically relevant. The evaluator script
+expects three weeks. As an alternate, you might be able to use tcpreplay
+to replay existing <span class="caps">PCAP</span> if you have enough&nbsp;data.</p>
+<div class="highlight"><pre><span></span>$ sudo /usr/local/bin/snort -c /etc/snort.conf -i eth0
+</pre></div>
+
+
+<p>You should start seeing messages to stdout that look like the&nbsp;following:</p>
+<div class="highlight"><pre><span></span>Loged transfer between 06-01-13 15:33:52 - 06-01-13 15:34:52
+Loged transfer between 06-01-13 15:34:52 - 06-01-13 15:35:52
+</pre></div>
+
+
+<p>Now you should have a log with a number of entries saved in
+/var/log/snort. The profile generation script is next run. In this
+example we specify a week rather than opt for the three week default but
+again, <span class="caps">YMMV</span> and you made need to adjust these values. Also, make sure
+you check the help of the profile generator as there are other
+algorithms, five to be specific: Moving average (default), Naive method,
+Autoregressive time series model, Holt-Winters model, and <span class="caps">HW</span> model with
+Brutlag&#8217;s confidence&nbsp;band.</p>
+<div class="highlight"><pre><span></span>/usr/local/src/profilegenerator/ad_profilegenerator.r -m AVG --avg &#39;WEEKLY,1&#39; -l Log_Data.txt -p profile.txt -e evaluator.txt -P pattern.txt
+</pre></div>
+
+
+<p>The previous command creates the profile.txt file which is a <span class="caps">CSV</span> file,
+i.e. you could respectively name it profile.csv. The <span class="caps">CSV</span> file will be
+used by your updated snort.conf file. In order to enable anomaly
+detection, we need to download or create a few Snort configuration&nbsp;files:</p>
+<div class="highlight"><pre><span></span>$ ls -l /etc/snort
+total <span class="m">4200</span>
+-rw-r--r--. <span class="m">1</span> root root    <span class="m">3621</span> Jan  <span class="m">5</span> <span class="m">15</span>:35 classification.config
+-rw-r--r--. <span class="m">1</span> root root   <span class="m">29596</span> Jan  <span class="m">5</span> <span class="m">15</span>:35 gen-msg.map
+-rw-r--r--. <span class="m">1</span> root root    <span class="m">7897</span> Jan  <span class="m">5</span> <span class="m">15</span>:35 preprocessor.rules
+-rw-r--r--. <span class="m">1</span> root root <span class="m">1484013</span> Jan  <span class="m">5</span> <span class="m">15</span>:35 profile.csv
+-rw-r--r--. <span class="m">1</span> root root     <span class="m">746</span> Jan  <span class="m">5</span> <span class="m">15</span>:35 reference.config
+-rw-r--r--. <span class="m">1</span> root root <span class="m">2696705</span> Jan  <span class="m">5</span> <span class="m">15</span>:35 sid-msg.map
+-rw-r--r--. <span class="m">1</span> root root     <span class="m">255</span> Jan  <span class="m">5</span> <span class="m">15</span>:35 snort.conf
+-rw-r--r--. <span class="m">1</span> root root    <span class="m">2556</span> Jan  <span class="m">5</span> <span class="m">15</span>:35 threshold.conf
+-rw-r--r--. <span class="m">1</span> root root   <span class="m">53841</span> Jan  <span class="m">5</span> <span class="m">15</span>:35 unicode.map
+</pre></div>
+
+
+<p>I found it simplest to pull down the latest Snort signature as they have
+the additional required files that are not included in the provide
+SnortAD build. You can pull down the needed preprocessor.rules from one
+of the authors <a href="https://bitbucket.org/AnomalyDetection/preprocessor/src/2aaea35a15b0a3dcb7f627cc428e4a136420c9d3/preproc_rules/preprocessor.rules?at=default">bitbucket</a>. The snort.conf was populated with the
+following&nbsp;contents:</p>
+<div class="highlight"><pre><span></span>include classification.config
+include reference.config
+include preprocessor.rules
+preprocessor AnomalyDetection: ProfilePath /etc/snort/profile.csv LogPath /var/log/snort alert log time 60
+</pre></div>
+
+
+<p>If you have everything in the /etc/snort directory, you should be able
+to run Snort and see alerts when anomalies are&nbsp;detected:</p>
+<div class="highlight"><pre><span></span>$ sudo /usr/local/bin/snort -c /etc/snort/snort.conf -i eth0
+</pre></div>
+
+
+<p>Here are some sample alerts from some early testing. It will probably
+take some tuning to begin seeing useful&nbsp;alerts:</p>
+<div class="highlight"><pre><span></span><span class="k">[**] [1000100:1000101:1] AD_UNUSUALLY_HIGH_TCP_TRAFFIC [**]</span>
+<span class="k">[Classification: Potentially Bad Traffic] [Priority: 2]</span>
+<span class="na">01/06-20:59:04.308505 10.0.0.116 -&gt; 8.8.8.8</span>
+<span class="na">ICMP TTL:64 TOS:0x0 ID:0 IpLen:20 DgmLen:84 DF</span>
+<span class="na">Type:8  Code:0  ID:30537   Seq:1  ECHO</span>
+
+<span class="k">[**] [1000100:1000107:1] AD_HIGH_LAN_TCP_TRAFFIC [**]</span>
+<span class="k">[Classification: Potentially Bad Traffic] [Priority: 2]</span>
+<span class="na">01/06-20:59:04.308505 10.0.0.116 -&gt; 8.8.8.8</span>
+<span class="na">ICMP TTL:64 TOS:0x0 ID:0 IpLen:20 DgmLen:84 DF</span>
+<span class="na">Type:8  Code:0  ID:30537   Seq:1  ECHO</span>
+
+<span class="k">[**] [1000100:1000108:1] AD_UNUSUALLY_LOW_UDP_TRAFFIC [**]</span>
+<span class="k">[Classification: Potentially Bad Traffic] [Priority: 2]</span>
+<span class="na">01/06-20:59:04.308505 10.0.0.116 -&gt; 8.8.8.8</span>
+<span class="na">ICMP TTL:64 TOS:0x0 ID:0 IpLen:20 DgmLen:84 DF</span>
+<span class="na">Type:8  Code:0  ID:30537   Seq:1  ECHO</span>
+
+<span class="k">[**] [1000100:1000114:1] AD_LOW_LAN_UDP_TRAFFIC [**]</span>
+<span class="k">[Classification: Potentially Bad Traffic] [Priority: 2]</span>
+<span class="na">01/06-20:59:04.308505 10.0.0.116 -&gt; 8.8.8.8</span>
+<span class="na">ICMP TTL:64 TOS:0x0 ID:0 IpLen:20 DgmLen:84 DF</span>
+<span class="na">Type:8  Code:0  ID:30537   Seq:1  ECHO</span>
+
+<span class="k">[**] [1000100:1000134:1] AD_LOW_ARP_REQUEST_NUMBER [**]</span>
+<span class="k">[Classification: Potentially Bad Traffic] [Priority: 2]</span>
+<span class="na">01/06-20:59:04.308505 10.0.0.116 -&gt; 8.8.8.8</span>
+<span class="na">ICMP TTL:64 TOS:0x0 ID:0 IpLen:20 DgmLen:84 DF</span>
+<span class="na">Type:8  Code:0  ID:30537   Seq:1  ECHO</span>
+
+<span class="k">[**] [1000100:1000138:1] AD_LOW_NOT_TCP_IP_TRAFFIC [**]</span>
+<span class="k">[Classification: Potentially Bad Traffic] [Priority: 2]</span>
+<span class="na">01/06-20:59:04.308505 10.0.0.116 -&gt; 8.8.8.8</span>
+<span class="na">ICMP TTL:64 TOS:0x0 ID:0 IpLen:20 DgmLen:84 DF</span>
+<span class="na">Type:8  Code:0  ID:30537   Seq:1  ECHO</span>
+
+<span class="k">[**] [1000100:1000140:1] AD_LOW_OVERALL_PACKET_NUMBER [**]</span>
+<span class="k">[Classification: Potentially Bad Traffic] [Priority: 2]</span>
+<span class="na">01/06-20:59:04.308505 10.0.0.116 -&gt; 8.8.8.8</span>
+<span class="na">ICMP TTL:64 TOS:0x0 ID:0 IpLen:20 DgmLen:84 DF</span>
+<span class="na">Type:8  Code:0  ID:30537   Seq:1  ECHO</span>
+</pre></div>
+
+
+<p>If you have any questions, leave a comment and/or check out the authors
+<a href="https://bitbucket.org/AnomalyDetection/preprocessor/raw/2aaea35a15b0a3dcb7f627cc428e4a136420c9d3/ReadMe.txt">Readme.txt</a> for some additional usage&nbsp;insight.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'running-snortad';
+                var disqus_url = 'https://www.rsreese.com/running-snortad/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Stephen Reese
+            &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-495000-2', 'auto', {'siteSpeedSampleRate': 25});
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+</body>
+</html>

@@ -1,0 +1,531 @@
+<!DOCTYPE html>
+<html lang="en"
+>
+<head>
+    <title>Passive DNS collection and analysis using YaF and Mediator - Stephen Reese</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index,follow" />
+<link rel="canonical" href="/passive-dns-collection-and-analysis-using-yaf-and-mediator/">
+        <meta name="author" content="Stephen Reese" />
+        <meta name="keywords" content="analysis,netflow,passive dns" />
+        <meta name="description" content="Passive DNS is a useful tool for any analysts teams toolbox, I have noted several public sensors here but they only see data (queries and responses) that transverse their sensors. I have been working on setting up passive DNS using Yet another Flowmeter (YaF) and Mediator (YaF to MySQL) to …" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Stephen Reese ATOM Feed"/>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+rsreese.com            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/archives/">Archives</a></li>
+                         <li><a href="/about/">
+                             About
+                          </a></li>
+                         <li><a href="/contact/">
+                             Contact
+                          </a></li>
+                         <li><a href="/web-stack/">
+                             Web&nbsp;Stack
+                          </a></li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<div id="site-banner">
+        <div id="site-banner-brand">
+            <div>
+                <a href="/"><h1 class="center-block">Stephen Reese</h1></a>
+            </div>
+
+                <div id="social-banner">
+                    <ul class="list-group list-inline">
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="/contact/"><i class="fa fa-envelope fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://github.com/rsreese"><i class="fa fa-github fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://twitter.com/rsreese"><i class="fa fa-twitter fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.google.com/profiles/rsreese"><i class="fa fa-google-plus fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://facebook.com/rsreese"><i class="fa fa-facebook fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.linkedin.com/in/rsreese"><i class="fa fa-linkedin fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://feeds.feedburner.com/rsreese"><i class="fa fa-rss fa-lg"></i></a>
+                            </li>
+                    </ul>
+                </div>
+
+        </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/passive-dns-collection-and-analysis-using-yaf-and-mediator/"
+                       rel="bookmark"
+                       title="Permalink to Passive DNS collection and analysis using YaF and Mediator">
+                        Passive <span class="caps">DNS</span> collection and analysis using YaF and&nbsp;Mediator
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+            <span>By</span>
+            <a href="/author/stephen-reese.html">Stephen Reese</a>
+
+    <span>on</span>
+    <span class="published">
+        <time datetime="2013-05-20T11:12:00-04:00"> Mon 20 May 2013</time>
+    </span>
+
+        <span><a href="/categories/">Category</a>:</span>
+        <a href="/category/security/">security</a>
+
+
+<span><a href="/tags/">Tags:</a></span>
+	<a href="/tag/analysis/">analysis</a>
+        /
+	<a href="/tag/netflow/">netflow</a>
+        /
+	<a href="/tag/passive-dns/">passive dns</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Passive <span class="caps">DNS</span> is a useful tool for any analysts teams toolbox, I have noted several public sensors <a href="http://www.rsreese.com/online-information-security-analysis-tools-and-resources/">here</a> but they only see data (queries and responses) that transverse their sensors. I have been working on setting up passive <span class="caps">DNS</span> using Yet another Flowmeter (YaF) and Mediator (YaF to MySQL) to fill the gap where third-party sensors may not be providing the coverage I would like. Passive <span class="caps">DNS</span> can provide tremendous insight and analytics upon <span class="caps">DNS</span> queries that users and/or malware may beperforming. A few items of&nbsp;interest:</p>
+<ul>
+<li>Hostnames that have a large number of <span class="caps">IP</span> addresses associated with them in a short time period and they have only been visited by very few hosts host on the&nbsp;network.</li>
+<li>Tertiary name usage associated with a specific&nbsp;domain?</li>
+<li>When was the domain first resolved on the network and further, how often is it being resolved and by&nbsp;whom?</li>
+<li>A recently accessed/registered domain with short time to live (TTLs) often associated with new <span class="caps">IP</span> addresses may indicate
+    malicious activity, or a <span class="caps">CDN</span>.</li>
+<li>Queries for TLDs that you typically do not interact with may be worth looking&nbsp;into.</li>
+<li>Users using non-approved <span class="caps">DNS</span>&nbsp;servers</li>
+</ul>
+<p>Passive <span class="caps">DNS</span> may be also helpful in tracking infections using Fast-fluxwhich make blocking the C2 difficult as the attackers will create algorithms to rotate the <span class="caps">IP</span> addresses and even the hostnames in the case of double-flux. (<a href="http://www.cs.ucsb.edu/~kemm/courses/cs177/torpig.pdf">TorPig</a>) The list goes on but in a nutshell, I wanted to be able to perform this activity without having to rely on having all of the <span class="caps">DNS</span> server logs in a centralized location, especially since users may reconfigure their <span class="caps">DNS</span> settings to use non-approved servers, e.g. <span class="caps">BYOD</span>.</p>
+<p>This entry demonstrates how to build and setup <a href="http://tools.netsa.cert.org/yaf/yaf.html">YaF</a> and <a href="https://tools.netsa.cert.org/confluence/pages/viewpage.action?pageId=15958035">Mediator</a> both of which are available from the <span class="caps">CERT</span> <a href="http://www.cert.org/netsa/">NetSA</a> <a href="http://tools.netsa.cert.org/">site</a> and should be considered complementary to the documentation the NetSA team have already provided for each of the respective tools. This setup was tested on CentOS 6.4 but most Linux distributions should work&nbsp;fine.</p>
+<ol>
+<li>Have site reconfigure interfaces on all hosts. eth0 should be management interface and eth1 should be the tap <span class="caps">OR</span> whatever makes sense, this need to happen every time the host comes up,&nbsp;i.e.</li>
+</ol>
+<div class="highlight"><pre><span></span>sudo ifconfig eth1 up promisc
+</pre></div>
+
+
+<ol>
+<li>Ensure development libraries/dependencies are installed. Some may require enabling the optional software&nbsp;channel</li>
+</ol>
+<div class="highlight"><pre><span></span>sudo yum install glib2-devel lzo  gcc-c++ libpcap-devel pcre-devel
+</pre></div>
+
+
+<ol>
+<li>Install <a href="http://tools.netsa.cert.org/fixbuf/">libfixbuf</a></li>
+</ol>
+<div class="highlight"><pre><span></span>cd libfixbuf-1.3.0
+./configure
+make
+sudo make install
+</pre></div>
+
+
+<ol>
+<li>Install&nbsp;YaF</li>
+</ol>
+<div class="highlight"><pre><span></span>cd yaf-2.3.3
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+./configure --with-libpcap --enable-applabel --enable-plugins
+make
+sudo make install
+</pre></div>
+
+
+<ol>
+<li>Edit&nbsp;ld</li>
+</ol>
+<div class="highlight"><pre><span></span>sudo echo &quot;/usr/local/lib&quot; &gt;&gt; /etc/ld.so.conf
+sudo /sbin/ldconfig
+sudo /sbin/ldconfig -v | grep libzmq # should rebuild the cache including zmq too.
+</pre></div>
+
+
+<p><span class="caps">OR</span></p>
+<div class="highlight"><pre><span></span>export PATH=$PATH:/usr/local/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+</pre></div>
+
+
+<ol>
+<li>Configure&nbsp;cmake</li>
+</ol>
+<div class="highlight"><pre><span></span>cd cmake-2.8.10.2
+./configure
+gmake
+</pre></div>
+
+
+<ol>
+<li>Optionally, configure YaF to File output for testing&nbsp;purposes.</li>
+</ol>
+<div class="highlight"><pre><span></span>export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+cd yaf_file_mediator-1.1.0/
+./configure
+../cmake-2.8.10.2/bin/cmake .
+make
+</pre></div>
+
+
+<ol>
+<li>Configure YaF to&nbsp;MySQL</li>
+</ol>
+<div class="highlight"><pre><span></span>export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+cd yaf_silk_mysql_mediator-1.4.0
+../cmake-2.8.10.2/bin/cmake .
+./configure --with-mysql
+make
+</pre></div>
+
+
+<p>Next, populate create a database and respective&nbsp;tables:</p>
+<div class="highlight"><pre><span></span>./yafMySQL -o localhost -n username -p password -d eflows
+</pre></div>
+
+
+<ol>
+<li>Setup YaF to start capturing. Here we are only capture <span class="caps">DNS</span> traffic and rotating the files written to disk after 5 minutes. Originally set to 10 minutes but yaf_silk_mysql_mediator would segmentation fault because MySQL would close the connection before all of the data would insert. We have a continuous method that works a little better which we should a little later. We lock the file so that another process cannot take the file that is currently being written&nbsp;to.</li>
+</ol>
+<div class="highlight"><pre><span></span>sudo /usr/local/bin/yaf --live pcap --in eth1 --out /data/ipfix/ --rotate 600 --filter=&quot;port 53&quot; --applabel --applabel-rules=/usr/local/etc/yafApplabelRules.conf --max-payload=1000 --plugin-name=/usr/local/lib/yaf/dpacketplugin.la --plugin-opts=&quot;53&quot; --lock --become-user=nobody --become-group=nobody &amp;
+</pre></div>
+
+
+<ol>
+<li>Testing the output of a&nbsp;YaF</li>
+</ol>
+<div class="highlight"><pre><span></span>yaf_file_mediator-1.1.0/yaf_file_mediator --input /data/ipfix/filename.yaf --output test.txt
+</pre></div>
+
+
+<p>After a few minutes, you should be able to parse the filename.yaf that was first written (in this case 5 minutes). The contents of test.txt should be similar to the&nbsp;following:</p>
+<div class="highlight"><pre><span></span>-------------------------------
+Template ID is 45841
+Application Label: 53
+Source IP: 192.168.0.5
+Destination IP: 8.8.8.8
+Source Port: 53855
+Dest Port: 53
+Flow Attributes: 1
+Rev Flow Attributes: 0
+flowStartTime: 2013-04-24 23:53:43
+flowEndTime: 2013-04-24 23:58:02
+flowEndReason: 1
+Protocol: 17
+Octet Total Count: 120
+Rev Octet count: 244
+Packet Total Count: 2
+Rev Packet Total Count: 2
+DNS ID: 32852 Type: 28 RR Section: 0 TTL: 0 Query: www.google.com.
+DNS ID: 32852 Type: 28 RR Section: 1 TTL: 204 RRName: www.google.com. AAAA: 2607:f8b0:400c:0c04::0069
+
+-------------------------------
+Template ID is 45841
+Application Label: 53
+Source IP: 192.168.0.5
+Destination IP: 8.8.8.8
+Source Port: 50845
+Dest Port: 53
+flowStartTime: 2013-04-24 23:58:02
+flowEndTime: 2013-04-24 23:58:02
+flowEndReason: 1
+Protocol: 17
+Octet Total Count: 60
+Rev Octet count: 156
+Packet Total Count: 1
+Rev Packet Total Count: 1
+DNS ID: 21141 Type: 1 RR Section: 0 TTL: 0 Query: www.google.com.
+DNS ID: 21141 Type: 1 RR Section: 1 TTL: 208 RRName: www.google.com. A: 74.125.26.103
+DNS ID: 21141 Type: 1 RR Section: 1 TTL: 208 RRName: www.google.com. A: 74.125.26.99
+DNS ID: 21141 Type: 1 RR Section: 1 TTL: 208 RRName: www.google.com. A: 74.125.26.105
+DNS ID: 21141 Type: 1 RR Section: 1 TTL: 208 RRName: www.google.com. A: 74.125.26.104
+DNS ID: 21141 Type: 1 RR Section: 1 TTL: 208 RRName: www.google.com. A: 74.125.26.106
+DNS ID: 21141 Type: 1 RR Section: 1 TTL: 208 RRName: www.google.com. A: 74.125.26.147
+</pre></div>
+
+
+<ol>
+<li>After you have confirmed that your YaF entries contain records, adda little automation. This will scoop up the files in the directory where the YaF files are being written, place them in the MySQL <span class="caps">DBMS</span> and delete the file. Note, if you start seeing &#8220;Segmentation Fault&#8221; then MySQL maybe closing the connection before all of the records from the YaF file could be written to the <span class="caps">DBMS</span>. You can try modifying MySQL parameters or reduce the the size of YaF files being written to disk in order to try mitigating this symptom if it occurs in your&nbsp;environment.</li>
+</ol>
+<div class="highlight"><pre><span></span>for i in $( ls /data/ipfix/*.yaf ); do /home/user/silk-installs/yaf_silk_mysql_mediator-1.4.0/yaf_silk_mysql_mediator --in-file $i --mysql-host localhost --name username --pass password --database eflows &amp;&amp; sudo rm $i; done
+</pre></div>
+
+
+<p>Here is our first query, lets see who has recently made requests for&nbsp;www.google.com.</p>
+<div class="highlight"><pre><span></span>mysql&gt; SELECT rrname,rrval,srcip4,dstip4,flowStartMilliseconds FROM dns d, flows f WHERE f.id = d.id AND rrname LIKE &quot;www.google.com.&quot; GROUP by rrval ORDER BY f.id DESC LIMIT 50;
++-----------------+---------------------------+------------+-----------+-----------------------+
+| rrname          | rrval                     | srcip4     | dstip4    | flowStartMilliseconds |
++-----------------+---------------------------+------------+-----------+-----------------------+
+| www.google.com. | 2001:4860:4001:0802::1012 | 3232235525 | 134744072 | 2013-05-03 17:47:24   |
+| www.google.com. | 2001:4860:4001:0801::1014 | 3232235525 | 134744072 | 2013-05-03 15:35:32   |
+| www.google.com. | 2001:4860:4001:0802::1014 | 3232235525 | 134744072 | 2013-05-03 11:28:42   |
+| www.google.com. | 2001:4860:4001:0801::1010 | 3232235525 | 134744072 | 2013-05-02 16:48:31   |
+| www.google.com. | 2001:4860:4001:0802::1011 | 3232235525 | 134744072 | 2013-05-02 13:33:57   |
+| www.google.com. | 2001:4860:4001:0803::1010 | 3232235525 | 134744072 | 2013-05-02 12:01:56   |
+| www.google.com. | 2607:f8b0:4004:0801::1012 | 3232235525 | 134744072 | 2013-05-01 21:36:55   |
+| www.google.com. | 2001:4860:4001:0802::1010 | 3232235525 | 134744072 | 2013-05-01 12:44:52   |
+| www.google.com. | 74.125.239.80             | 3232235525 | 134744072 | 2013-05-01 10:45:04   |
+| www.google.com. | 74.125.239.83             | 3232235525 | 134744072 | 2013-05-01 10:45:04   |
+| www.google.com. | 74.125.239.82             | 3232235525 | 134744072 | 2013-05-01 10:45:04   |
+| www.google.com. | 74.125.239.81             | 3232235525 | 134744072 | 2013-05-01 10:45:04   |
+| www.google.com. | 74.125.239.84             | 3232235525 | 134744072 | 2013-05-01 10:45:04   |
+| www.google.com. | 2607:f8b0:4004:0802::1010 | 3232235525 | 134744072 | 2013-04-29 19:54:00   |
+| www.google.com. | 2607:f8b0:4005:0802::1010 | 3232235525 | 134744072 | 2013-04-28 15:52:00   |
+| www.google.com. | 2607:f8b0:4004:0803::1013 | 3232235525 | 134744072 | 2013-04-28 15:05:53   |
+| www.google.com. | 2607:f8b0:4005:0802::1011 | 3232235525 | 134744072 | 2013-04-27 14:45:35   |
+| www.google.com. | 2607:f8b0:4004:0801::1013 | 3232235525 | 134744072 | 2013-04-26 18:53:45   |
+| www.google.com. | 2607:f8b0:4005:0802::1012 | 3232235525 | 134744072 | 2013-04-26 13:55:51   |
+| www.google.com. | 2607:f8b0:4005:0802::1013 | 3232235525 | 134744072 | 2013-04-26 12:35:18   |
+| www.google.com. | 74.125.239.145            | 3232235525 | 134744072 | 2013-04-26 12:03:10   |
+| www.google.com. | 74.125.239.148            | 3232235525 | 134744072 | 2013-04-26 12:03:10   |
+| www.google.com. | 74.125.239.146            | 3232235525 | 134744072 | 2013-04-26 12:03:10   |
+| www.google.com. | 74.125.239.147            | 3232235525 | 134744072 | 2013-04-26 12:03:10   |
+| www.google.com. | 74.125.239.144            | 3232235525 | 134744072 | 2013-04-26 12:03:10   |
+| www.google.com. | 2607:f8b0:4005:0802::1014 | 3232235525 | 134744072 | 2013-04-26 11:31:59   |
+| www.google.com. | 74.125.228.112            | 3232235525 | 134744072 | 2013-04-25 16:25:39   |
+| www.google.com. | 74.125.228.114            | 3232235525 | 134744072 | 2013-04-25 16:25:39   |
+| www.google.com. | 74.125.228.113            | 3232235525 | 134744072 | 2013-04-25 16:25:39   |
+| www.google.com. | 74.125.228.115            | 3232235525 | 134744072 | 2013-04-25 16:25:39   |
+| www.google.com. | 74.125.228.116            | 3232235525 | 134744072 | 2013-04-25 16:25:39   |
+| www.google.com. | 2607:f8b0:4004:0802::1012 | 3232235525 | 134744072 | 2013-04-25 11:29:45   |
+| www.google.com. | 2607:f8b0:4004:0803::1014 | 3232235525 | 134744072 | 2013-04-24 20:33:42   |
+| www.google.com. | 2607:f8b0:400e:0c04::006a | 3232235525 | 134744072 | 2013-04-24 18:04:19   |
+| www.google.com. | 2607:f8b0:400e:0c02::006a | 3232235525 | 134744072 | 2013-04-24 15:26:22   |
+| www.google.com. | 74.125.228.20             | 3232235525 | 134744072 | 2013-04-24 12:05:43   |
+| www.google.com. | 74.125.228.16             | 3232235525 | 134744072 | 2013-04-24 12:05:43   |
+| www.google.com. | 74.125.228.18             | 3232235525 | 134744072 | 2013-04-24 12:05:43   |
+| www.google.com. | 74.125.228.19             | 3232235525 | 134744072 | 2013-04-24 12:05:43   |
+| www.google.com. | 74.125.228.17             | 3232235525 | 134744072 | 2013-04-24 12:05:43   |
+| www.google.com. | 2607:f8b0:4004:0801::1014 | 3232235525 | 134744072 | 2013-04-23 20:43:26   |
+| www.google.com. | 74.125.228.50             | 3232235525 | 134744072 | 2013-04-23 20:38:43   |
+| www.google.com. | 74.125.228.51             | 3232235525 | 134744072 | 2013-04-23 20:38:43   |
+| www.google.com. | 74.125.228.52             | 3232235525 | 134744072 | 2013-04-23 20:38:43   |
+| www.google.com. | 74.125.228.48             | 3232235525 | 134744072 | 2013-04-23 20:38:43   |
+| www.google.com. | 74.125.228.49             | 3232235525 | 134744072 | 2013-04-23 20:38:43   |
+| www.google.com. | 2607:f8b0:4004:0801::1011 | 3232235525 | 134744072 | 2013-04-23 18:38:52   |
+| www.google.com. | 2607:f8b0:400e:0c01::0067 | 3232235525 | 134744072 | 2013-04-23 15:57:45   |
+| www.google.com. | 2607:f8b0:4004:0801::1010 | 3232235525 | 134744072 | 2013-04-23 15:07:59   |
+| www.google.com. | 2607:f8b0:400e:0c01::0069 | 3232235525 | 134744072 | 2013-04-23 12:30:28   |
++-----------------+---------------------------+------------+-----------+-----------------------+
+</pre></div>
+
+
+<p>Here is a similar query but we want to see any tertiary youtube.com domains and sort by the lookup&nbsp;returned.</p>
+<div class="highlight"><pre><span></span>mysql&gt; SELECT qr,type,auth,nx,ttl,rrname,rrval from dns WHERE rrname LIKE &quot;%.youtube.com.&quot; GROUP BY rrval LIMIT 50;
++------+------+------+------+------+--------------------------------+----------------+
+| qr   | type | auth | nx   | ttl  | rrname                         | rrval          |
++------+------+------+------+------+--------------------------------+----------------+
+|    0 |    1 |    0 |    0 |    0 | www.youtube.com.               |                |
+|    1 |    1 |    0 |    0 |  300 | v17.lscache2.c.youtube.com.    | 12.216.80.12   |
+|    1 |    1 |    0 |    0 | 1800 | r2.sn-5uu-vgqe.c.youtube.com.  | 12.216.80.13   |
+|    1 |    1 |    0 |    0 | 1800 | r3.sn-5uu-vgqe.c.youtube.com.  | 12.216.80.14   |
+|    1 |    1 |    0 |    0 | 1800 | r4.att-ord1.c.youtube.com.     | 12.216.80.15   |
+|    1 |    1 |    0 |    0 | 1800 | r6.sn-5uu-vgqe.c.youtube.com.  | 12.216.80.17   |
+|    1 |    1 |    0 |    0 | 1714 | r8.sn-5uu-vgqe.c.youtube.com.  | 12.216.80.19   |
+|    1 |    1 |    0 |    0 | 1741 | r1.sn-5uu-vgql.c.youtube.com.  | 12.216.80.44   |
+|    1 |    1 |    0 |    0 | 1800 | r2.sn-5uu-vgql.c.youtube.com.  | 12.216.80.45   |
+|    1 |    1 |    0 |    0 | 1800 | r3.sn-5uu-vgql.c.youtube.com.  | 12.216.80.46   |
+|    1 |    1 |    0 |    0 | 1279 | r4.sn-5uu-vgql.c.youtube.com.  | 12.216.80.47   |
+|    1 |    1 |    0 |    0 | 1800 | r6.sn-5uu-vgql.c.youtube.com.  | 12.216.80.49   |
+|    1 |    1 |    0 |    0 | 1800 | r7.sn-5uu-vgql.c.youtube.com.  | 12.216.80.50   |
+|    1 |    1 |    0 |    0 | 1739 | r8.sn-5uu-vgql.c.youtube.com.  | 12.216.80.51   |
+|    1 |    1 |    0 |    0 | 1800 | r12.sn-hp576nes.c.youtube.com. | 173.194.17.17  |
+|    1 |    1 |    0 |    0 | 1800 | r20.sn-hp576nes.c.youtube.com. | 173.194.17.25  |
+|    1 |    1 |    0 |    0 | 1800 | r6.sn-q4f7dnel.c.youtube.com.  | 173.194.24.11  |
+|    1 |    1 |    0 |    0 | 1800 | r1.dfw06s08.c.youtube.com.     | 173.194.24.134 |
+|    1 |    1 |    0 |    0 | 1800 | r15.sn-q4f7dn7r.c.youtube.com. | 173.194.24.148 |
+|    1 |    1 |    0 |    0 | 1800 | r18.sn-hp576n7d.c.youtube.com. | 173.194.29.119 |
+|    1 |    1 |    0 |    0 | 1800 | r9.sn-hp576n7z.c.youtube.com.  | 173.194.29.46  |
+|    1 |    1 |    0 |    0 | 1800 | r5.sn-ab5e6ner.c.youtube.com.  | 173.194.31.10  |
+|    1 |    1 |    0 |    0 | 1800 | r1.sn-ab5e6nle.c.youtube.com.  | 173.194.31.102 |
+|    1 |    1 |    0 |    0 |  640 | r2.sn-ab5e6nle.c.youtube.com.  | 173.194.31.103 |
+|    1 |    1 |    0 |    0 | 1800 | r3.sn-ab5e6nle.c.youtube.com.  | 173.194.31.104 |
+|    1 |    1 |    0 |    0 | 1800 | r4.sn-ab5e6nle.c.youtube.com.  | 173.194.31.105 |
+|    1 |    1 |    0 |    0 | 1800 | r5.sn-ab5e6nle.c.youtube.com.  | 173.194.31.106 |
+|    1 |    1 |    0 |    0 | 1800 | r6.sn-ab5e6nle.c.youtube.com.  | 173.194.31.107 |
+|    1 |    1 |    0 |    0 | 1800 | r7.sn-ab5e6nle.c.youtube.com.  | 173.194.31.108 |
+|    1 |    1 |    0 |    0 | 1800 | r8.sn-ab5e6nle.c.youtube.com.  | 173.194.31.109 |
+|    1 |    1 |    0 |    0 |  705 | r6.sn-ab5e6ner.c.youtube.com.  | 173.194.31.11  |
+|    1 |    1 |    0 |    0 | 1800 | r9.sn-ab5e6nle.c.youtube.com.  | 173.194.31.110 |
+|    1 |    1 |    0 |    0 | 1800 | r10.sn-ab5e6nle.c.youtube.com. | 173.194.31.111 |
+|    1 |    1 |    0 |    0 |  292 | r11.sn-ab5e6nle.c.youtube.com. | 173.194.31.112 |
+|    1 |    1 |    0 |    0 | 1800 | r12.sn-ab5e6nle.c.youtube.com. | 173.194.31.113 |
+|    1 |    1 |    0 |    0 |  178 | r13.sn-ab5e6nle.c.youtube.com. | 173.194.31.114 |
+|    1 |    1 |    0 |    0 | 1800 | r14.sn-ab5e6nle.c.youtube.com. | 173.194.31.115 |
+|    1 |    1 |    0 |    0 | 1800 | r15.sn-ab5e6nle.c.youtube.com. | 173.194.31.116 |
+|    1 |    1 |    0 |    0 | 1800 | r16.sn-ab5e6nle.c.youtube.com. | 173.194.31.117 |
+|    1 |    1 |    0 |    0 | 1800 | r17.sn-ab5e6nle.c.youtube.com. | 173.194.31.118 |
+|    1 |    1 |    0 |    0 | 1800 | r18.sn-ab5e6nle.c.youtube.com. | 173.194.31.119 |
+|    1 |    1 |    0 |    0 | 1653 | r7.sn-ab5e6ner.c.youtube.com.  | 173.194.31.12  |
+|    1 |    1 |    0 |    0 | 1800 | r19.sn-ab5e6nle.c.youtube.com. | 173.194.31.120 |
+|    1 |    1 |    0 |    0 | 1800 | r20.sn-ab5e6nle.c.youtube.com. | 173.194.31.121 |
+|    1 |    1 |    0 |    0 | 1800 | r8.sn-ab5e6ner.c.youtube.com.  | 173.194.31.13  |
+|    1 |    1 |    0 |    0 |   81 | r1.sn-ab5e6nll.c.youtube.com.  | 173.194.31.134 |
+|    1 |    1 |    0 |    0 | 1800 | r2.sn-ab5e6nll.c.youtube.com.  | 173.194.31.135 |
+|    1 |    1 |    0 |    0 | 1800 | r3.sn-ab5e6nll.c.youtube.com.  | 173.194.31.136 |
+|    1 |    1 |    0 |    0 | 1800 | r4.sn-ab5e6nll.c.youtube.com.  | 173.194.31.137 |
+|    1 |    1 |    0 |    0 | 1800 | r5.lga15s22.c.youtube.com.     | 173.194.31.138 |
++------+------+------+------+------+--------------------------------+----------------+
+50 rows in set (22.17 sec)
+</pre></div>
+
+
+<p>An alternative method is to write YaF records directly to mediator, and further the MySQL <span class="caps">DBMS</span> rather then writing files to disk although youcan still do this with the appropriate toggles. Here is example usage to start the&nbsp;processes:</p>
+<div class="highlight"><pre><span></span>$ ./silk-installs/yaf_silk_mysql_mediator-1.4.0/yaf_silk_mysql_mediator --in-host<span class="o">=</span><span class="m">127</span>.0.0.1 --in-port<span class="o">=</span><span class="m">18000</span> --mysql-host<span class="o">=</span>localhost --name<span class="o">=</span>username --pass password --database eflows
+$ sudo /usr/local/bin/yaf --live pcap --in eth1 --out <span class="m">127</span>.0.0.1 --ipfix-port<span class="o">=</span><span class="m">18000</span> --ipfix tcp --log<span class="o">=</span>/var/log/yaf.log --filter<span class="o">=</span><span class="s2">&quot;port 53&quot;</span> --applabel --applabel-rules<span class="o">=</span>/usr/local/etc/yafApplabelRules.conf --max-payload<span class="o">=</span><span class="m">1000</span> --plugin-name<span class="o">=</span>/usr/local/lib/yaf/dpacketplugin.la --plugin-opts<span class="o">=</span><span class="s2">&quot;53&quot;</span> <span class="p">&amp;</span>
+</pre></div>
+
+
+<p>Ensure YaF and mediator are&nbsp;connected:</p>
+<div class="highlight"><pre><span></span>$ sudo netstat -tupan<span class="p">|</span>grep yaf
+tcp        <span class="m">0</span>      <span class="m">0</span> <span class="m">127</span>.0.0.1:18000             <span class="m">0</span>.0.0.0:*                   LISTEN      <span class="m">6497</span>/yaf_silk_mysql
+tcp        <span class="m">0</span>      <span class="m">0</span> <span class="m">127</span>.0.0.1:47417             <span class="m">127</span>.0.0.1:18000             ESTABLISHED <span class="m">6513</span>/yaf
+tcp        <span class="m">0</span>      <span class="m">0</span> <span class="m">127</span>.0.0.1:18000             <span class="m">127</span>.0.0.1:47417             ESTABLISHED <span class="m">6497</span>/yaf_silk_mysql
+</pre></div>
+
+
+<p>You may use the following MySQL query to see when the table was last updated to ensure records are being inserted on a regular&nbsp;basis:</p>
+<div class="highlight"><pre><span></span>mysql&gt; SHOW TABLE STATUS in eflows;
+</pre></div>
+
+
+<p>After a few minutes of collection, query a domain that has been recently resolved and you should see it in the <span class="caps">DBMS</span>.</p>
+<div class="highlight"><pre><span></span>mysql&gt; SELECT rrname,rrval from dns WHERE rrname LIKE &quot;%rsreese.com.&quot; GROUP BY rrval LIMIT 10;
++--------------+--------------------------------+
+| rrname       | rrval                          |
++--------------+--------------------------------+
+| rsreese.com. |                                |
+| rsreese.com. | 2600:3c02::f03c:91ff:fe96:f7bd |
+| rsreese.com. | 74.207.234.79                  |
+| rsreese.com. | ns1.linode.com.                |
+| rsreese.com. | ns2.linode.com.                |
+| rsreese.com. | ns3.linode.com.                |
+| rsreese.com. | ns4.linode.com.                |
+| rsreese.com. | ns5.linode.com.                |
++--------------+--------------------------------+
+8 rows in set (18.26 sec)
+</pre></div>
+
+
+<p>There are a number of different fields available for query so I leave it to you to come up with whatever is most useful for you. Further, think of how you could write a shiny front-end for analysts to use rather then having to use the MySQL command line interface. Hope you found this useful and leave a comment if you did or have any&nbsp;questions. </p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'passive-dns-collection-and-analysis-using-yaf-and-mediator';
+                var disqus_url = 'https://www.rsreese.com/passive-dns-collection-and-analysis-using-yaf-and-mediator/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Stephen Reese
+            &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-495000-2', 'auto', {'siteSpeedSampleRate': 25});
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+</body>
+</html>

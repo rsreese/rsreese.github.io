@@ -1,0 +1,78 @@
+==================================================================
+https://keybase.io/rsreese
+--------------------------------------------------------------------
+
+I hereby claim:
+
+  * I am an admin of https://www.rsreese.com
+  * I am rsreese (https://keybase.io/rsreese) on keybase.
+  * I have a public key with fingerprint 88DC 5721 575D 90CF 2E2F  1DFF FF66 FF92 E2E6 AE17
+
+To claim this, I am signing this object:
+
+{
+    "body": {
+        "key": {
+            "fingerprint": "88dc5721575d90cf2e2f1dffff66ff92e2e6ae17",
+            "host": "keybase.io",
+            "key_id": "ff66ff92e2e6ae17",
+            "kid": "01013280382931f9da6d5ad9276eae5cd0d9025c6704c2c875f9a5971f44591220ed0a",
+            "uid": "2faca3df4cde055d4b30c1bb141f8200",
+            "username": "rsreese"
+        },
+        "revoke": {
+            "sig_ids": [
+                "ec53046aaae08637fa97e600897abe2ee01340be8fa82f13702c5d6f19c9a79a0f"
+            ]
+        },
+        "service": {
+            "hostname": "www.rsreese.com",
+            "protocol": "https:"
+        },
+        "type": "web_service_binding",
+        "version": 1
+    },
+    "ctime": 1421934272,
+    "expire_in": 157680000,
+    "prev": "a71b5d6de9bedbe59d39b2da8c8fcd5cd375edd4a6c45cb9b9d474713e6ce196",
+    "seqno": 6,
+    "tag": "signature"
+}
+
+with the aforementioned key, yielding the PGP signature:
+
+-----BEGIN PGP MESSAGE-----
+Version: GnuPG v1.4.11 (GNU/Linux)
+
+owFtUn9QVFUUBpQFcRywmQIFY3oQFEPr+/1j/5AcUXKcSIhiCmF979772Ney+3bf
+LqBhM44SYoXjwDiJbkwOAeqSU4hkslbojFJEQhpBJIWjlGAiMxkDMwvdZei/7j93
+zjnf/c53vnuOrlkRFhG+qC7W35k4Fx/ed18JK/hmYbCKUHS4l7BUEXa0dKmasxQZ
+LkNzegkLIYoQcAJNcQIHJRKoNKJVCqr48LyqSjhEvIwogcgkbLon9ALTKLIHmTUd
+53Bg1SDO/g/evlQgKZJiaJFkRFpiKFWCMg85GUq0wCMZcQCSuC/NAV4gWUADUeBU
+SeYkgVJZlpMomiYRJGVMV75ER6sykBmosgAikuMgqzAkoBSFYilVpEkyBPQgwyk7
+EEYbHgMhDyLeySQMVKHbUcgAj1aKNXsISxGBAMeQLC/LMiJFnhFUWRIQT5KiJMgK
+HgVh7SypIFGVRewLI5A04CCvUhKQZEGSSZUoxty4YYUGlshDJi03r6ysNC8LMAPd
+gZW5DN2rA70MF21er8tjCQnz7nUtoZFiXeaxKpoT4l/CLyqQ4dF0J2GhMBJ4tRAx
+xdKUxLC0QGcSaI9LM5BVCyE4gRdJfEJ9UAVh2U3IAqVguRBJCoIK4iTISAoNZRGI
+KoDYe0bgEISszAOWA4qkSJAVWIFiEA8QJfFEaDS3UycsPNYpl2KZ2Dyn7C03sKcx
+hyOSVoaFR4SZIiNCmxYWsyruv/Xz3YxdYJUP6noakg5MPgajDb5jk90z7Pz992OH
+31wM+I6ndNh2NfnG8xubX5h5y/fq9qL3Hr6UPpK6eNPe1P3r8dgrs509O0464jo8
+aZTd4Y917W/bradERQ2tao2+O1kbveW5loPnpn6+YE5aM/N255HE8YGsL7Z3dVX8
++PLfd1aHFyuz9ED5LZ+/P8V8io96eDJv6KvE0bKykoSFkbP0afdfsZdyCwe6lJy4
+Xw7MPVW3qWjucODD7OqWDPftnZWvHw3anhn8biB3V3NNQ39ggni0OSHh++ve7hNZ
+s2Og5WJwviXpbn719S21j99wjwfQ8A3SWha+znelc9B/FWRoU+vRPiOxOPnbfdFT
+W4vfdStp0xVljYfyTA96aX+BiPzqNfPGSEcrTCqYZteOFfZuIkfnDlqCJdbaZ8e+
+TDb1cgHb6svp3cnNG+JnBzbMzH5S0Fr3is0dvzmr5odO0/qz026zK583B1fseQLq
+VvXj6tIdr73YOTbbkXVm29aVntT999Z+fqug7VShpQ3E+M6M/WNtSss48nxOyVz2
+OsfGxsBHVYV/5OdcG4lkeW6xPq+5JjUuvqvk9KVcx/nfFw8JN4IGkz6nkJU/tV4Y
+tZcM+7P5ofY+xnSiu118cHlb+fl5U8uftoSsvosNj56uq4/W9M9MFv1qQvtEnnHv
+t6Hb+pPw60/7e3YG/wU=
+=2eti
+-----END PGP MESSAGE-----
+
+And finally, I am proving ownership of this host by posting or
+appending to this document.
+
+View my publicly-auditable identity here: https://keybase.io/rsreese
+
+==================================================================

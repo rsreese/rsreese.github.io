@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en"
+>
+<head>
+    <title>Authenicating kerberos against active directory - Stephen Reese</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index,follow" />
+<link rel="canonical" href="/authenicating-kerberos-against-active-directory/">
+        <meta name="author" content="Stephen Reese" />
+        <meta name="keywords" content="authentication,active directory,linux" />
+        <meta name="description" content="Your /etc/pam.d/system-auth is created with the command “authconfig” on a RHEL5 machine though you may have to manually edit it with other distributions: #%PAM-1.0# This file is auto-generated. # User changes will be destroyed the next time authconfig is run. auth required /lib/security/$ISA/pam_env.so …" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Stephen Reese ATOM Feed"/>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+rsreese.com            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/archives/">Archives</a></li>
+                         <li><a href="/about/">
+                             About
+                          </a></li>
+                         <li><a href="/contact/">
+                             Contact
+                          </a></li>
+                         <li><a href="/web-stack/">
+                             Web&nbsp;Stack
+                          </a></li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<div id="site-banner">
+        <div id="site-banner-brand">
+            <div>
+                <a href="/"><h1 class="center-block">Stephen Reese</h1></a>
+            </div>
+
+                <div id="social-banner">
+                    <ul class="list-group list-inline">
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="/contact/"><i class="fa fa-envelope fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://github.com/rsreese"><i class="fa fa-github fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://twitter.com/rsreese"><i class="fa fa-twitter fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.google.com/profiles/rsreese"><i class="fa fa-google-plus fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://facebook.com/rsreese"><i class="fa fa-facebook fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.linkedin.com/in/rsreese"><i class="fa fa-linkedin fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://feeds.feedburner.com/rsreese"><i class="fa fa-rss fa-lg"></i></a>
+                            </li>
+                    </ul>
+                </div>
+
+        </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/authenicating-kerberos-against-active-directory/"
+                       rel="bookmark"
+                       title="Permalink to Authenicating kerberos against active directory">
+                        Authenicating kerberos against active&nbsp;directory
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+            <span>By</span>
+            <a href="/author/stephen-reese.html">Stephen Reese</a>
+
+    <span>on</span>
+    <span class="published">
+        <time datetime="2008-02-12T03:37:00-05:00"> Tue 12 February 2008</time>
+    </span>
+
+        <span><a href="/categories/">Category</a>:</span>
+        <a href="/category/administration/">administration</a>
+
+
+<span><a href="/tags/">Tags:</a></span>
+	<a href="/tag/authentication/">authentication</a>
+        /
+	<a href="/tag/active-directory/">active directory</a>
+        /
+	<a href="/tag/linux/">linux</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Your /etc/pam.d/system-auth is created with the command &#8220;authconfig&#8221; on
+a <span class="caps">RHEL5</span> machine though you may have to manually edit it with other&nbsp;distributions:</p>
+<div class="highlight"><pre><span></span>#%PAM-1.0# This file is auto-generated.
+# User changes will be destroyed the next time authconfig is run.
+auth required /lib/security/$ISA/pam_env.so
+auth sufficient /lib/security/$ISA/pam_unix.so like
+auth nullokauth sufficient /lib/security/$ISA/pam_krb5.so use_first_pass
+auth required /lib/security/$ISA/pam_deny.so
+account required /lib/security/$ISA/pam_unix.so broken_shadow
+account sufficient /lib/security/$ISA/pam_succeed_if.so uid &lt; 100 quiet
+account [default=bad success=ok user_unknown=ignore] /lib/security/$ISA/pam_krb5.so
+account required /lib/security/$ISA/pam_permit.so
+password requisite /lib/security/$ISA/pam_cracklib.so retry=3
+password sufficient /lib/security/$ISA/pam_unix.so nullok use_authtok md5 shadow
+password sufficient /lib/security/$ISA/pam_krb5.so use_authtok
+password required /lib/security/$ISA/pam_deny.so
+session required /lib/security/$ISA/pam_limits.so
+session required /lib/security/$ISA/pam_unix.so
+session optional /lib/security/$ISA/pam_krb5.so
+</pre></div>
+
+
+<p>Your /etc/krb5.conf should look something like this. Your system time
+must be accurate or else it will not work&nbsp;correctly.</p>
+<div class="highlight"><pre><span></span>[logging] default = FILE:/var/log/krb5libs.log kdc = FILE:/var/log/krb5kdc.log admin_server = FILE:/var/log/kadmind.log[libdefaults] default_realm = AD.DOMAIN.EDUclockskew = 300 dns_lookup_realm = false dns_lookup_kdc = false ticket_lifetime = 24h forwardable = yes[realms]UFL.EDU = { kdc = DC01.AD.DOMAIN.EDU default_domain = DOMAIN.EDU }AD.DOMAIN.EDU = { kdc = ad.domain.edu admin_server = ad.domain.edu }[domain_realm] .domain.edu = DOMAIN.EDU domain.edu = DOMAIN.EDU[kdc] profile = /var/kerberos/krb5kdc/kdc.conf[appdefaults] pam = { debug = false ticket_lifetime = 36000 renew_lifetime = 36000 forwardable = true krb4_convert = false }
+</pre></div>
+
+
+<p>Next you need run kinit to make sure that you can contact the kerberos
+server, if it returns nothing then you should be&nbsp;good.</p>
+<div class="highlight"><pre><span></span>$ kinitPassword <span class="k">for</span> rsreese@AD.DOMAIN.EDU: blahblah
+</pre></div>
+
+
+<p>Next setup two cron entries to keep the time up to date and kinit
+alive:<br>
+$ sudo crontab&nbsp;-e</p>
+<div class="highlight"><pre><span></span>0 23 * * 1,3,5 /usr/sbin/ntpdate time.nrc.ca0 */4 * * * kinit -R
+</pre></div>
+
+
+<p>The /etc/samba/smb.conf file needs to be&nbsp;setup.</p>
+<div class="highlight"><pre><span></span># grep -Ev &#39;#|;|^$&#39; /etc/samba/smb.conf[global] workgroup = UFAD realm = AD.DOMAIN.EDU server string = SRVV-SERV hosts allow = 10.242. 10.228. load printers = no log file = /var/log/samba/%m.log max log size = 50 security = ads idmap uid = 10000 - 20000 idmap gid = 10000 - 20000winbind enum users=yeswinbind enum groups=yes template homedir = /home/%U template shell = /bin/bashclient use spnego = yes winbind use default domain = no encrypt passwords = yes smb passwd file = /etc/samba/smbpasswd socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192 local master = no dns proxy = no[homes] comment = %U Home Directory browseable = no path = %H valid users = %U writable = yes create mode = 0664 directory mode = 0775[printers] comment = All Printers path = /var/spool/samba browseable = no guest ok = no writable = no printable = yes
+</pre></div>
+
+
+<p>Now add the computer object to the domain via the Active directory
+&#8220;Users and&nbsp;Computers&#8221;</p>
+<p>You need to join the linux machine to the domain. First create an
+account on the domain for the machine as mentioned in the beginning or
+this will fail.<br>
+# net ads join -U&nbsp;administrator</p>
+<p>SElinux needs to be told to let Samba play nicely<br>
+# setsebool -P&nbsp;samba_enable_home_dirs=1</p>
+<p>\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~<span class="caps">NOT</span>
+<span class="caps">NEEDED</span>\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~<br>
+The /etc/ldap.conf looks like&nbsp;this:</p>
+<p>host 10.241.28.100<br>
+base dc=domain,dc=edu<br>
+uri ldap://ad.domain.edu/<br>
+binddn rsreese@domain.edu<br>
+bindpw<br>
+scope sub<br>
+pam_filter objectclass=User<br>
+pam_login_attribute sAMAccountName<br>
+pam_lookup_policy yes<br>
+nss_base_passwd dc=edu?sub<br>
+nss_base_shadow dc=edu?sub<br>
+nss_base_group dc=edu?sub<br>
+nss_map_objectclass posixAccount user<br>
+nss_map_objectclass shadowAccount user<br>
+nss_map_attribute uid sAMAccountName<br>
+nss_map_attribute homeDirectory unixHomeDirectory<br>
+nss_map_attribute shadowLastChange pwdLastSet<br>
+nss_map_objectclass posixGroup group<br>
+nss_map_attribute uniqueMember member<br>
+pam_login_attribute sAMAccountName<br>
+pam_filter objectclass=User<br>
+pam_password ad<br>
+ssl no<br>
+tls_cacertdir /etc/openldap/cacerts<br>
+pam_password&nbsp;md5</p>
+<p>\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~<span class="caps">NOT</span>
+<span class="caps">NEEDED</span>\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~<br>
+Next I edit the /etc/nsswitch.conf to add ldap&nbsp;support:</p>
+<p>passwd: files ldap<br>
+shadow: files<br>
+group: files ldap<br>
+hosts: files dns<br>
+bootparams: nisplus [<span class="caps">NOTFOUND</span>=return] files<br>
+ethers: files<br>
+netmasks: files<br>
+networks: files<br>
+protocols: files<br>
+rpc: files<br>
+services: files<br>
+netgroup: files<br>
+publickey: nisplus<br>
+automount: files<br>
+aliases: files&nbsp;nisplus</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'authenicating-kerberos-against-active-directory';
+                var disqus_url = 'https://www.rsreese.com/authenicating-kerberos-against-active-directory/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Stephen Reese
+            &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-495000-2', 'auto', {'siteSpeedSampleRate': 25});
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+</body>
+</html>

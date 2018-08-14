@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en"
+>
+<head>
+    <title>Redirect Blogger URL using Mod Rewrite and shell scripting fu - Stephen Reese</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index,follow" />
+<link rel="canonical" href="/redirect-blogger-url-using-mod-rewrite-and-shell-scripting-fu/">
+        <meta name="author" content="Stephen Reese" />
+        <meta name="keywords" content="shell scripting" />
+        <meta name="description" content="Blogger is doing away with the option to host your blog via your own host and migrating everything to the cloud. I wanted to have the option to continue hosting my blog on my own server even though as of now I am still hosting with Blogger. The main concern …" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Stephen Reese ATOM Feed"/>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+rsreese.com            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/archives/">Archives</a></li>
+                         <li><a href="/about/">
+                             About
+                          </a></li>
+                         <li><a href="/contact/">
+                             Contact
+                          </a></li>
+                         <li><a href="/web-stack/">
+                             Web&nbsp;Stack
+                          </a></li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<div id="site-banner">
+        <div id="site-banner-brand">
+            <div>
+                <a href="/"><h1 class="center-block">Stephen Reese</h1></a>
+            </div>
+
+                <div id="social-banner">
+                    <ul class="list-group list-inline">
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="/contact/"><i class="fa fa-envelope fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://github.com/rsreese"><i class="fa fa-github fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://twitter.com/rsreese"><i class="fa fa-twitter fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.google.com/profiles/rsreese"><i class="fa fa-google-plus fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://facebook.com/rsreese"><i class="fa fa-facebook fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.linkedin.com/in/rsreese"><i class="fa fa-linkedin fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://feeds.feedburner.com/rsreese"><i class="fa fa-rss fa-lg"></i></a>
+                            </li>
+                    </ul>
+                </div>
+
+        </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/redirect-blogger-url-using-mod-rewrite-and-shell-scripting-fu/"
+                       rel="bookmark"
+                       title="Permalink to Redirect Blogger URL using Mod Rewrite and shell scripting fu">
+                        Redirect Blogger <span class="caps">URL</span> using Mod Rewrite and shell scripting&nbsp;fu
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+            <span>By</span>
+            <a href="/author/stephen-reese.html">Stephen Reese</a>
+
+    <span>on</span>
+    <span class="published">
+        <time datetime="2010-02-13T01:07:00-05:00"> Sat 13 February 2010</time>
+    </span>
+
+        <span><a href="/categories/">Category</a>:</span>
+        <a href="/category/coding/">coding</a>
+
+
+<span><a href="/tags/">Tags:</a></span>
+	<a href="/tag/shell-scripting/">shell scripting</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Blogger is doing away with the <a href="http://blogger-ftp.blogspot.com/">option</a> to host your blog via your own
+host and migrating everything to the cloud. I wanted to have the option
+to continue hosting my blog on my own server even though as of now I am
+still hosting with <a href="http://www.blogger.com/">Blogger</a>. The main concern I had was redirecting
+URLs that blogger had created to a new blogging platform such as
+<a href="http://www.wordpress.com/">WordPress</a>. I looked around and found several methods <a href="http://joepoon.com/blog/2009/04/02/from-blogger-to-wordpress-without-breaking-the-internet/">here</a>,
+<a href="http://www.seobook.com/migrate-blogger-powered-blog-wordpress">here</a>, and <a href="http://www.slicksurface.com/blog/2008-03/how-to-migrate-from-blogger-to-wordpress">here</a> for redirecting one <span class="caps">URL</span> to another. The two
+primary method were <span class="caps">HTTP</span> redirects by modifying the page header or
+Apaches [mod_rewrite][]. I like Apache so I opted for the&nbsp;latter.</p>
+<p>I only had about 60 posts so creating a few mod_rewrite rules is not a
+big deal. There were a number bloggers had <a href="http://blogger-ftp.blogspot.com/2010/02/for-blogs-that-are-no-longer-updated.html">complaints</a> about Blogger
+removing <span class="caps">FTP</span>/<span class="caps">SFTP</span> publishing capabilities and they were considering a
+migration away from Blogger. This got me thinking about how to help
+others in transferring thousands blog&nbsp;entries.</p>
+<p>I decided to try to automate this process somewhat with a little
+scripting fu. This could be scripted into a single script and if there
+is enough interest, I will make it&nbsp;happen.</p>
+<p>The first step is to import your Blogger posts into your WordPress
+database. Blogger can export its posts but WordPress does not have a
+native plug-in for importing the posts in the <span class="caps">XML</span> format that Blogger is
+capable of exporting. WordPress can however import posts and comments
+from a Blogger Blogspot hosted profile. Create a Blogspot host and
+import the posts that you have backed up from your main profiles <span class="caps">XML</span>
+file. Make sure to disable search engine indexing for the temporary site
+so that you do not hurt your <span class="caps">SEO</span>.</p>
+<p>The second step is to import the posts into WordPress. This is
+relatively easy to do, basically login to your WordPress administrative
+tools and import the blogger posts from your Blogspot profile that you
+created in the first step. I tried using the recommended <a href="http://codex.wordpress.org/Importing_Content#Blogger">tools</a> per
+WordPress and a third party <a href="http://justinsomnia.org/2006/10/maintain-permalinks-moving-from-blogger-to-wordpress/">tool</a> but they did not work very well for&nbsp;me.</p>
+<p>Now your WordPress install should have all of your content and comments
+and your WordPress install is working correctly. This tutorial also
+assumes you are using the following permalink format for your WordPress
+posts, if not you will have to adjust this tutorial to your&nbsp;liking:</p>
+<div class="highlight"><pre><span></span>/%year%/%monthnum%/%postname%/
+</pre></div>
+
+
+<p>You will notice that your <span class="caps">URL</span> conforms to the WordPress install and not
+to Bloggers. This means that when you migrate your <span class="caps">DNS</span> to point at your
+shiny WordPress install all of the links that users have bookmarked and
+the search engines have crawled will no longer be valid. Worse, this
+could hurt your search engine rankings as it will take time for search
+engines to realize the new content and during that time you will have
+duplicate content floating around. Not an ideal&nbsp;situation.</p>
+<p>Third step is to determine all of the URLs that your Blogger account was
+using the <span class="caps">XML</span> file that you exported from your Blogger blogs profile.
+This will produce a file with your Blogger file names. It should be the
+same as the number of posts you have published on Blogger or in other
+words imported to WordPress. Note you will need to change the <span class="caps">XML</span> file
+name and domain name to match your&nbsp;settings:</p>
+<div class="highlight"><pre><span></span># Produces blogger file names.
+sed &quot;s/\(href=&#39;[^&#39;]*&#39;\)/\1\n/g&quot; blog-02-04-2010.xml |   
+grep &quot;href=&#39;http://www.rsreese.com/20.*html&#39;&quot; |   
+sed &quot;s+.*href=&#39;http://www.domain.com/\(20[^&#39;]*\)&#39;.*+\1+&quot; |   
+sort -ut/ -k3 | xargs -I{} basename {} | sort -u &gt; /tmp/blogger.txt
+</pre></div>
+
+
+<p>Next you want to generate a similar listing from your WordPress install
+that is populated with all of your Blogger content. This involves
+logging into your MySQL install and exporting a little&nbsp;data.</p>
+<div class="highlight"><pre><span></span>mysql -u wordpress_user -p
+mysql&gt; USE wordpress_db;
+mysql&gt; SELECT post_name FROM wp_posts INTO OUTFILE &#39;/tmp/wp.txt&#39;;
+</pre></div>
+
+
+<p>Next you want to ensure that your post line up from the two files. In my
+case I had some that were not sorted exactly right, this basically let
+me know how much manipulating I would have to do. Paste this into a file
+on your Linux and provide executable permissions such as &#8216;chmod +x
+filename&#8217;. Then run the file &#8216;/filename&#8217;. Note you will need to specify
+the paths to your wp.txt and blogger.txt in the small&nbsp;script.</p>
+<div class="highlight"><pre><span></span>paste blogger.txt wp.txt | while read Line
+do set $Line
+echo &quot;This is from FileA: &quot; $1
+echo &quot;This is from FileB: &quot; $2
+done
+</pre></div>
+
+
+<p>Lastly lets actually generate the mod_rewrite rules for Apache. Again
+when this runs the sort function may not match up the file names exactly
+right so you may have to do some manual&nbsp;manipulation.</p>
+<div class="highlight"><pre><span></span>paste blogger.txt wp.txt | while read Line
+do set $Line
+echo &#39;RewriteRule ^([0-9]{4})/([0-9]{1,2})/&#39;$1&#39;$ $1/$2/&#39;$2&#39;/ [NC,R=301,L]&#39;
+done
+</pre></div>
+
+
+<p>You probably want to redirect the output to a file so you can go in and
+fix the values that have not sorted&nbsp;correctly.</p>
+<p>The last part of the configuration here is a section from my Apache
+configuration file. I have also included a little bit to redirect the
+feeds though for me this was not very important as I syndicate through
+<a href="http://feedburner.google.com/">FeedBurner</a> allowing me to modify my feed without effect&nbsp;subscribers.</p>
+<div class="highlight"><pre><span></span># This has two of my rewrite rules, I have many more but kept it brief for readability.
+<span class="nt">&lt;Directory</span> <span class="err">/var/www/apache2-default/wordpress</span><span class="nt">/&gt;</span>
+RewriteEngine OnRewriteBase /wordpress/
+RewriteRule ^atom.xml$ feed/ [NC,R=301,L]
+RewriteRule ^rss.xml$ feed/ [NC,R=301,L]
+RewriteRule ^([0-9]{4})/([0-9]{1,2})/adding-character-to-line-using-perl.html$ $1/$2/adding-a-character-to-a-line-using-perl/ [NC,R=301,L]
+RewriteRule ^([0-9]{4})/([0-9]{1,2})/authenicating-kerberos-against-active.html$ $1/$2/authenicating-kerberos-against-active-directory/ [NC,R=301,L]
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+RewriteRule . /wordpress/index.php [L]<span class="nt">&lt;/Directory&gt;</span>
+</pre></div>
+
+
+<p>Finally you should test your setup to determine that all of the links&nbsp;redirect.</p>
+<div class="highlight"><pre><span></span>sed &quot;s/\(href=&#39;[^&#39;]*&#39;\)/\1\n/g&quot; blog-02-07-2010.xml|   
+grep &quot;href=&#39;http://www.rsreese.com/20.*html&#39;&quot; |   
+sed &quot;s+.*href=&#39;\([^&#39;]*\)&#39;.*+\1+&quot; |   
+sort -ut/ -k3 &gt; /tmp/full_blogger_urls.txt
+</pre></div>
+
+
+<p>Next you can use wget to test the URLs to make sure they all redirect&nbsp;correctly.</p>
+<div class="highlight"><pre><span></span>wget -i /tmp/full_blogger_urls.txt
+</pre></div>
+
+
+<p>This tutorial is not an end all solution is not perfect by any means. It
+still requires some manipulation of data but if you have a large number
+of URLs to redirect then you may find it useful. Your mileage may vary
+though if you have problems or recommendations than drop a&nbsp;comment&#8230;</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'redirect-blogger-url-using-mod-rewrite-and-shell-scripting-fu';
+                var disqus_url = 'https://www.rsreese.com/redirect-blogger-url-using-mod-rewrite-and-shell-scripting-fu/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Stephen Reese
+            &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-495000-2', 'auto', {'siteSpeedSampleRate': 25});
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+</body>
+</html>

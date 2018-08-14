@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en"
+>
+<head>
+    <title>Making WordPress Fast - Stephen Reese</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index,follow" />
+<link rel="canonical" href="/making-wordpress-fast/">
+        <meta name="author" content="Stephen Reese" />
+        <meta name="keywords" content="wordpress" />
+        <meta name="description" content="This site previously used WordPress as a CMS platform. Quite a bit of time was spent tuning in order to get page load times that were consistently less then 500ms although usually closer to 200 to 300ms. The WordPress site was able to burst to around to 2000 users per …" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Stephen Reese ATOM Feed"/>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+rsreese.com            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/archives/">Archives</a></li>
+                         <li><a href="/about/">
+                             About
+                          </a></li>
+                         <li><a href="/contact/">
+                             Contact
+                          </a></li>
+                         <li><a href="/web-stack/">
+                             Web&nbsp;Stack
+                          </a></li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<div id="site-banner">
+        <div id="site-banner-brand">
+            <div>
+                <a href="/"><h1 class="center-block">Stephen Reese</h1></a>
+            </div>
+
+                <div id="social-banner">
+                    <ul class="list-group list-inline">
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="/contact/"><i class="fa fa-envelope fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://github.com/rsreese"><i class="fa fa-github fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://twitter.com/rsreese"><i class="fa fa-twitter fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.google.com/profiles/rsreese"><i class="fa fa-google-plus fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://facebook.com/rsreese"><i class="fa fa-facebook fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.linkedin.com/in/rsreese"><i class="fa fa-linkedin fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://feeds.feedburner.com/rsreese"><i class="fa fa-rss fa-lg"></i></a>
+                            </li>
+                    </ul>
+                </div>
+
+        </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/making-wordpress-fast/"
+                       rel="bookmark"
+                       title="Permalink to Making WordPress Fast">
+                        Making WordPress&nbsp;Fast
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+            <span>By</span>
+            <a href="/author/stephen-reese.html">Stephen Reese</a>
+
+    <span>on</span>
+    <span class="published">
+        <time datetime="2014-12-15T12:00:00-05:00"> Mon 15 December 2014</time>
+    </span>
+
+        <span><a href="/categories/">Category</a>:</span>
+        <a href="/category/web-sites/">web sites</a>
+
+
+<span><a href="/tags/">Tags:</a></span>
+	<a href="/tag/wordpress/">wordpress</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>This site previously used WordPress as a <span class="caps">CMS</span> platform. Quite a bit of time was spent tuning in order to get page load times that were consistently less then 500ms although usually closer to 200 to 300ms. The WordPress site was able to burst to around to 2000 users per <a href="https://www.blitz.io/report/904c1ab082af0d106e4be71c0023b2aa">blitz.io</a> although there was an error here or there. I speculate that is a limitation on the outgoing bandwidth of the <span class="caps">VPS</span> as the system resources appeared stable. The largest improvements were made by caching, Varnish prevented repeat Apache, <span class="caps">PHP</span> and MySQL requests. Real world saturation is a different scenario but not too bad when compared to a stock <a href="http://en.wikipedia.org/wiki/LAMP_%28software_bundle%29"><span class="caps">LAMP</span></a> setup. A stock <span class="caps">LAMP</span> setup on my <span class="caps">VPS</span> would handle around 50 req/sec before services started to hang up. I have since migrated to a new platform but wanted to keep this around for&nbsp;reference.</p>
+<p>Note that the process flow in the following diagram is approximate and does not necessarily&nbsp;accurate.</p>
+<p><img alt="Web Stack Architecture" src="/assets/web-stack-arch.png"></p>
+<ul>
+<li>Hosted with <a href="http://www.linode.com/?r=6579d0b21f581ea769a6ca4af46de0dad6f88df8">Linode</a> on a <a href="http://wiki.xenproject.org/wiki/Xen_Overview">Xen Hypervisor</a>.</li>
+<li><a href="http://www.debian.org/">Debian</a> Linux Operating&nbsp;System</li>
+<li><a href="http://httpd.apache.org/docs/2.2/mod/worker.html">Apache <span class="caps">MPM</span> worker</a> - Multi-Processing Module implementing a hybrid multi-threaded multi-process web&nbsp;server</li>
+<li><a href="https://developers.google.com/speed/pagespeed/mod">Google PageSpeed Apache module</a> backed by&nbsp;Memcached</li>
+<li><a href="http://php-fpm.org/"><span class="caps">PHP</span>-<span class="caps">FPM</span></a> (FastCGI Process&nbsp;Manager)</li>
+<li><a href="https://www.varnish-cache.org/">Varnish Cache</a> - a web application accelerator <span class="caps">AKA</span> a caching <span class="caps">HTTP</span> reverse&nbsp;proxy</li>
+<li><a href="http://memcached.org/">Memcached</a> memory object caching&nbsp;system</li>
+<li><a href="http://wordpress.org/">WordPress</a> running 2010&nbsp;template</li>
+<li><a href="http://wordpress.org/extend/plugins/batcache/">Batcache</a> plugin using <a href="http://svn.wp-plugins.org/memcached/trunk/">Object Cache</a> backed by&nbsp;Memcached</li>
+</ul>
+<p>If you are looking for a solid do it yourself hosting provider, I recommend you checkout <a href="http://www.linode.com/?r=6579d0b21f581ea769a6ca4af46de0dad6f88df8">Linode</a> and use my referral <a href="http://www.linode.com/?r=6579d0b21f581ea769a6ca4af46de0dad6f88df8">link</a> if you sign up which helps support this&nbsp;site.</p>
+<p><img alt="Blitz Report" src="/assets/wordpress-blitz-report.png"></p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'making-wordpress-fast';
+                var disqus_url = 'https://www.rsreese.com/making-wordpress-fast/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Stephen Reese
+            &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-495000-2', 'auto', {'siteSpeedSampleRate': 25});
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+</body>
+</html>

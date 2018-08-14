@@ -2,13 +2,13 @@
 <html lang="en"
 >
 <head>
-    <title>Stephen Reese</title>
+    <title>Articles by Stephen Reese - Stephen Reese</title>
     <!-- Using the latest rendering mode for IE -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex,follow" />
-<link rel="canonical" href="">    <meta name="author" content="Stephen Reese" />
+    <meta name="author" content="Stephen Reese" />
     <!-- Bootstrap -->
     <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
     <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
@@ -43,9 +43,13 @@ rsreese.com            </a>
                              Web&nbsp;Stack
                           </a></li>
             </ul>
+<!--            <ul class="nav navbar-nav navbar-right">
+                <li><a href="/archives/"><i class="fa fa-th-list"></i><span class="icon-label">Archives</span></a></li>
+            </ul>-->
         </div>
+        <!-- /.navbar-collapse -->
     </div>
-</div> 
+</div> <!-- /.navbar -->
 
 <div id="site-banner">
         <div id="site-banner-brand">
@@ -87,13 +91,6 @@ rsreese.com            </a>
         <div class="col-lg-12">
 <!--
 -->
-            <article>
-                <h2><a href="/network-traffic-capture-in-virtual-enviroments/">Network Traffic Capture in Virtual&nbsp;Enviroments</a></h2>
-                <div class="summary">This post demonstrates how you mirror interfaces on a virtual private server (VPS) in a cloud environment, e.g. virtual machine (VM) on a hypervisor where you do not have access to network or virtualization infrastructure where a network TAP or SPAN port would be available. This technique is used …
-                    <!--<a class="btn btn-default btn-xs" href="/network-traffic-capture-in-virtual-enviroments/">read more ...</a>-->
-                </div>
-            </article>
-            <hr/>
             <article>
                 <h2><a href="/network-traffic-capture-on-linux-using-openvswitch/">Network Traffic Capture on Linux using&nbsp;OpenvSwitch</a></h2>
                 <div class="summary">This post demonstrates how you can mirror interfaces on a Linux server in an environment where you may not have physical network taps or SPAN ports. We can use OpenvSwitch in order to forward traffic between nodes, even if we are not using virtualization. Each node being monitored needs two …
@@ -227,21 +224,28 @@ rsreese.com            </a>
                 </div>
             </article>
             <hr/>
+            <article>
+                <h2><a href="/increment-ip-packet-timestamp/">Increment <span class="caps">IP</span> packet&nbsp;timestamp</a></h2>
+                <div class="summary">I recently had a need to specify and increment the IP timestamp values of packets in a PCAP. In this example, the starting second value is specified and we increment the microsecond value. This requires the use of Scapy. If you have any questions or recommendations for improvement, please leave …
+                    <!--<a class="btn btn-default btn-xs" href="/increment-ip-packet-timestamp/">read more ...</a>-->
+                </div>
+            </article>
+            <hr/>
 
         <ul class="pagination">
                 <li class="prev disabled"><a href="#">&laquo;</a></li>
                     <li class="active"><a
-                            href="/index.html">1</a></li>
+                            href="/author/stephen-reese.html">1</a></li>
                     <li class=""><a
-                            href="/index2.html">2</a></li>
+                            href="/author/stephen-reese2.html">2</a></li>
                     <li class=""><a
-                            href="/index3.html">3</a></li>
+                            href="/author/stephen-reese3.html">3</a></li>
                     <li class=""><a
-                            href="/index4.html">4</a></li>
+                            href="/author/stephen-reese4.html">4</a></li>
                     <li class=""><a
-                            href="/index5.html">5</a></li>
+                            href="/author/stephen-reese5.html">5</a></li>
                 <li class="next"><a
-                        href="/2/">&raquo;</a></li>
+                        href="/author/stephen-reese2.html">&raquo;</a></li>
         </ul>
         </div>
     </div>
@@ -250,7 +254,7 @@ rsreese.com            </a>
    <div class="container">
       <hr>
       <div class="row">
-         <div class="col-xs-10">&copy; 2018 Stephen Reese
+         <div class="col-xs-10">&copy; 2017 Stephen Reese
             &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
          <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
       </div>

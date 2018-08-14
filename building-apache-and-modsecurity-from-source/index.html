@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en"
+>
+<head>
+    <title>Building Apache and ModSecurity from source - Stephen Reese</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index,follow" />
+<link rel="canonical" href="/building-apache-and-modsecurity-from-source/">
+        <meta name="author" content="Stephen Reese" />
+        <meta name="keywords" content="apache,modsecurity" />
+        <meta name="description" content="This entry describes settting up ModSecurity on a node in order to protect a few WordPress sites I host. There are a slew of guides out there describing ModSecurity builds but I wanted to leverage the latest ModSecurity and Apache MPM Event packages which typically are not included in most …" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Stephen Reese ATOM Feed"/>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+rsreese.com            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/archives/">Archives</a></li>
+                         <li><a href="/about/">
+                             About
+                          </a></li>
+                         <li><a href="/contact/">
+                             Contact
+                          </a></li>
+                         <li><a href="/web-stack/">
+                             Web&nbsp;Stack
+                          </a></li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<div id="site-banner">
+        <div id="site-banner-brand">
+            <div>
+                <a href="/"><h1 class="center-block">Stephen Reese</h1></a>
+            </div>
+
+                <div id="social-banner">
+                    <ul class="list-group list-inline">
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="/contact/"><i class="fa fa-envelope fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://github.com/rsreese"><i class="fa fa-github fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://twitter.com/rsreese"><i class="fa fa-twitter fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.google.com/profiles/rsreese"><i class="fa fa-google-plus fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://facebook.com/rsreese"><i class="fa fa-facebook fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.linkedin.com/in/rsreese"><i class="fa fa-linkedin fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://feeds.feedburner.com/rsreese"><i class="fa fa-rss fa-lg"></i></a>
+                            </li>
+                    </ul>
+                </div>
+
+        </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/building-apache-and-modsecurity-from-source/"
+                       rel="bookmark"
+                       title="Permalink to Building Apache and ModSecurity from source">
+                        Building Apache and ModSecurity from&nbsp;source
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+            <span>By</span>
+            <a href="/author/stephen-reese.html">Stephen Reese</a>
+
+    <span>on</span>
+    <span class="published">
+        <time datetime="2015-02-27T08:00:00-05:00"> Fri 27 February 2015</time>
+    </span>
+
+        <span><a href="/categories/">Category</a>:</span>
+        <a href="/category/security/">security</a>
+
+
+<span><a href="/tags/">Tags:</a></span>
+	<a href="/tag/apache/">apache</a>
+        /
+	<a href="/tag/modsecurity/">modsecurity</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>This entry describes settting up <a href="http://modsecurity.org">ModSecurity</a> on a node in order to protect a few WordPress sites I host. There are a slew of guides out there describing ModSecurity <a href="https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#Installation_for_Apache">builds</a> but I wanted to leverage the latest ModSecurity and Apache <span class="caps">MPM</span> Event packages which typically are not included in most Linux distribution repositories. We use a proxy node that passes requests to the backend (origin) server hosting the web application. You may just as easily build ModSecurity on the same host that is serving your content verse using a reverse proxy, i.e. there are a number of ways to architect the setup. In the figure below, a request is first received by the proxy with ModSecurity enabled, and then passed to the origin host serving the actual content if ModSecurity does not intervene. We use Debian but other distributions should be&nbsp;similar.</p>
+<p><img alt="ModSecurity Proxy" src="/assets/modsecurity-proxy-figure.png"></p>
+<p>Install prerequisite&nbsp;packages:</p>
+<div class="highlight"><pre><span></span>$ sudo apt-get install gcc libpcre3-dev libxml2-dev libcurl4-gnutls-dev
+</pre></div>
+
+
+<p>Download, Build, and Install <span class="caps">SSL</span> (enable shared if on&nbsp;64bit):</p>
+<div class="highlight"><pre><span></span>$ mkdir install
+$ ./config shared --prefix<span class="o">=</span>/root/openssl-1.0.2a/install/
+$ make depend
+$ make
+$ make <span class="nb">test</span>
+$ make install
+</pre></div>
+
+
+<p>Download latest Apache, <span class="caps">APR</span>, and <span class="caps">APR</span> Util packages. Extract <span class="caps">APR</span> and <span class="caps">APR</span> Util, copy both to Apache src directory, build and install&nbsp;Apache:</p>
+<div class="highlight"><pre><span></span>$ cp -R apr-util-1.5.4 httpd-2.4.12/srclib/apr-util/
+$ cp -R apr-1.5.1 httpd-2.4.12/srclib/apr/
+$ ./configure --with-included-apr --enable-ssl --enable-ssl-staticlib-deps --with-ssl<span class="o">=</span>/root/openssl-1.0.2/install/ --enable-proxy --with-mpm<span class="o">=</span>event
+$ make
+$ sudo make install
+</pre></div>
+
+
+<p>Download, Build and install ModSecurity (optionally install <span class="caps">LUA</span> if&nbsp;desired):</p>
+<div class="highlight"><pre><span></span>$ tar xzf modsecurity-2.9.0.tar.gz
+$ <span class="nb">cd</span> modsecurity-2.9.0/
+$ ./configure --with-apxs<span class="o">=</span>/usr/local/apache2/bin/apxs --with-apr<span class="o">=</span>/root/httpd-2.4.12/srclib/apr/ --with-apu<span class="o">=</span>/root/httpd-2.4.12/srclib/apr-util/ --with-lua<span class="o">=</span>/usr/lib/x86_64-linux-gnu/pkgconfig/
+$ make
+$ sudo make install
+</pre></div>
+
+
+<p>Grab a rule-set. You may also choose to use <span class="caps">GIT</span> to&nbsp;download.</p>
+<div class="highlight"><pre><span></span>$ wget https://github.com/SpiderLabs/owasp-modsecurity-crs/tarball/master
+$ mv master master.tar.gz
+$ cp -R SpiderLabs-owasp-modsecurity-crs-ebe8790/ /usr/local/apache2/conf/crs/
+$ <span class="nb">cd</span> /usr/local/apache2/conf/crs/
+$ mv modsecurity_crs_10_setup.conf.example modsecurity_crs_10_setup.conf
+$ ln -s /usr/local/apache2/conf/crs/modsecurity_crs_10_setup.conf activated_rules/
+$ <span class="k">for</span> f in <span class="sb">`</span>ls base_rules/<span class="sb">`</span> <span class="p">;</span> <span class="k">do</span> ln -s /usr/local/apache2/conf/crs/base_rules/<span class="nv">$f</span> activated_rules/<span class="nv">$f</span> <span class="p">;</span> <span class="k">done</span>
+$ <span class="k">for</span> f in <span class="sb">`</span>ls optional_rules/<span class="sb">`</span> <span class="p">;</span> <span class="k">do</span> ln -s /usr/local/apache2/conf/crs/optional_rules/<span class="nv">$f</span> activated_rules/<span class="nv">$f</span> <span class="p">;</span> <span class="k">done</span>
+$ mkdir /etc/modsec
+$ <span class="nb">cd</span>
+$ cp modsecurity-2.9.0/modsecurity.conf-recommended /etc/modsec/modsecurity.conf
+$ cp modsecurity-2.9.0/unicode.mapping /etc/modsec/
+$ vim /etc/modsec/whitelist.conf
+</pre></div>
+
+
+<p>Setup your Apache site, virtual host, or use proxy pass in order to fetch from a back-end origin node. Add ModSecurity directives to Apache conf&nbsp;file:</p>
+<div class="highlight"><pre><span></span>LoadModule unique_id_module modules/mod_unique_id.so
+LoadModule security2_module modules/mod_security2.so
+<span class="nt">&lt;IfModule</span> <span class="err">security2_module</span><span class="nt">&gt;</span>
+Include /etc/modsec/modsecurity.conf
+Include conf/crs/activated_rules/*.conf
+Include /etc/modsec/whitelist.conf
+SecRule ARGS &quot;mod_security_test&quot; &quot;t:normalisePathWin,id:99999,severity:4,msg:&#39;Drive Access&#39;&quot;
+<span class="nt">&lt;/IfModule&gt;</span>
+</pre></div>
+
+
+<p>Start Apache and test to validate rules are logging and optionally being enforced. You should see a 403 forbidden response meaning that the malicious requests were blocked. Now you can move to tuning the ruleset to your web&nbsp;application:</p>
+<p>http://waf.rsreese.com/?test=mod_security_test</p>
+<p><img alt="Forbidden" src="/assets/modsecurity-forbidden.png"></p>
+<p>If something is not clear, leave a comment&nbsp;below.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'building-apache-and-modsecurity-from-source';
+                var disqus_url = 'https://www.rsreese.com/building-apache-and-modsecurity-from-source/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Stephen Reese
+            &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-495000-2', 'auto', {'siteSpeedSampleRate': 25});
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+</body>
+</html>

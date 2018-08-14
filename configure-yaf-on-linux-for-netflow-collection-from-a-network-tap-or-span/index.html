@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en"
+>
+<head>
+    <title>Configure YAF on Linux for NetFlow collection from a network tap or SPAN - Stephen Reese</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index,follow" />
+<link rel="canonical" href="/configure-yaf-on-linux-for-netflow-collection-from-a-network-tap-or-span/">
+        <meta name="author" content="Stephen Reese" />
+        <meta name="keywords" content="linux,netflow,silk,yaf" />
+        <meta name="description" content="In a previous post SiLK was setup on a Debian host using NetFlow v5 from a Cisco switch. This worked well but I also have a network tap and said Cisco switch is capable of capturing data via SPAN port(s). This got me thinking about what difference I may …" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Stephen Reese ATOM Feed"/>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+rsreese.com            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/archives/">Archives</a></li>
+                         <li><a href="/about/">
+                             About
+                          </a></li>
+                         <li><a href="/contact/">
+                             Contact
+                          </a></li>
+                         <li><a href="/web-stack/">
+                             Web&nbsp;Stack
+                          </a></li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<div id="site-banner">
+        <div id="site-banner-brand">
+            <div>
+                <a href="/"><h1 class="center-block">Stephen Reese</h1></a>
+            </div>
+
+                <div id="social-banner">
+                    <ul class="list-group list-inline">
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="/contact/"><i class="fa fa-envelope fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://github.com/rsreese"><i class="fa fa-github fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://twitter.com/rsreese"><i class="fa fa-twitter fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.google.com/profiles/rsreese"><i class="fa fa-google-plus fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://facebook.com/rsreese"><i class="fa fa-facebook fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.linkedin.com/in/rsreese"><i class="fa fa-linkedin fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://feeds.feedburner.com/rsreese"><i class="fa fa-rss fa-lg"></i></a>
+                            </li>
+                    </ul>
+                </div>
+
+        </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/configure-yaf-on-linux-for-netflow-collection-from-a-network-tap-or-span/"
+                       rel="bookmark"
+                       title="Permalink to Configure YAF on Linux for NetFlow collection from a network tap or SPAN">
+                        Configure <span class="caps">YAF</span> on Linux for NetFlow collection from a network tap or <span class="caps">SPAN</span>
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+            <span>By</span>
+            <a href="/author/stephen-reese.html">Stephen Reese</a>
+
+    <span>on</span>
+    <span class="published">
+        <time datetime="2011-08-26T21:27:00-04:00"> Fri 26 August 2011</time>
+    </span>
+
+        <span><a href="/categories/">Category</a>:</span>
+        <a href="/category/security/">security</a>
+
+
+<span><a href="/tags/">Tags:</a></span>
+	<a href="/tag/linux/">linux</a>
+        /
+	<a href="/tag/netflow/">netflow</a>
+        /
+	<a href="/tag/silk/">silk</a>
+        /
+	<a href="/tag/yaf/">yaf</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>In a previous <a href="https://www.rsreese.com/configure-silk-on-linux-for-netflow-collection-from-a-cisco-router/">post</a> SiLK was setup on a Debian host using NetFlow v5
+from a Cisco switch. This worked well but I also have a network tap and
+said Cisco switch is capable of capturing data via <span class="caps">SPAN</span> port(s). This
+got me thinking about what difference I may see between the two NetFlow
+sources. This guide walks through setting up <span class="caps">YAF</span> on a Debian Linux host
+to receive data from a network tap or Switched Port Analyzer (<span class="caps">SPAN</span>) and
+converting it using <a href="http://tools.netsa.cert.org/yaf/index.html">Yet Another Flowmeter (<span class="caps">YAF</span>)</a>.</p>
+<p>First, your host will need to obtain data from your network tap or <span class="caps">SPAN</span>
+port. I have two network interface cards in my box so I connected the
+non-management interface to the tap and started the interface without an
+<span class="caps">IP</span> in promiscuous mode. If you would like to use a <span class="caps">SPAN</span> port seek
+guidance <a href="https://www.cisco.com/en/US/products/hw/switches/ps708/products_tech_note09186a008015c612.shtml">here</a>.</p>
+<p>Note that this guide assumes that you already have compiled and
+successfully built SiLK. If not checkout this&nbsp;[post][].</p>
+<p>You first need <em>libfixbuf</em> - <a href="http://tools.netsa.cert.org/fixbuf/index.html"><span class="caps">IPFIX</span> Protocol Library</a>. Before building
+<span class="caps">IPFIX</span> will need glib2 and its respective development libraries, I did
+not have the latter so a little <span class="caps">APT</span> action takes care of that for&nbsp;me.</p>
+<div class="highlight"><pre><span></span>$ sudo apt-get install libglib2-dev
+</pre></div>
+
+
+<p>Building libfixbuf is straigtforward once the prerequetes are in&nbsp;place.</p>
+<div class="highlight"><pre><span></span>$ ./configure --prefix<span class="o">=</span>/usr
+$ make
+$ make install
+</pre></div>
+
+
+<p>Next we are going to build <a href="http://tools.netsa.cert.org/yaf/index.html"><span class="caps">YAF</span> is Yet Another Flowmeter</a> which has several prerequisites. <em>libpcap</em> needs to be
+installed along with its respective development libraries. I also
+installed the required <em><span class="caps">PCRE</span></em> required libraries for application&nbsp;labeling.</p>
+<div class="highlight"><pre><span></span>$ sudo apt-get install libpcap-dev
+$ sudo apt-get install libpcre3-dev
+</pre></div>
+
+
+<p>Next we can build <span class="caps">YAF</span>.</p>
+<div class="highlight"><pre><span></span>$ ./configure --prefix<span class="o">=</span>/usr --enable-applabel
+$ make
+$ sudo make install
+</pre></div>
+
+
+<p>Now that everything is ready to go we have a little housekeeping to do
+on the <span class="caps">YAF</span> configuration files. I placed the <span class="caps">YAF</span> configuration file in
+<em>/etc/silk/yaf.conf</em>. This file contains all of the setting such as
+which interface to listen on, <span class="caps">IPFIX</span> port, etc.<em><br>
+</em></p>
+<div class="highlight"><pre><span></span>## ------------------------------------------------------------------------
+## yaf.conf
+## YAF daemon startup script configuration file
+## ------------------------------------------------------------------------
+## Copyright (C) 2007-2011 Carnegie Mellon University. All Rights Reserved.
+## ------------------------------------------------------------------------
+## Authors: Brian Trammell
+## ------------------------------------------------------------------------
+## GNU General Public License (GPL) Rights pursuant to Version 2, June 1991
+## Government Purpose License Rights (GPLR) pursuant to DFARS 252.227-7013
+## ------------------------------------------------------------------------
+
+# Must be non-empty to start YAF
+ENABLED=yes
+
+##### Capture Options ##########################################################
+
+# Live capture type. Must be pcap, or dag for Endace DAG if YAF was built
+# with libdag.
+YAF_CAP_TYPE=pcap
+
+# Live capture interface name.
+YAF_CAP_IF=eth0
+
+##### Export Options ###########################################################
+
+# IPFIX transport protocol to use for export. Must be one of tcp or udp, or
+# sctp if fixbuf was built with SCTP support.
+YAF_IPFIX_PROTO=tcp
+
+# Hostname or IP address of IPFIX collector to export flows to.
+YAF_IPFIX_HOST=localhost
+
+# If present, connect to the IPFIX collector on the specified port.
+# Defaults to port 4739, the IANA-assigned port for IPFIX
+YAF_IPFIX_PORT=18000
+
+##### Logging and State Options ################################################
+
+# Path to state location directory; contains the log and pidfiles unless
+# modified by the following configuration parameters.
+# Defaults to <span class="cp">${</span><span class="n">prefix</span><span class="cp">}</span>/var.
+#YAF_STATEDIR=
+
+# Path to PID file for YAF. Defaults to YAF_STATEDIR/yaf.pid
+#YAF_PIDFILE=
+
+# File or syslog facility name for YAF logging. If file, must be an absolute
+# path to a logfile. Defaults to YAF_STATEDIR/yaf.log
+#YAF_LOG=
+
+# File or syslog facility name for YAF airdaemon logging. If file, must be an
+# absolute path to a logfile. Defaults to YAF_STATEDIR/airdaemon-yaf.log
+#YAF_DAEMON_LOG=
+
+##### Miscellaneous Options ####################################################
+
+# If present, become the specified user after starting YAF
+#YAF_USER=
+
+# Additional flags to pass to the YAF process. Use --silk --ip4-only for
+# export to SiLK rwflowpack or SiLK flowcap.
+YAF_EXTRAFLAGS=&quot;--silk&quot;
+</pre></div>
+
+
+<p>Made sure there was a sensor definition in the <em>/netflow/silk.conf</em>.</p>
+<div class="highlight"><pre><span></span><span class="nx">sensor</span> <span class="mi">0</span> <span class="nx">s0</span>    <span class="s2">&quot;v5 netflow from router&quot;</span>
+<span class="nx">sensor</span> <span class="mi">1</span> <span class="nx">s1</span>    <span class="s2">&quot;YAF converted from tap&quot;</span>
+
+<span class="kr">class</span> <span class="nx">all</span>
+    <span class="nx">sensors</span> <span class="nx">s0</span> <span class="nx">s1</span>
+<span class="nx">end</span> <span class="kr">class</span>
+</pre></div>
+
+
+<p>The <em>/etc/silk/sensor.conf</em> configuration file also need to be updated
+with the new sensor definition. In this case s1 is our&nbsp;tap.</p>
+<div class="highlight"><pre><span></span>probe s0 netflow-v5
+    listen-on-port 9990
+    protocol udp
+    accept-from-host 172.16.0.1
+end probe
+
+sensor s0
+    netflow-v5-probes s0
+    internal-ipblocks 172.16.0.0/24
+    external-ipblocks remainder
+end sensor
+
+probe s1 ipfix
+    listen-on-port 18000
+    protocol tcp
+    accept-from-host 127.0.0.1
+end probe
+
+sensor s1
+    ipfix-probes s1
+    internal-ipblocks 172.16.0.0/24
+    external-ipblocks remainder
+end sensor
+</pre></div>
+
+
+<p>Lastly, start <span class="caps">YAF</span> assuming that you have rwflowpack running from the
+SiLK package per the previous&nbsp;[post][].</p>
+<div class="highlight"><pre><span></span>$ sudo yaf --silk --ipfix<span class="o">=</span>tcp --live<span class="o">=</span>pcap --in<span class="o">=</span>eth0 --out<span class="o">=</span><span class="m">127</span>.0.0.1 --ipfix-port<span class="o">=</span><span class="m">18000</span> <span class="p">&amp;</span>
+</pre></div>
+
+
+<p>You should now be capturing data and converting into a format that SiLK
+can process via <span class="caps">YAF</span>.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'configure-yaf-on-linux-for-netflow-collection-from-a-network-tap-or-span';
+                var disqus_url = 'https://www.rsreese.com/configure-yaf-on-linux-for-netflow-collection-from-a-network-tap-or-span/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Stephen Reese
+            &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-495000-2', 'auto', {'siteSpeedSampleRate': 25});
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+</body>
+</html>

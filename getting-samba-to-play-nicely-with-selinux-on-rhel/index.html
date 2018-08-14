@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en"
+>
+<head>
+    <title>Getting Samba to play nicely with SELinux on RHEL - Stephen Reese</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index,follow" />
+<link rel="canonical" href="/getting-samba-to-play-nicely-with-selinux-on-rhel/">
+        <meta name="author" content="Stephen Reese" />
+        <meta name="keywords" content="linux" />
+        <meta name="description" content="This helpful bit was written by Don Meyer. I am a little too stubborn for a quick fix like this, so I went the route of adding the specific rules needed to allow SMB/Winbindd to run without throwing AVC errors. I am doing this on RHEL4 boxes, which install …" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Stephen Reese ATOM Feed"/>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+rsreese.com            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/archives/">Archives</a></li>
+                         <li><a href="/about/">
+                             About
+                          </a></li>
+                         <li><a href="/contact/">
+                             Contact
+                          </a></li>
+                         <li><a href="/web-stack/">
+                             Web&nbsp;Stack
+                          </a></li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<div id="site-banner">
+        <div id="site-banner-brand">
+            <div>
+                <a href="/"><h1 class="center-block">Stephen Reese</h1></a>
+            </div>
+
+                <div id="social-banner">
+                    <ul class="list-group list-inline">
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="/contact/"><i class="fa fa-envelope fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://github.com/rsreese"><i class="fa fa-github fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://twitter.com/rsreese"><i class="fa fa-twitter fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.google.com/profiles/rsreese"><i class="fa fa-google-plus fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://facebook.com/rsreese"><i class="fa fa-facebook fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.linkedin.com/in/rsreese"><i class="fa fa-linkedin fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://feeds.feedburner.com/rsreese"><i class="fa fa-rss fa-lg"></i></a>
+                            </li>
+                    </ul>
+                </div>
+
+        </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/getting-samba-to-play-nicely-with-selinux-on-rhel/"
+                       rel="bookmark"
+                       title="Permalink to Getting Samba to play nicely with SELinux on RHEL">
+                        Getting Samba to play nicely with SELinux on <span class="caps">RHEL</span>
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+            <span>By</span>
+            <a href="/author/stephen-reese.html">Stephen Reese</a>
+
+    <span>on</span>
+    <span class="published">
+        <time datetime="2008-02-04T06:31:00-05:00"> Mon 04 February 2008</time>
+    </span>
+
+        <span><a href="/categories/">Category</a>:</span>
+        <a href="/category/administration/">administration</a>
+
+
+<span><a href="/tags/">Tags:</a></span>
+	<a href="/tag/linux/">linux</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>This helpful bit was written by Don&nbsp;Meyer.</p>
+<p>I am a little too stubborn for a quick fix like this, so I went the<br>
+route of adding the specific rules needed to allow <span class="caps">SMB</span>/Winbindd to<br>
+run without throwing <span class="caps">AVC</span> errors. I am doing this on <span class="caps">RHEL4</span> boxes,<br>
+which install with SElinux enforcing targeted by default &#8212; this<br>
+allows me to leave SElinux active for its additional&nbsp;protections.</p>
+<p>Doing it this way requires a little extra work,&nbsp;though&#8230;</p>
+<p>First, you need to install the selinux-policy-targeted-sources<br>
+package, if not already&nbsp;installed.</p>
+<p>When I build the RPMs from the source tarball, the first upgrade from<br>
+the default <span class="caps">RHEL4</span> packages changes the tdb directory from<br>
+/var/cache/samba/ to /var/lib/samba/. This is accomplished by<br>
+creating /var/lib/samba/ &#8212; Naturally, this royally mucks up the<br>
+SElinux labelings/permissions. So, immediately after the first<br>
+upgrade from <span class="caps">RHEL4</span> samba packages, (before starting either smb or<br>
+winbind) I need to do the&nbsp;following:</p>
+<div class="highlight"><pre><span></span>#chcon -Rt samba_var_t /var/lib/samba
+#mkdir /var/lib/samba/winbindd_privileged/
+#chcon -t winbind_var_run_t /var/lib/samba/winbindd_privileged/
+</pre></div>
+
+
+<p>Then, I drop the following file into the directory<br>&nbsp;/etc/selinux/targeted/src/policy/domains/misc/:</p>
+<p>winbind_add.te:</p>
+<div class="highlight"><pre><span></span><span class="nt">allow</span> <span class="nt">winbind_t</span> <span class="nt">etc_runtime_t</span><span class="p">:</span><span class="nd">file</span> <span class="nt">read</span><span class="o">;</span>
+<span class="nt">allow</span> <span class="nt">winbind_t</span> <span class="nt">proc_t</span><span class="p">:</span><span class="nd">file</span> <span class="nt">read</span><span class="o">;</span>
+<span class="nt">allow</span> <span class="nt">winbind_t</span> <span class="nt">etc_t</span><span class="p">:</span><span class="nd">file</span> <span class="nt">write</span><span class="o">;</span>
+<span class="nt">allow</span> <span class="nt">winbind_t</span> <span class="nt">samba_etc_t</span><span class="p">:</span><span class="nd">file</span> <span class="nt">write</span><span class="o">;</span>
+<span class="nt">allow</span> <span class="nt">winbind_t</span> <span class="nt">initrc_t</span><span class="p">:</span><span class="nd">process</span> <span class="p">{</span> <span class="err">signal</span> <span class="err">signull</span> <span class="p">}</span><span class="o">;</span>
+<span class="nt">allow</span> <span class="nt">winbind_t</span> <span class="nt">initrc_var_run_t</span><span class="p">:</span><span class="nd">file</span> <span class="p">{</span> <span class="err">lock</span> <span class="err">read</span> <span class="p">}</span><span class="o">;</span>
+<span class="nt">allow</span> <span class="nt">winbind_t</span> <span class="nt">var_lib_t</span><span class="p">:</span><span class="nd">dir</span> <span class="p">{</span> <span class="err">search</span> <span class="err">getattr</span> <span class="p">}</span><span class="o">;</span>
+<span class="nt">allow</span> <span class="nt">winbind_t</span> <span class="nt">var_lib_t</span><span class="p">:</span><span class="nd">dir</span> <span class="nt">search</span><span class="o">;</span>
+<span class="nt">allow</span> <span class="nt">winbind_t</span> <span class="nt">samba_log_t</span><span class="p">:</span><span class="nd">dir</span> <span class="p">{</span> <span class="err">create</span> <span class="err">setattr</span> <span class="p">}</span><span class="o">;</span>
+<span class="nt">allow</span> <span class="nt">winbind_t</span> <span class="nt">unconfined_t</span><span class="p">:</span><span class="nd">fifo_file</span> <span class="nt">read</span><span class="o">;</span>
+<span class="nt">allow</span> <span class="nt">winbind_t</span> <span class="nt">var_lib_t</span><span class="p">:</span><span class="nd">dir</span> <span class="nt">search</span><span class="o">;</span>
+</pre></div>
+
+
+<p>This file is what I currently need to add to the default SElinux<br>
+configuration to get Samba 3.0.23pre1 to work. What is needed seems<br>
+to change with each new version of Samba&#8230; (The default SElinux<br>
+ruleset for 3.0.10-1.3E.6 can be found in<br>&nbsp;&#8220;/etc/selinux/targeted/src/policy/domains/program/winbind.te&#8221;.)</p>
+<p>Finally, after this &#8220;extra&#8221; policy file is in place, you should chdir<br>
+to &#8220;/etc/selinux/targeted/src/policy/&#8221;, and run the following&nbsp;command:</p>
+<p>#make&nbsp;load</p>
+<p>After this, you should be able to start/restart the smb <span class="amp">&amp;</span> winbind<br>
+services without&nbsp;complaints.</p>
+<p>Now, some might ask &#8220;How do you derive these additional&nbsp;rules?&#8221;</p>
+<p>On a clean install, I install the packages, make the necessary mods,<br>
+and then set SElinux to&nbsp;non-enforcing:</p>
+<p>#setenforce&nbsp;0</p>
+<p>I then start &#8220;tail -f /var/log/messages > /tmp/samba_avc.log&#8221; in a<br>
+separate&nbsp;console.</p>
+<p>Next, I start the smb <span class="amp">&amp;</span> winbind services and get the running<br>
+properly. Running in non-enforcing mode allows all the error<br>
+messages to be generated in the logs, but the operations are allowed<br>
+to complete successfully. Once the services are running, I do a<br>
+couple user queries to prime the winbind system and have it sync with<br>
+the <span class="caps">AD</span>, etc. I then terminate the tail in the other console, and run<br>
+the following&nbsp;command:</p>
+<p>#audit2allow -i&nbsp;/tmp/samba_avc.log</p>
+<p>This outputs (to stdout) the additional rules necessary to allow all<br>
+of the operations that generated <span class="caps">AVC</span> error messages in the log<br>
+excerpt. This should be what is necessary to get everything running<br>
+&#8212; I copy these rules into the file I call winbind_add.te in<br>
+&#8220;/etc/selinux/targeted/src/domains/misc/&#8221;, and run the &#8220;make load&#8221;<br>
+command to force the system to reload the SElinux&nbsp;rules.</p>
+<p>Finally, I can shut down the smb <span class="amp">&amp;</span> winbind services, run &#8220;setenforce<br>
+1&#8221; to re-enable SElinux enforcing mode, and then restart smb &amp;<br>
+winbind. If all goes well, this should not generate any <span class="caps">AVC</span>&nbsp;errors&#8230;</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'getting-samba-to-play-nicely-with-selinux-on-rhel';
+                var disqus_url = 'https://www.rsreese.com/getting-samba-to-play-nicely-with-selinux-on-rhel/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Stephen Reese
+            &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-495000-2', 'auto', {'siteSpeedSampleRate': 25});
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+</body>
+</html>

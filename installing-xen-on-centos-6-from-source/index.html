@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en"
+>
+<head>
+    <title>Installing Xen on CentOS 6 from source - Stephen Reese</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index,follow" />
+<link rel="canonical" href="/installing-xen-on-centos-6-from-source/">
+        <meta name="author" content="Stephen Reese" />
+        <meta name="keywords" content="linux,xen,virtualization" />
+        <meta name="description" content="I recently had a need to install Xen hypervisor on CentOS and most of the guides covered using the package maintainers version. Further, RHEL distributions favor using KVM. I did come across HowTo: Install XEN Dom0 on CentOS 6 from source but the domain was blocked (Google cache made quick …" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Stephen Reese ATOM Feed"/>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+rsreese.com            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/archives/">Archives</a></li>
+                         <li><a href="/about/">
+                             About
+                          </a></li>
+                         <li><a href="/contact/">
+                             Contact
+                          </a></li>
+                         <li><a href="/web-stack/">
+                             Web&nbsp;Stack
+                          </a></li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<div id="site-banner">
+        <div id="site-banner-brand">
+            <div>
+                <a href="/"><h1 class="center-block">Stephen Reese</h1></a>
+            </div>
+
+                <div id="social-banner">
+                    <ul class="list-group list-inline">
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="/contact/"><i class="fa fa-envelope fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://github.com/rsreese"><i class="fa fa-github fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://twitter.com/rsreese"><i class="fa fa-twitter fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.google.com/profiles/rsreese"><i class="fa fa-google-plus fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://facebook.com/rsreese"><i class="fa fa-facebook fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.linkedin.com/in/rsreese"><i class="fa fa-linkedin fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://feeds.feedburner.com/rsreese"><i class="fa fa-rss fa-lg"></i></a>
+                            </li>
+                    </ul>
+                </div>
+
+        </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/installing-xen-on-centos-6-from-source/"
+                       rel="bookmark"
+                       title="Permalink to Installing Xen on CentOS 6 from source">
+                        Installing Xen on CentOS 6 from&nbsp;source
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+            <span>By</span>
+            <a href="/author/stephen-reese.html">Stephen Reese</a>
+
+    <span>on</span>
+    <span class="published">
+        <time datetime="2013-06-29T17:33:00-04:00"> Sat 29 June 2013</time>
+    </span>
+
+        <span><a href="/categories/">Category</a>:</span>
+        <a href="/category/administration/">administration</a>
+
+
+<span><a href="/tags/">Tags:</a></span>
+	<a href="/tag/linux/">linux</a>
+        /
+	<a href="/tag/xen/">xen</a>
+        /
+	<a href="/tag/virtualization/">virtualization</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>I recently had a need to install Xen hypervisor on CentOS and most of
+the guides covered using the package maintainers version. Further, <span class="caps">RHEL</span>
+distributions favor using <span class="caps">KVM</span>. I did come across <a href="http://blog.tidyhosts.com/index.php/howto-install-xen-dom0-on-centos-6-from-source">HowTo: Install <span class="caps">XEN</span>
+Dom0 on CentOS 6 from source</a> but the domain was blocked (Google cache
+made quick work of getting around that issue) and there were a few steps
+that felt unclear. I took that guide and made a few changes which are
+reflected below. You may want to also reference the Xen <a href="http://wiki.xen.org/wiki/Compiling_Xen_From_Source">Wiki</a> CenOS
+6.2, Xen 4.2.1, and Kernel version 3.9.2 were used in this example but
+newer and older versions should be&nbsp;similar.</p>
+<p>First install&nbsp;dependencies:</p>
+<div class="highlight"><pre><span></span>yum groupinstall &quot;Development Libraries&quot;
+yum groupinstall &quot;Development Tools&quot;
+yum install transfig wget tar less texi2html libaio-devel dev86 glibc-devel e2fsprogs-devel gitk mkinitrd iasl xz-devel bzip2-devel
+yum install pciutils-libs pciutils-devel SDL-devel libX11-devel gtk2-devel bridge-utils PyXML qemu-common qemu-img mercurial texinfo
+yum install libidn-devel yajl yajl-devel ocaml ocaml-findlib ocaml-findlib-devel python-devel uuid-devel libuuid-devel openssl-devel
+yum install glibc-devel.i686
+yum install
+libvirt python-virtinst
+</pre></div>
+
+
+<p>Download the latest Xen <a href="http://www.xenproject.org/downloads/xen-archives.html">source package</a>.</p>
+<div class="highlight"><pre><span></span>$ tar xzf xen-4.2.1.tar.gz
+$ <span class="nb">cd</span> xen-4.2.1
+$ ./configure
+$ make xen <span class="o">&amp;&amp;</span> make tools <span class="o">&amp;&amp;</span> make stubdom
+$ sudo make install xen
+$ sudo make install xen-tools
+$ sudo make install stubdom
+</pre></div>
+
+
+<p>Prevent the screen from powering&nbsp;off:</p>
+<div class="highlight"><pre><span></span>$ sudo sh -c <span class="s2">&quot;echo &#39;/usr/bin/setterm -powersave off&#39; &gt;&gt; /etc/rc.local&quot;</span>
+</pre></div>
+
+
+<p>Define the resources for domain&nbsp;0:</p>
+<div class="highlight"><pre><span></span>$ sudo sh -c <span class="s2">&quot;echo &#39;xl sched-credit -d Domain-0 -w 512&#39; &gt;&gt; /etc/xendom0caps&quot;</span>
+$ sudo chmod +x /etc/xendom0caps
+</pre></div>
+
+
+<p>Start the services at&nbsp;boot:</p>
+<div class="highlight"><pre><span></span>sudo ln -s /etc/init.d/xendomains /etc/rc0.d/S10xendomains
+sudo ln -s /etc/init.d/xendomains /etc/rc6.d/S10xendomains
+sudo ln -s /etc/init.d/xendomains /etc/rc3.d/S98xendomains
+sudo ln -s /etc/init.d/xencommons /etc/rc3.d/S98xencommons
+sudo ln -s /etc/xendom0caps /etc/rc3.d/S97xendom0caps
+</pre></div>
+
+
+<p>Optionally for those that want to use the xm&nbsp;commands.</p>
+<div class="highlight"><pre><span></span>sudo ln -s /etc/init.d/xend /etc/rc3.d/S98xend
+</pre></div>
+
+
+<p>Make sure everything is going to start at the correct runlevel. Note
+that <strong>xend</strong> is&nbsp;optional</p>
+<div class="highlight"><pre><span></span>$ chkconfig --list <span class="p">|</span>grep xen
+xencommons      <span class="m">0</span>:off   <span class="m">1</span>:off   <span class="m">2</span>:off   <span class="m">3</span>:on    <span class="m">4</span>:off   <span class="m">5</span>:off   <span class="m">6</span>:off
+xend            <span class="m">0</span>:off   <span class="m">1</span>:off   <span class="m">2</span>:off   <span class="m">3</span>:on    <span class="m">4</span>:off   <span class="m">5</span>:off   <span class="m">6</span>:off
+xendomains      <span class="m">0</span>:on    <span class="m">1</span>:off   <span class="m">2</span>:off   <span class="m">3</span>:on    <span class="m">4</span>:off   <span class="m">5</span>:off   <span class="m">6</span>:on
+</pre></div>
+
+
+<p>Make sure the weight is setup, this may vary depending your
+needs/resources&nbsp;available.</p>
+<div class="highlight"><pre><span></span>$ sudo xl sched-credit
+Cpupool Pool-0: <span class="nv">tslice</span><span class="o">=</span>30ms <span class="nv">ratelimit</span><span class="o">=</span>1000us
+Name                                ID Weight  Cap
+Domain-0                             <span class="m">0</span>    <span class="m">512</span>    <span class="m">0</span>
+Wheezy                               <span class="m">3</span>    <span class="m">256</span>    <span class="m">0</span>
+</pre></div>
+
+
+<p><a href="https://www.kernel.org/">Download</a> the latest kernel version you would like to use and extract
+the contents of the archive. You can try pulling your configuration via
+&#8220;<em>make oldconfig</em>&#8220;, so your old settings are migrated and only new or
+changed options are presented to you to select. Then to make sure
+everything is ok, run &#8220;<em>make menuconfig</em>&#8221; or &#8220;<em>make xconfig</em>&#8221; to
+determine if the feature/module setting are appropriate for you. I left
+everything alone with the exception of enabling the Xen features as
+described below. <em>make oldconfig</em> is clever, it can do its job between
+different versions of kernel although just issuing a &#8220;<em>make menuconfig</em>&#8221;
+is probably also&nbsp;fine.</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> linux-3.9.2
+$ make oldconfig
+scripts/kconfig/conf --oldconfig Kconfig
+<span class="c1">#</span>
+<span class="c1"># configuration written to .config</span>
+<span class="c1">#</span>
+</pre></div>
+
+
+<p>Alternatively just use the defaults and add the required Xen&nbsp;features:</p>
+<div class="highlight"><pre><span></span>$ <span class="nb">cd</span> linux-3.9.2
+$ make menuconfig
+</pre></div>
+
+
+<p>Location:<br>
+-> Processor type and features<br>
+-> Paravirtualized guest support<br>
+Select all&nbsp;features.</p>
+<p><img alt="makemenu3" src="/assets/makemenu3.png"></p>
+<p><img alt="makemenu2" src="/assets/makemenu2.png"></p>
+<p><img alt="makemenu4" src="/assets/makemenu4.png"></p>
+<p>Location:<br>
+-> Device Drivers<br>
+-> Block devices<br>
+Select the two features &#8220;Xen virtual block device support&#8221; and &#8220;Xen
+block-device backend&nbsp;driver&#8221;</p>
+<p><img alt="makemenu5" src="/assets/makemenu5.png"></p>
+<p><img alt="makemenu6" src="/assets/makemenu6.png"></p>
+<p><img alt="makemenu7" src="/assets/makemenu7.png"></p>
+<p>Location:<br>
+-> Device Drivers<br>
+-> Xen driver support<br>
+Select all&nbsp;features.</p>
+<p><img alt="makemenu5" src="/assets/makemenu5.png"></p>
+<p><img alt="makemenu8" src="/assets/makemenu8.png"></p>
+<p><img alt="makemenu9" src="/assets/makemenu9.png"></p>
+<p>Location:<br>
+-> Device Drivers<br>
+-> Network device support<br>
+Select the two features &#8220;Xen network device frontend driver&#8221; and &#8220;Xen
+backend network&nbsp;device&#8221;</p>
+<p><img alt="makemenu5" src="/assets/makemenu5.png"></p>
+<p><img alt="makemenu10" src="/assets/makemenu10.png"></p>
+<p><img alt="makemenu11" src="/assets/makemenu11.png"></p>
+<p>Lastly, you can search using &#8220;/&#8221; when at the root menu to see what you
+have&nbsp;enabled:</p>
+<p><img alt="makemenu1" src="/assets/makemenu1.png"></p>
+<p>Which will provide you a list of features that have been selected but it
+may be easier to grep through the .config as shown in the next&nbsp;command.</p>
+<p><img alt="makemenu12" src="/assets/makemenu12.png"></p>
+<p>You can use &#8220;<em>grep</em>&#8221; to ensure you should have similar values for your
+Xen settings after running menu&nbsp;config.</p>
+<div class="highlight"><pre><span></span>$ grep XEN .config
+<span class="nv">CONFIG_XEN</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_DOM0</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_PRIVILEGED_GUEST</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_PVHVM</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_MAX_DOMAIN_MEMORY</span><span class="o">=</span><span class="m">500</span>
+<span class="nv">CONFIG_XEN_SAVE_RESTORE</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_DEBUG_FS</span><span class="o">=</span>y
+<span class="nv">CONFIG_PCI_XEN</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_PCIDEV_FRONTEND</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_BLKDEV_FRONTEND</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_BLKDEV_BACKEND</span><span class="o">=</span>y
+<span class="nv">CONFIG_NETXEN_NIC</span><span class="o">=</span>m
+<span class="nv">CONFIG_XEN_NETDEV_FRONTEND</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_NETDEV_BACKEND</span><span class="o">=</span>y
+<span class="nv">CONFIG_INPUT_XEN_KBDDEV_FRONTEND</span><span class="o">=</span>y
+<span class="nv">CONFIG_HVC_XEN</span><span class="o">=</span>y
+<span class="nv">CONFIG_HVC_XEN_FRONTEND</span><span class="o">=</span>y
+<span class="c1"># CONFIG_XEN_WDT is not set</span>
+<span class="nv">CONFIG_XEN_FBDEV_FRONTEND</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_BALLOON</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_BALLOON_MEMORY_HOTPLUG</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_SCRUB_PAGES</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_DEV_EVTCHN</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_BACKEND</span><span class="o">=</span>y
+<span class="nv">CONFIG_XENFS</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_COMPAT_XENFS</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_SYS_HYPERVISOR</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_XENBUS_FRONTEND</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_GNTDEV</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_GRANT_DEV_ALLOC</span><span class="o">=</span>y
+<span class="nv">CONFIG_SWIOTLB_XEN</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_PCIDEV_BACKEND</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_PRIVCMD</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_ACPI_PROCESSOR</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_MCE_LOG</span><span class="o">=</span>y
+<span class="nv">CONFIG_XEN_HAVE_PVMMU</span><span class="o">=</span>y
+</pre></div>
+
+
+<p>If all of the Xen features are enabled, move on to&nbsp;compiling.</p>
+<div class="highlight"><pre><span></span>$ make bzImage
+$ make modules
+$ sudo make modules_install
+</pre></div>
+
+
+<p>Copy the images to the appropriate&nbsp;locations.</p>
+<div class="highlight"><pre><span></span>$ sudo cp -a arch/x86/boot/bzImage /boot/vmlinuz-3.9.2
+$ sudo cp -a System.map /boot/System.map-3.9.2
+$ sudo cp -a .config /boot/config-3.9.2
+$ sudo depmod -a
+$ sudo mkinitrd /boot/initrd.img-3.9.2 <span class="m">3</span>.9.2
+</pre></div>
+
+
+<p>Add a grub entry to /etc/grub.conf, make sure it is the first entry but
+leave an existing distribution kernel entry to fall back to if there are&nbsp;problems:</p>
+<div class="highlight"><pre><span></span>title Xen 4.2.1 / Kernel 3.9.2
+root (hd0,0)
+kernel /xen.gz
+module /vmlinuz-3.9.2
+module /initrd.img-3.9.2
+</pre></div>
+
+
+<p>Reboot the system and you should be able to run the following command to
+verify that your efforts have paid&nbsp;off.</p>
+<div class="highlight"><pre><span></span>$ sudo xl list
+Name                                        ID   Mem VCPUs      State   Time<span class="o">(</span>s<span class="o">)</span>
+Domain-0                                     <span class="m">0</span>  <span class="m">2048</span>     <span class="m">1</span>     r-----     <span class="m">941</span>.4
+</pre></div>
+
+
+<p>Now you can move on to setting up a guest as described in <a href="http://www.rsreese.com/creating-debian-guests-on-xen-using-parition-based-filesystem/" title="Creating Debian guests on Xen using parition based filesystem">Creating
+Debian guests on Xen using parition based filesystem</a>.</p>
+<p>If you are unable to reboot using your new kernel, revert back to a
+distro kernel and double check that you have done everything as
+described. If something is not clear or could be improved upon, let me
+know by leaving a comment&nbsp;below.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'installing-xen-on-centos-6-from-source';
+                var disqus_url = 'https://www.rsreese.com/installing-xen-on-centos-6-from-source/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Stephen Reese
+            &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-495000-2', 'auto', {'siteSpeedSampleRate': 25});
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+</body>
+</html>

@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="en"
+>
+<head>
+    <title>Configure SiLK on Linux for NetFlow collection from a Cisco router - Stephen Reese</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index,follow" />
+<link rel="canonical" href="/configure-silk-on-linux-for-netflow-collection-from-a-cisco-router/">
+        <meta name="author" content="Stephen Reese" />
+        <meta name="keywords" content="cisco,linux,netflow,silk" />
+        <meta name="description" content="This guide walks through configuring SiLK from a source install on a Debian 6 host in order to collect NetFlow data from a Cisco router. The guides here and here written by CERT NetSA are quite good but lack some detail specific to the Debian distribution which required a bit …" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Stephen Reese ATOM Feed"/>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+rsreese.com            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/archives/">Archives</a></li>
+                         <li><a href="/about/">
+                             About
+                          </a></li>
+                         <li><a href="/contact/">
+                             Contact
+                          </a></li>
+                         <li><a href="/web-stack/">
+                             Web&nbsp;Stack
+                          </a></li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<div id="site-banner">
+        <div id="site-banner-brand">
+            <div>
+                <a href="/"><h1 class="center-block">Stephen Reese</h1></a>
+            </div>
+
+                <div id="social-banner">
+                    <ul class="list-group list-inline">
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="/contact/"><i class="fa fa-envelope fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://github.com/rsreese"><i class="fa fa-github fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://twitter.com/rsreese"><i class="fa fa-twitter fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.google.com/profiles/rsreese"><i class="fa fa-google-plus fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://facebook.com/rsreese"><i class="fa fa-facebook fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.linkedin.com/in/rsreese"><i class="fa fa-linkedin fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://feeds.feedburner.com/rsreese"><i class="fa fa-rss fa-lg"></i></a>
+                            </li>
+                    </ul>
+                </div>
+
+        </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/configure-silk-on-linux-for-netflow-collection-from-a-cisco-router/"
+                       rel="bookmark"
+                       title="Permalink to Configure SiLK on Linux for NetFlow collection from a Cisco router">
+                        Configure SiLK on Linux for NetFlow collection from a Cisco&nbsp;router
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+            <span>By</span>
+            <a href="/author/stephen-reese.html">Stephen Reese</a>
+
+    <span>on</span>
+    <span class="published">
+        <time datetime="2011-08-15T00:43:00-04:00"> Mon 15 August 2011</time>
+    </span>
+
+        <span><a href="/categories/">Category</a>:</span>
+        <a href="/category/security/">security</a>
+
+
+<span><a href="/tags/">Tags:</a></span>
+	<a href="/tag/cisco/">cisco</a>
+        /
+	<a href="/tag/linux/">linux</a>
+        /
+	<a href="/tag/netflow/">netflow</a>
+        /
+	<a href="/tag/silk/">silk</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>This guide walks through configuring <a href="http://tools.netsa.cert.org/silk/index.html">SiLK</a> from a source install on a
+<a href="http://www.debian.org/">Debian</a> 6 host in order to collect <a href="https://www.cisco.com/en/US/products/ps6601/products_ios_protocol_group_home.html">NetFlow</a> data from a Cisco
+router. The guides <a href="http://tools.netsa.cert.org/silk/install-handbook.html#x1-130002">here</a> and <a href="https://tools.netsa.cert.org/confluence/display/tt/Configure+SiLK+for+NetFlow+collection+from+a+Cisco+router">here</a> written by <span class="caps">CERT</span> <a href="https://www.cert.org/netsa/">NetSA</a> are
+quite good but lack some detail specific to the Debian distribution
+which required a bit of mucking about to get everything functioning
+correctly. This assumes that you have a Cisco router to send NetFlow
+data to a host on your network, in this case, a Debian&nbsp;host.</p>
+<p>Installation:</p>
+<p>First install a&nbsp;prerequisite.</p>
+<div class="highlight"><pre><span></span>$ sudo apt-get install libpcap-dev
+</pre></div>
+
+
+<p>Next untar and change into the SiLK directory. For Debian I found that
+using the <em>/usr</em> directory worked well. By default the configure script
+uses <em>/usr/local</em> in which it places the binaries, libraries, etc
+outside of Debians default&nbsp;paths.</p>
+<div class="highlight"><pre><span></span>$ ./configure --prefix<span class="o">=</span>/usr --sysconfdir<span class="o">=</span>/etc/silk --enable-data-rootdir<span class="o">=</span>/netflow   
+--enable-ipv6 --enable-output-compression
+</pre></div>
+
+
+<p>Your output should be something along the&nbsp;following:</p>
+<div class="highlight"><pre><span></span>    * Configured package:           SiLK 2.4.5
+    * Host type:                    x86_64-unknown-linux-gnu
+    * Source files ($top_srcdir):   .
+    * Install directory:            /usr
+    * Root of packed data tree:     /netflow
+    * Packing logic:                via run-time plugin
+    * Timezone support:             UTC
+    * Default compression method:   SK_COMPMETHOD_ZLIB
+    * IPv6 support:                 YES
+    * IPFIX collection support:     YES (-pthread -lfixbuf -lgthread-2.0 -lrt -lglib-2.0)
+    * Transport encryption support: NO (gnutls not found)
+    * IPA support:                  NO
+    * LIBPCAP support:              YES (-lpcap)
+    * ADNS support:                 NO
+    * Python support:               NO
+    * Build analysis tools:         YES
+    * Build packing tools:          YES
+    * Compiler (CC):                gcc
+    * Compiler flags (CFLAGS):      -I$(srcdir) -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -DNDEBUG -O3 -fno-strict-aliasing -Wall -W -Wmissing-prototypes -Wformat=2 -Wdeclaration-after-statement -Wpointer-arith
+    * Linker flags (LDFLAGS):
+    * Libraries (LIBS):             -lz -ldl -lm
+</pre></div>
+
+
+<p>Lastly:</p>
+<div class="highlight"><pre><span></span>$ make
+$ sudo make install
+</pre></div>
+
+
+<p>Configuration:</p>
+<p>Example files are available in the tarball that you extracted. Modified
+versions or notes for Debian and similar architectures available&nbsp;below.</p>
+<p><em>/netflow/silk.conf</em> in your data directory, the default is <em>/data</em> but
+I used /netflow as you can see in the configure toggle above. The
+changes I made were to reduce the number of&nbsp;sensors.</p>
+<div class="highlight"><pre><span></span><span class="err">#</span> <span class="nx">The</span> <span class="nx">syntactic</span> <span class="nx">format</span> <span class="nx">of</span> <span class="k">this</span> <span class="nx">file</span>
+<span class="err">#</span>    <span class="nx">version</span> <span class="mi">2</span> <span class="nx">supports</span> <span class="nx">sensor</span> <span class="nx">descriptions</span><span class="p">,</span> <span class="nx">but</span> <span class="nx">otherwise</span> <span class="nx">identical</span> <span class="nx">to</span> <span class="mi">1</span>
+<span class="nx">version</span> <span class="mi">2</span>
+
+<span class="nx">sensor</span> <span class="mi">0</span> <span class="nx">s0</span>    <span class="s2">&quot;Description for sensor S0&quot;</span>
+<span class="nx">sensor</span> <span class="mi">1</span> <span class="nx">s1</span>
+
+<span class="kr">class</span> <span class="nx">all</span>
+    <span class="nx">sensors</span> <span class="nx">s0</span> <span class="nx">s1</span>
+<span class="nx">end</span> <span class="kr">class</span>
+
+<span class="err">#</span> <span class="nx">Editing</span> <span class="nx">above</span> <span class="k">this</span> <span class="nx">line</span> <span class="nx">is</span> <span class="nx">sufficient</span> <span class="k">for</span> <span class="nx">sensor</span> <span class="nx">definition</span><span class="p">.</span>
+</pre></div>
+
+
+<p><em>/etc/silk/sensor.conf</em> is the definition for the data coming in from
+your Cisco&nbsp;router:</p>
+<div class="highlight"><pre><span></span>probe s0 netflow-v5
+    listen-on-port 9990
+    protocol udp
+    accept-from-host 172.16.0.1
+end probe
+
+sensor s0
+    netflow-v5-probes s0
+    internal-ipblocks 172.16.0.0/24
+    external-ipblocks remainder
+end sensor
+</pre></div>
+
+
+<p><em>/etc/silk/rwflowpack.conf</em>:</p>
+<div class="highlight"><pre><span></span>### Packer configuration file  -*- sh -*-
+##
+## The canonical pathname for this file is /usr/local/etc/rwflowpack.conf
+##
+## RCSIDENT(&quot;<span class="nv">$SiLK</span>: rwflowpack.conf.in 16306 2010-09-15 18:14:41Z mthomas $&quot;)
+##
+## This is a /bin/sh file that gets loaded by the init.d/rwflowpack
+## wrapper script, and this file must follow /bin/sh syntax rules.
+
+# Set to non-empty value to enable rwflowpack
+ENABLED=yes
+
+# These are convenience variables for setting other values in this
+# configuration file; their use is not required.
+statedirectory=/var/lib/rwflowpack
+
+# If CREATE_DIRECTORIES is set to &quot;yes&quot;, the directories named in this
+# file will be created automatically if they do not already exist
+CREATE_DIRECTORIES=yes
+
+# Full path of the directory containing the &quot;rwflowpack&quot; program
+BIN_DIR=/usr/sbin
+
+# The full path to the sensor configuration file.  Used by
+# --sensor-configuration.  YOU MUST PROVIDE THIS (the value is ignored
+# when INPUT_MODE is &quot;respool&quot;).
+SENSOR_CONFIG=/etc/silk/sensor.conf
+
+# The full path to the root of the tree under which the packed SiLK
+# Flow files will be written.  Used by --root-directory.
+DATA_ROOTDIR=/netflow
+
+# The full path to the site configuration file.  Used by
+# --site-config-file.  If not set, defaults to silk.conf in the
+# <span class="cp">${</span><span class="n">DATA_ROOTDIR</span><span class="cp">}</span>.
+SITE_CONFIG=/netflow/silk.conf
+
+# Specify the path to the packing-logic plug-in that rwflowpack should
+# load and use.  The plug-in provides functions that determine into
+# which class and type each flow record will be categorized and the
+# format of the files that rwflowpack will write.  When SiLK has been
+# configured with hard-coded packing logic (i.e., when
+# --enable-packing-logic was specified to the configure script), this
+# value should be empty.  A default value for this switch may be
+# specified in the <span class="cp">${</span><span class="n">SITE_CONFIG</span><span class="cp">}</span> site configuration file.  This value
+# is ignored when INPUT_MODE is &quot;respool&quot;.
+PACKING_LOGIC=
+
+# Data input mode.  Valid values are:
+#  * &quot;stream&quot; mode to read from the network or from probes that have
+#    poll-directories
+#  * &quot;fcfiles&quot; to process flowcap files on the local disk
+#  * &quot;respool&quot; to process SiLK flow files maintaining the sensor and
+#    class/type values that already exist on those records.
+INPUT_MODE=stream
+
+# Directory in which to look for incoming flowcap files in &quot;fcfiles&quot;
+# mode or for incoming SiLK files in &quot;respool&quot; mode
+INCOMING_DIR=<span class="cp">${</span><span class="n">statedirectory</span><span class="cp">}</span>/incoming
+
+# Directory to move input files to after successful processing.  When
+# in &quot;stream&quot; mode, these are the files passed to any probe with a
+# poll-directory directive.  When in &quot;fcfiles&quot; mode, these are the
+# flowcap files.  When in &quot;respool&quot; mode, these are the SiLK Flow
+# files.  If not set, the input files are not archived but are deleted
+# instead.
+ARCHIVE_DIR=<span class="cp">${</span><span class="n">statedirectory</span><span class="cp">}</span>/archive
+
+# When using the ARCHIVE_DIR, normally files are stored in
+# subdirectories of the ARCHIVE_DIR.  If this variable&#39;s value is 1,
+# files are stored in ARCHIVE_DIR itself, not in subdirectories of it.
+FLAT_ARCHIVE=0
+
+# Directory to move an input file into if there is a problem opening
+# the file.  If this value is not set, rwflowpack will exit when it
+# encounters a problem file.  When in &quot;fcfiles&quot; mode, these are the
+# flowcap files.  When in &quot;stream&quot; mode, these are the files passed to
+# any probe with a poll-directory directive.
+ERROR_DIR=  #<span class="cp">${</span><span class="n">statedirectory</span><span class="cp">}</span>/error
+
+# Data output mode.  Valid values are &quot;local&quot; and &quot;remote&quot;.  &quot;local&quot;
+# writes the hourly data files to the local disk.  &quot;remote&quot; creates
+# small files (called incremental files) that must be processed by
+# rwflowappend to create the hourly files.
+OUTPUT_MODE=local
+
+# Directory in which the incremental files are written when the
+# OUTPUT_MODE is &quot;remote&quot;.  Typically there is an rwsender deamon that
+# polls this directory for new incremental files.
+SENDER_DIR=<span class="cp">${</span><span class="n">statedirectory</span><span class="cp">}</span>/sender-incoming
+
+# Temporary directory in which to build incremental files prior to
+# handing them to rwsender.  Used only when OUTPUT_MODE is &quot;remote&quot;.
+INCREMENTAL_DIR=<span class="cp">${</span><span class="n">statedirectory</span><span class="cp">}</span>/incremental
+
+
+# The type of compression to use for packed files.  Left empty, the
+# value chosen at compilation time will be used.  Valid values are
+# &quot;best&quot; and &quot;none&quot;.  Other values are system-specific (the available
+# values are listed in the description of the --compression-method
+# switch in the output of rwflowpack --help).
+COMPRESSION_TYPE=best
+
+# Interval between attempts to check the INCOMING_DIR or
+# poll-directory probe entries for new files, in seconds.  This may be
+# left blank, and will default to 15.
+POLLING_INTERVAL=
+
+# Interval between periodic flushes of open SiLK Flow files to disk,
+# in seconds.  This may be left blank, and will default to 120.
+FLUSH_TIMEOUT=
+
+# Maximum number of SiLK Flow files to have open for writing
+# simultaneously.  This may be left blank, and will default to 64
+FILE_CACHE_SIZE=
+
+# Whether rwflowpack should use advisory write locks.  1=yes, 0=no.
+# Set to zero if messages like &quot;Cannot get a write lock on file&quot;
+# appear in rwflowpack&#39;s log file.
+FILE_LOCKING=1
+
+# Whether rwflowpack should include the input and output SNMP
+# interfaces and the next-hop-ip in the output files.  1=yes, 0=no.
+# The default is no, and these values are not stored to save disk
+# space.  (The input and output fields contain VLAN tags when the
+# sensor.conf file contains the attribute &quot;interface-values vlan&quot;.)
+PACK_INTERFACES=0
+
+
+###
+
+# The type of logging to use.  Valid values are &quot;legacy&quot; and &quot;syslog&quot;.
+LOG_TYPE=syslog
+
+# The lowest level of logging to actually log.  Valid values are:
+# emerg, alert, crit, err, warning, notice, info, debug
+LOG_LEVEL=info
+
+# The full path of the directory where the log files will be written
+# when LOG_TYPE is &quot;legacy&quot;.
+LOG_DIR=/var/log
+
+# The full path of the directory where the PID file will be written
+PID_DIR=<span class="cp">${</span><span class="n">LOG_DIR</span><span class="cp">}</span>
+
+# The user this program runs as; root permission is required only when
+# rwflowpack listens on a privileged port.
+USER=root
+#USER=`whoami`  # run as user invoking the script
+
+# Extra options to pass to rwflowpack
+EXTRA_OPTIONS=
+</pre></div>
+
+
+<p><em>/etc/init.d/rwflowback</em> directory, the only change was to line 38 in
+order to change to the configuration specified in the configure&nbsp;statement.</p>
+<div class="highlight"><pre><span></span>SCRIPT_CONFIG_LOCATION=&quot;/etc/silk&quot;
+</pre></div>
+
+
+<p>With everything installed in their respective locations it is time to
+move on to setting up the Cisco&nbsp;device.</p>
+<div class="highlight"><pre><span></span>Router(config)# ip cef 
+Router(config)# ip flow-export source Loopback0 
+Router(config)# ip flow-export version 5 
+Router(config)# ip flow-export destination x.x.x.x 9990 
+Router(config)# interface  f1/0 
+Router(config-if)# ip flow ingress 
+Router(config-if)# ip flow egress
+</pre></div>
+
+
+<p>I hope this helps. If you have any comments or questions, leave a
+comment&nbsp;below.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'configure-silk-on-linux-for-netflow-collection-from-a-cisco-router';
+                var disqus_url = 'https://www.rsreese.com/configure-silk-on-linux-for-netflow-collection-from-a-cisco-router/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Stephen Reese
+            &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-495000-2', 'auto', {'siteSpeedSampleRate': 25});
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+</body>
+</html>

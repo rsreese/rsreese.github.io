@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en"
+>
+<head>
+    <title>Keeping your hardware safe and avoiding the evil maid - Stephen Reese</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index,follow" />
+<link rel="canonical" href="/keeping-your-hardware-safe-and-avoiding-the-evil-maid/">
+        <meta name="author" content="Stephen Reese" />
+        <meta name="keywords" content="evil bits,exploits,physical security" />
+        <meta name="description" content="This installment is about keeping your notebook and other technology items safe. I was recently asked what the Defcon locks were for that I have been distributing with the new notebooks. I jokingly said to keep people from taking your monitor and chair from your desk while your on travel …" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Stephen Reese ATOM Feed"/>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+rsreese.com            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/archives/">Archives</a></li>
+                         <li><a href="/about/">
+                             About
+                          </a></li>
+                         <li><a href="/contact/">
+                             Contact
+                          </a></li>
+                         <li><a href="/web-stack/">
+                             Web&nbsp;Stack
+                          </a></li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<div id="site-banner">
+        <div id="site-banner-brand">
+            <div>
+                <a href="/"><h1 class="center-block">Stephen Reese</h1></a>
+            </div>
+
+                <div id="social-banner">
+                    <ul class="list-group list-inline">
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="/contact/"><i class="fa fa-envelope fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://github.com/rsreese"><i class="fa fa-github fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://twitter.com/rsreese"><i class="fa fa-twitter fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.google.com/profiles/rsreese"><i class="fa fa-google-plus fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://facebook.com/rsreese"><i class="fa fa-facebook fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.linkedin.com/in/rsreese"><i class="fa fa-linkedin fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://feeds.feedburner.com/rsreese"><i class="fa fa-rss fa-lg"></i></a>
+                            </li>
+                    </ul>
+                </div>
+
+        </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/keeping-your-hardware-safe-and-avoiding-the-evil-maid/"
+                       rel="bookmark"
+                       title="Permalink to Keeping your hardware safe and avoiding the evil maid">
+                        Keeping your hardware safe and avoiding the evil&nbsp;maid
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+            <span>By</span>
+            <a href="/author/stephen-reese.html">Stephen Reese</a>
+
+    <span>on</span>
+    <span class="published">
+        <time datetime="2010-11-23T21:17:00-05:00"> Tue 23 November 2010</time>
+    </span>
+
+        <span><a href="/categories/">Category</a>:</span>
+        <a href="/category/security/">security</a>
+
+
+<span><a href="/tags/">Tags:</a></span>
+	<a href="/tag/evil-bits/">evil bits</a>
+        /
+	<a href="/tag/exploits/">exploits</a>
+        /
+	<a href="/tag/physical-security/">physical security</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>This installment is about keeping your notebook and other technology
+items safe. I was recently asked what the Defcon locks were for that I
+have been distributing with the new notebooks. I jokingly said to keep
+people from taking your monitor and chair from your desk while your on
+travel but there is a better reason I distribute&nbsp;them.</p>
+<p>People assume having your hardware stolen is the ultimate way to
+compromise your data. An adversary that is smart enough will know better
+though. A system running TrueCrypt or similar encryption is a near
+impossible target if powered off while you are away but a system running
+encryption that powered on on, not so much. Passwords and keys to most
+encryption are <a href="http://en.wikipedia.org/wiki/TrueCrypt#Passwords_stored_in_memory">stored in memory</a> while the system is running.
+Recovering said keys is not an easy task but is possible. If you cannot
+break the habit of leaving your device on when not around or putting it
+standby because you cannot stand the boot up time then make sure you are
+using strong passwords that a difficult to guess to avoid giving the
+attacker the chance to use tools to capture memory and parse it for your
+super secret&nbsp;pass-phrase.</p>
+<p>Even this has it&#8217;s downfalls though, there have been attacks that can
+thwart the password mechanism on a device and run an attack such as
+stealing the pass-phrase. An example is the <a href="http://www.hermann-uwe.de/blog/physical-memory-attacks-via-firewire-dma-part-1-overview-and-mitigation">Firewire attack</a> which
+provides direct hardware access from some devices to your system. If the
+attacker can do this then it is game over for your data as they can use
+a tool to crack your system password. Fix, do not let an attacker walk
+away with your device still powered on, i.e. use a lock when at clients
+or at a hotel&nbsp;room.</p>
+<p>The <a href="http://theinvisiblethings.blogspot.com/2009/10/evil-maid-goes-after-truecrypt.html">evil maid attack</a> is often not thought of. You are supporting a
+remote client, come back to your room to check your mail and leave for
+dinner leaving your notebook. While gone the evil-doer aka evil maid
+visits your room to fluff your pillows and notices your notebook on the
+table. Whether it&#8217;s on or off a device that you probably won&#8217;t notice is
+plugged into your system and it records your pass-phrase when you type
+it in. The evil maid returns to then steal the notebook as they now have
+the passphrase to get your data. To avoid this one, pay attention to
+rogue devices plugged into your hardware. Sounds simple but who would
+check for a small <span class="caps">USB</span> device plugged into the back their host. Also use
+a lock to keep the evil-doer from stealing the hardware after obtaining
+the key after such an&nbsp;attack.</p>
+<p>What am I trying to say&nbsp;here?</p>
+<ul>
+<li>Use encryption, the performance hit is very small and the newest
+    notebooks with the &#8220;i&#8221; series chipsets use hardware&nbsp;encryption.</li>
+<li>Avoid leaving your device running if not around when at foreign
+    locations, i.e. hotels, clients,&nbsp;etc&#8230;</li>
+<li>Use a lock to attach the notebook to a desk, chair, whatever. I know
+    these are not exactly Fort Knox but it is a&nbsp;deterrent.</li>
+<li>Epoxy ports (warning this may not be an available option for a
+    corporate assets). Yes this is extreme but why do you think some
+    companies enforce this on their desktop systems and/or&nbsp;servers.</li>
+</ul>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'keeping-your-hardware-safe-and-avoiding-the-evil-maid';
+                var disqus_url = 'https://www.rsreese.com/keeping-your-hardware-safe-and-avoiding-the-evil-maid/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Stephen Reese
+            &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-495000-2', 'auto', {'siteSpeedSampleRate': 25});
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+</body>
+</html>

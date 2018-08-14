@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en"
+>
+<head>
+    <title>Graphing Namebench Spreadsheet Data with R - Stephen Reese</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="index,follow" />
+<link rel="canonical" href="/graphing-namebench-spreadsheet-data-with-r/">
+        <meta name="author" content="Stephen Reese" />
+        <meta name="keywords" content="benchmark,graph,R,namebench" />
+        <meta name="description" content="In the previous post, I described the process of benchmarking domain name servers for a website domain with a modified version of Namebench. Namebench generates graphs using the Google chart API. This left me wanting a little more therefore decided to explore the data using the R Project. This post …" />
+    <!-- Bootstrap -->
+    <link rel="stylesheet" href="/theme/css/bootstrap.flatly.min.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+    <link href="/theme/css/pygments/default.css" rel="stylesheet">
+    <link href="/theme/css/typogrify.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+    <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate" title="Stephen Reese ATOM Feed"/>
+</head>
+<body>
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+rsreese.com            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/archives/">Archives</a></li>
+                         <li><a href="/about/">
+                             About
+                          </a></li>
+                         <li><a href="/contact/">
+                             Contact
+                          </a></li>
+                         <li><a href="/web-stack/">
+                             Web&nbsp;Stack
+                          </a></li>
+            </ul>
+        </div>
+    </div>
+</div> 
+
+<div id="site-banner">
+        <div id="site-banner-brand">
+            <div>
+                <a href="/"><h1 class="center-block">Stephen Reese</h1></a>
+            </div>
+
+                <div id="social-banner">
+                    <ul class="list-group list-inline">
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="/contact/"><i class="fa fa-envelope fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://github.com/rsreese"><i class="fa fa-github fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://twitter.com/rsreese"><i class="fa fa-twitter fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.google.com/profiles/rsreese"><i class="fa fa-google-plus fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://facebook.com/rsreese"><i class="fa fa-facebook fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://www.linkedin.com/in/rsreese"><i class="fa fa-linkedin fa-lg"></i></a>
+                            </li>
+                            <li class="list-group-item">
+                                <a class="navbar-link social-nav-link" href="https://feeds.feedburner.com/rsreese"><i class="fa fa-rss fa-lg"></i></a>
+                            </li>
+                    </ul>
+                </div>
+
+        </div>
+    </div>
+
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/graphing-namebench-spreadsheet-data-with-r/"
+                       rel="bookmark"
+                       title="Permalink to Graphing Namebench Spreadsheet Data with R">
+                        Graphing Namebench Spreadsheet Data with&nbsp;R
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+            <span>By</span>
+            <a href="/author/stephen-reese.html">Stephen Reese</a>
+
+    <span>on</span>
+    <span class="published">
+        <time datetime="2015-07-11T12:00:00-04:00"> Sat 11 July 2015</time>
+    </span>
+
+        <span><a href="/categories/">Category</a>:</span>
+        <a href="/category/coding/">coding</a>
+
+
+<span><a href="/tags/">Tags:</a></span>
+	<a href="/tag/benchmark/">benchmark</a>
+        /
+	<a href="/tag/graph/">graph</a>
+        /
+	<a href="/tag/r/">R</a>
+        /
+	<a href="/tag/namebench/">namebench</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>In the previous <a href="/benchmarking-website-domain-name-servers/">post</a>, I described the process of benchmarking domain name servers for a website domain with a modified version of <a href="https://github.com/rsreese/namebench">Namebench</a>. Namebench generates graphs using the Google chart <span class="caps">API</span>. This left me wanting a little more therefore decided to explore the data using the <a href="http://www.r-project.org">R Project</a>. This post makes the assumption you are using our <a href="/assets/namebench_2015-07-14_1952.csv">data set</a> in order to follow along or else <span class="caps">YMMV</span>. </p>
+<p>First, remove trailing commas from each&nbsp;row:</p>
+<div class="highlight"><pre><span></span>$ sed <span class="s1">&#39;s/,[[:space:]]*$//&#39;</span> namebench_2015-07-14_1952.csv &gt; data.csv
+</pre></div>
+
+
+<p>Next, we read in the data from the <span class="caps">CSV</span> file into the R buffer assuming you are already in the R&nbsp;console:</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;</span> data <span class="o">&lt;-</span> read.table<span class="p">(</span>file<span class="o">=</span><span class="s">&quot;data.csv&quot;</span><span class="p">,</span>header<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span>sep<span class="o">=</span><span class="s">&quot;,&quot;</span><span class="p">,</span>row.names<span class="o">=</span><span class="kc">NULL</span><span class="p">)</span>
+</pre></div>
+
+
+<p>If you get errors about a line not having 9 elements, you likely had timeouts in your <span class="caps">DNS</span> queries. You can either re-run the test until you do not experience any timeouts or remove the Timeout error message lines. Something like <code>grep -v Timeout data.csv &gt;a.out</code> and copy back to data.csv or whatever filename you would like to work&nbsp;with.</p>
+<p>As an aside, we can also export our data back&nbsp;out:</p>
+<div class="highlight"><pre><span></span>&gt; write.table(data, &#39;a.txt&#39;, col.names=NA)
+</pre></div>
+
+
+<p>Which results&nbsp;in:</p>
+<div class="highlight"><pre><span></span>&quot;&quot; &quot;IP&quot; &quot;Name&quot; &quot;Test_Num&quot; &quot;Record&quot; &quot;Record_Type&quot; &quot;Duration&quot; &quot;TTL&quot; &quot;Answer_Count&quot; &quot;Response&quot;
+&quot;1&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 76.2228965759277 86400 1 &quot;74.207.234.79&quot;
+&quot;2&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 73.7550258636475 86400 1 &quot;74.207.234.79&quot;
+&quot;3&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 73.4801292419434 86400 1 &quot;74.207.234.79&quot;
+&quot;4&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 76.7168998718262 86400 1 &quot;74.207.234.79&quot;
+&quot;5&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 73.2970237731934 86400 1 &quot;74.207.234.79&quot;
+&quot;6&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 73.3959674835205 86400 1 &quot;74.207.234.79&quot;
+&quot;7&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 72.7560520172119 86400 1 &quot;74.207.234.79&quot;
+&quot;8&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 76.8599510192871 86400 1 &quot;74.207.234.79&quot;
+&quot;9&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 72.8960037231445 86400 1 &quot;74.207.234.79&quot;
+&quot;10&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 74.0060806274414 86400 1 &quot;74.207.234.79&quot;
+--snip--
+</pre></div>
+
+
+<p>Now that R has our data, we can take a quick look to ensure the columns make&nbsp;sense:</p>
+<div class="highlight"><pre><span></span>&gt; options(width=150)
+&gt; head(data,n=10)
+&gt; head(data,n=10)
+             IP          Name Test_Num           Record Record_Type Duration   TTL Answer_Count      Response
+1  2600:3c01::a Linode 2 IPv6        0 www.rsreese.com.           A 76.22290 86400            1 74.207.234.79
+2  2600:3c01::a Linode 2 IPv6        0 www.rsreese.com.           A 73.75503 86400            1 74.207.234.79
+3  2600:3c01::a Linode 2 IPv6        0 www.rsreese.com.           A 73.48013 86400            1 74.207.234.79
+4  2600:3c01::a Linode 2 IPv6        0 www.rsreese.com.           A 76.71690 86400            1 74.207.234.79
+5  2600:3c01::a Linode 2 IPv6        0 www.rsreese.com.           A 73.29702 86400            1 74.207.234.79
+6  2600:3c01::a Linode 2 IPv6        0 www.rsreese.com.           A 73.39597 86400            1 74.207.234.79
+7  2600:3c01::a Linode 2 IPv6        0 www.rsreese.com.           A 72.75605 86400            1 74.207.234.79
+8  2600:3c01::a Linode 2 IPv6        0 www.rsreese.com.           A 76.85995 86400            1 74.207.234.79
+9  2600:3c01::a Linode 2 IPv6        0 www.rsreese.com.           A 72.89600 86400            1 74.207.234.79
+10 2600:3c01::a Linode 2 IPv6        0 www.rsreese.com.           A 74.00608 86400            1 74.207.234.79
+&gt; summary(data$Duration)
+   Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+  1.455   2.582   3.836  24.430  47.640 780.500
+</pre></div>
+
+
+<p>We can create an aggregated table of the data based on mean&nbsp;values:</p>
+<div class="highlight"><pre><span></span>&gt; aggregate(data$Duration, by=list(data$Name), FUN=mean)
+         Group.1         x
+1        CF Erin  3.752344
+2         CF Ram  6.141772
+3           HE 1  2.563629
+4           HE 2  2.494576
+5      HE 2 IPv6  2.677688
+6           HE 3  5.510935
+7      HE 3 IPv6  3.057263
+8           HE 4  2.982669
+9      HE 4 IPv6  2.626012
+10          HE 5  2.642891
+11     HE 5 IPv6  2.736038
+12      Linode 1 49.536158
+13 Linode 1 IPv6 48.098648
+14      Linode 2 75.840130
+15 Linode 2 IPv6 76.885061
+16      Linode 3 25.727819
+17 Linode 3 IPv6 26.703984
+18      Linode 4  8.020208
+19 Linode 4 IPv6  7.908908
+20      Linode 5 82.185041
+21 Linode 5 IPv6 76.434550
+</pre></div>
+
+
+<p>Lets see how a boxplot looks. The graph is representative of the third command listed here, others are for&nbsp;reference/tinkering:</p>
+<div class="highlight"><pre><span></span>&gt; plot(data$Duration ~ data$Name, horizontal=TRUE, par(las=1))
+&gt; boxplot(data$Duration ~ data$Name, horizontal=TRUE, par(las=1), col=rainbow(10))
+&gt; boxplot(data$Duration ~ data$Name, ylim=c(0,100), horizontal=TRUE, par(las=1), col=rainbow(10))
+</pre></div>
+
+
+<p><a href="/assets/namebench-boxplot.png"><img alt="namebench-boxplot" src="/assets/namebench-boxplot.png"></a></p>
+<p>If we zoom in a little more, the distribution of the more responsive name servers becomes apparent. I believe this graph is the best representation of the fastest name servers in the&nbsp;dataset:</p>
+<div class="highlight"><pre><span></span>&gt; boxplot(data$Duration ~ data$Name, ylim=c(0,10), horizontal=TRUE, par(las=1), col=rainbow(10))
+</pre></div>
+
+
+<p><a href="/assets/namebench-boxplot2.png"><img alt="namebench-boxplot2" src="/assets/namebench-boxplot2.png"></a></p>
+<p>Alternatively, we can plot using ggplot2 if&nbsp;available:</p>
+<div class="highlight"><pre><span></span>&gt; library(ggplot2)
+&gt; ggplot(data=data, aes(x=Duration, y=Name, group=Name, colour=Name)) + geom_line() + geom_point()
+</pre></div>
+
+
+<p><a href="/assets/namebench-ggplot2.png"><img alt="namebench-ggplot2" src="/assets/namebench-ggplot2.png"></a></p>
+<p>Display horizontal bar graph. I did not do a great job with the axis labels here but you get the&nbsp;idea:</p>
+<div class="highlight"><pre><span></span><span class="o">&gt;</span> agg <span class="o">&lt;-</span> aggregate<span class="p">(</span>data<span class="o">$</span>Duration<span class="p">,</span> by<span class="o">=</span><span class="kt">list</span><span class="p">(</span>data<span class="o">$</span>Name<span class="p">),</span> FUN<span class="o">=</span><span class="kp">mean</span><span class="p">)</span>
+<span class="o">&gt;</span> sorted <span class="o">&lt;-</span> agg<span class="p">[</span><span class="kp">with</span><span class="p">(</span>agg<span class="p">,</span> <span class="kp">order</span><span class="p">(</span>x<span class="p">)),</span> <span class="p">]</span>
+<span class="o">&gt;</span> mymat <span class="o">&lt;-</span> <span class="kp">t</span><span class="p">(</span>sorted<span class="p">[</span><span class="m">-1</span><span class="p">])</span>
+<span class="o">&gt;</span> <span class="kp">colnames</span><span class="p">(</span>mymat<span class="p">)</span> <span class="o">&lt;-</span> sorted<span class="p">[,</span> <span class="m">1</span><span class="p">]</span>
+<span class="o">&gt;</span> barplot<span class="p">(</span>mymat<span class="p">,</span> horiz<span class="o">=</span><span class="kc">TRUE</span><span class="p">,</span> col<span class="o">=</span><span class="kt">c</span><span class="p">(</span><span class="s">&quot;blue&quot;</span><span class="p">),</span> las<span class="o">=</span><span class="m">1</span><span class="p">)</span>
+</pre></div>
+
+
+<p><a href="/assets/namebench-barplot.png"><img alt="namebench-barplot" src="/assets/namebench-barplot.png"></a></p>
+<p>Finally, we will graph a group of values from the set and display them. We also limit the range so the graph is&nbsp;readable:</p>
+<div class="highlight"><pre><span></span>&gt; plot(ecdf(data$Duration[data$Name==&quot;Linode 1&quot;]), xlim=c(45,55), ylim=c(0,1))
+</pre></div>
+
+
+<p><a href="/assets/namebench-line.png"><img alt="namebench-line" src="/assets/namebench-line.png"></a></p>
+<p>Please leave any questions you have regarding this post&nbsp;below.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+                    var disqus_identifier = 'graphing-namebench-spreadsheet-data-with-r';
+                var disqus_url = 'https://www.rsreese.com/graphing-namebench-spreadsheet-data-with-r/';
+
+            var disqus_config = function () {
+                this.language = "en";
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2018 Stephen Reese
+            &middot; Powered by <a href="/web-stack/">Web Stack</a>         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'rsreese'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+    <!-- Google Analytics Universal -->
+    <script type="text/javascript">
+        (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+        (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+        m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+        })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+        ga('create', 'UA-495000-2', 'auto', {'siteSpeedSampleRate': 25});
+        ga('send', 'pageview');
+    </script>
+    <!-- End Google Analytics Universal Code -->
+</body>
+</html>
