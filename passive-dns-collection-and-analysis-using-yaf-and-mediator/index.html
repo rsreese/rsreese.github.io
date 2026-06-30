@@ -1,0 +1,212 @@
+<!doctype html><html lang="en" data-theme="auto"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Passive DNS collection and analysis using YaF and Mediator</title><meta name="description" content="Passive DNS is a useful tool for any analysts teams toolbox, I have noted several public sensors here but they only see data (queries and responses) that tra…"><link rel="canonical" href="https://www.rsreese.com/passive-dns-collection-and-analysis-using-yaf-and-mediator/"><meta name="theme-color" content="#11191a"><meta property="og:type" content="article"><meta property="og:title" content="Passive DNS collection and analysis using YaF and Mediator"><meta property="og:description" content="Passive DNS is a useful tool for any analysts teams toolbox, I have noted several public sensors here but they only see data (queries and responses) that tra…"><meta property="og:url" content="https://www.rsreese.com/passive-dns-collection-and-analysis-using-yaf-and-mediator/"><meta property="og:site_name" content="Stephen Reese"><meta property="article:author" content="https://www.linkedin.com/in/rsreese"><meta property="article:published_time" content="2013-05-20T15:12:00.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@rsreese"><meta name="twitter:creator" content="@rsreese"><meta name="twitter:title" content="Passive DNS collection and analysis using YaF and Mediator"><meta name="twitter:description" content="Passive DNS is a useful tool for any analysts teams toolbox, I have noted several public sensors here but they only see data (queries and responses) that tra…"><link rel="me" href="https://www.linkedin.com/in/rsreese"><link rel="me" href="https://twitter.com/rsreese"><script>(function(){try{var saved=localStorage.getItem('rsreese-theme');var dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',saved==='light'||saved==='dark'?saved:(dark?'dark':'light'));}catch(e){}})();</script><style>:root{--bg:#f7f7f4;--panel:#fff;--text:#1d2728;--muted:#667070;--line:#e3e2dc;--accent:#2f6f73;--ink:#11191a;--ink-soft:#dfe8e8;--ink-muted:#a8b7b7;--shadow:0 20px 50px rgba(29,39,40,.08)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:18px/1.65 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:inherit;text-decoration-thickness:.08em;text-underline-offset:.18em}.site-header-wrap{background:var(--ink);color:var(--ink-soft);border-bottom:1px solid rgba(255,255,255,.08)}.site-header{max-width:1120px;margin:0 auto;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{color:#fff;font-weight:800;text-decoration:none;letter-spacing:-.03em}.primary-nav{display:flex;gap:22px;flex-wrap:wrap;font-size:15px}.primary-nav a{color:var(--ink-muted);text-decoration:none}.primary-nav a:hover{color:#fff}.nav-toggle{display:none;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.08);color:#fff;padding:10px 14px;font:inherit;font-size:15px;font-weight:700;cursor:pointer}.nav-toggle-icon{width:10px;height:10px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .2s ease}.nav-toggle[aria-expanded=true] .nav-toggle-icon{transform:rotate(225deg) translateY(-1px)}.container{max-width:1120px;margin:0 auto;padding:24px}.hero{padding:96px 0 84px;max-width:860px}.eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:.12em;font-weight:800;font-size:13px}h1,h2,h3{line-height:1.08;letter-spacing:-.05em;margin:0 0 18px}h1{font-size:clamp(48px,10vw,112px)}h2{font-size:clamp(32px,5vw,54px)}h3{font-size:28px}.lede,.page-intro p{font-size:clamp(22px,3vw,30px);line-height:1.35;color:var(--muted);max-width:760px}.actions{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap}.button{display:inline-flex;padding:13px 18px;border-radius:999px;background:var(--text);color:#fff;text-decoration:none;font-weight:700;font-size:15px}.button-secondary{background:transparent;color:var(--text);border:1px solid var(--line)}.section-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:22px}.post-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.card,.list-card{background:var(--panel);border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:var(--shadow)}.card h3 a,.list-card h2 a{text-decoration:none}.card p,.list-card p,.content p,.content li{color:var(--muted)}.card-meta,.meta{color:var(--muted);font-size:14px;margin:0 0 14px}.page-intro{padding:72px 0 40px}.narrow,.post{max-width:780px}.post{padding:70px 0}.post h1{font-size:clamp(42px,7vw,76px)}.site-footer-wrap{margin-top:72px;background:var(--ink);color:var(--ink-muted)}.site-footer{max-width:1120px;margin:0 auto;padding:36px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:14px}.site-footer p{margin:0}.back-to-top{color:#fff;font-weight:800;text-decoration:none;white-space:nowrap}@media (max-width:800px){.site-header{position:relative;align-items:center;flex-direction:row;padding:18px}.brand{max-width:calc(100% - 108px)}.nav-toggle{display:inline-flex}.primary-nav{display:none;position:absolute;top:calc(100% - 8px);left:18px;right:18px;z-index:10;flex-direction:column;gap:0;padding:10px;background:var(--ink);border:1px solid rgba(255,255,255,.12);border-radius:22px;box-shadow:var(--shadow)}.primary-nav.is-open{display:flex}.primary-nav a{display:block;padding:14px 16px;border-radius:14px;color:#fff;font-weight:700}.primary-nav a:hover,.primary-nav a:focus{background:rgba(255,255,255,.08)}.site-footer{align-items:flex-start;flex-direction:column}.hero{padding-top:54px}.post-grid{grid-template-columns:1fr}}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.hamburger{width:22px;height:16px;display:inline-flex;flex-direction:column;justify-content:space-between}.hamburger span{display:block;height:2px;background:currentColor;border-radius:999px}.nav-toggle-icon{display:none}.theme-toggle{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#fff;width:40px;height:40px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}html[data-theme=dark]{color-scheme:dark;--bg:#0f1415;--panel:#151c1d;--text:#edf5f4;--muted:#a9b5b5;--line:#293334;--accent:#8bcbd3;--ink:#080d0e;--ink-soft:#f2f7f6;--ink-muted:#a9b8b7;--shadow:0 18px 45px rgba(0,0,0,.28)}</style><link rel="preload" href="/assets/css/main.css?v=3.0.0" as="style"><link rel="stylesheet" href="/assets/css/main.css?v=3.0.0" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/assets/css/main.css?v=3.0.0"></noscript><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-JH5ZXYTT84"></script><script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-JH5ZXYTT84'); </script></head><body id="top"><header class="site-header-wrap"><div class="site-header"><a class="brand" href="/">Stephen Reese</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><span class="sr-only">Open navigation</span><span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span></button><nav id="primary-nav" class="primary-nav" aria-label="Primary navigation"><a href="/about/">About</a><a href="/articles/">Articles</a><a href="/web-stack/">Web Stack</a><a href="/contact/">Contact</a></nav><button class="theme-toggle" type="button" aria-label="Toggle light and dark mode" title="Toggle light/dark mode"><span class="theme-toggle-icon" aria-hidden="true">◐</span></button></div></header><main class="container"><article class="post"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/articles/">Articles</a><span aria-hidden="true">/</span><span>Passive DNS collection and analysis using YaF and Mediator</span></nav><h1>Passive DNS collection and analysis using YaF and Mediator</h1><p class="meta">May 20, 2013 · By Stephen Reese</p><div class="content"><p>Passive DNS is a useful tool for any analysts teams toolbox, I have noted several public sensors <a href="http://www.rsreese.com/online-information-security-analysis-tools-and-resources/">here</a> but they only see data (queries and responses) that transverse their sensors. I have been working on setting up passive DNS using Yet another Flowmeter (YaF) and Mediator (YaF to MySQL) to fill the gap where third-party sensors may not be providing the coverage I would like. Passive DNS can provide tremendous insight and analytics upon DNS queries that users and/or malware may beperforming. A few items of interest:</p><ul><li>Hostnames that have a large number of IP addresses associated with them in a short time period and they have only been visited by very few hosts host on the network.</li><li>Tertiary name usage associated with a specific domain?</li><li>When was the domain first resolved on the network and further, how often is it being resolved and by whom?</li><li>A recently accessed/registered domain with short time to live (TTLs) often associated with new IP addresses may indicate</li></ul><pre class="language-text" data-language="text"><code class="language-text">malicious activity, or a CDN.
+</code></pre><ul><li>Queries for TLDs that you typically do not interact with may be worth looking into.</li><li>Users using non-approved DNS servers</li></ul><p>Passive DNS may be also helpful in tracking infections using Fast-fluxwhich make blocking the C2 difficult as the attackers will create algorithms to rotate the IP addresses and even the hostnames in the case of double-flux. (<a href="http://www.cs.ucsb.edu/~kemm/courses/cs177/torpig.pdf">TorPig</a>) The list goes on but in a nutshell, I wanted to be able to perform this activity without having to rely on having all of the DNS server logs in a centralized location, especially since users may reconfigure their DNS settings to use non-approved servers, e.g. BYOD.</p><p>This entry demonstrates how to build and setup <a href="http://tools.netsa.cert.org/yaf/yaf.html">YaF</a> and <a href="https://tools.netsa.cert.org/confluence/pages/viewpage.action?pageId=15958035">Mediator</a> both of which are available from the CERT <a href="http://www.cert.org/netsa/">NetSA</a><a href="http://tools.netsa.cert.org/">site</a> and should be considered complementary to the documentation the NetSA team have already provided for each of the respective tools. This setup was tested on CentOS 6.4 but most Linux distributions should work fine.</p><ol><li>Have site reconfigure interfaces on all hosts. eth0 should be management interface and eth1 should be the tap OR whatever makes sense, this need to happen every time the host comes up, i.e.</li></ol><pre class="language-code" data-language="code"><code class="language-code">sudo ifconfig eth1 up promisc
+</code></pre><ol start="2"><li>Ensure development libraries/dependencies are installed. Some may require enabling the optional software channel</li></ol><pre class="language-code" data-language="code"><code class="language-code">sudo yum install glib2-devel lzo gcc-c++ libpcap-devel pcre-devel
+</code></pre><ol start="3"><li>Install <a href="http://tools.netsa.cert.org/fixbuf/">libfixbuf</a></li></ol><pre class="language-code" data-language="code"><code class="language-code">cd libfixbuf-1.3.0
+./configure
+make
+sudo make install
+</code></pre><ol start="4"><li>Install YaF</li></ol><pre class="language-code" data-language="code"><code class="language-code">cd yaf-2.3.3
+export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+./configure --with-libpcap --enable-applabel --enable-plugins
+make
+sudo make install
+</code></pre><ol start="5"><li>Edit ld</li></ol><pre class="language-code" data-language="code"><code class="language-code">sudo echo &quot;/usr/local/lib&quot; &gt;&gt; /etc/ld.so.conf
+sudo /sbin/ldconfig
+sudo /sbin/ldconfig -v | grep libzmq # should rebuild the cache including zmq too.
+</code></pre><p>OR</p><pre class="language-code" data-language="code"><code class="language-code">export PATH=$PATH:/usr/local/lib
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/usr/local/lib
+</code></pre><ol start="6"><li>Configure cmake</li></ol><pre class="language-code" data-language="code"><code class="language-code">cd cmake-2.8.10.2
+./configure
+gmake
+</code></pre><ol start="6"><li>Optionally, configure YaF to File output for testing purposes.</li></ol><pre class="language-code" data-language="code"><code class="language-code">export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+cd yaf_file_mediator-1.1.0/
+./configure
+../cmake-2.8.10.2/bin/cmake .
+make
+</code></pre><ol start="7"><li>Configure YaF to MySQL</li></ol><pre class="language-code" data-language="code"><code class="language-code">export PKG_CONFIG_PATH=/usr/local/lib/pkgconfig/
+cd yaf_silk_mysql_mediator-1.4.0
+../cmake-2.8.10.2/bin/cmake .
+./configure --with-mysql
+make
+</code></pre><p>Next, populate create a database and respective tables:</p><pre class="language-code" data-language="code"><code class="language-code">./yafMySQL -o localhost -n username -p password -d eflows
+</code></pre><ol start="8"><li>Setup YaF to start capturing. Here we are only capture DNS traffic and rotating the files written to disk after 5 minutes. Originally set to 10 minutes but yaf_silk_mysql_mediator would segmentation fault because MySQL would close the connection before all of the data would insert. We have a continuous method that works a little better which we should a little later. We lock the file so that another process cannot take the file that is currently being written to.</li></ol><pre class="language-code" data-language="code"><code class="language-code">sudo /usr/local/bin/yaf --live pcap --in eth1 --out /data/ipfix/ --rotate 600 --filter=&quot;port 53&quot; --applabel --applabel-rules=/usr/local/etc/yafApplabelRules.conf --max-payload=1000 --plugin-name=/usr/local/lib/yaf/dpacketplugin.la --plugin-opts=&quot;53&quot; --lock --become-user=nobody --become-group=nobody &amp;
+</code></pre><ol start="9"><li>Testing the output of a YaF</li></ol><pre class="language-code" data-language="code"><code class="language-code">yaf_file_mediator-1.1.0/yaf_file_mediator --input /data/ipfix/filename.yaf --output test.txt
+</code></pre><p>After a few minutes, you should be able to parse the filename.yaf that was first written (in this case 5 minutes). The contents of test.txt should be similar to the following:</p><pre class="language-code" data-language="code"><code class="language-code">-------------------------------
+Template ID is 45841
+Application Label: 53
+Source IP: 192.168.0.5
+Destination IP: 8.8.8.8
+Source Port: 53855
+Dest Port: 53
+Flow Attributes: 1
+Rev Flow Attributes: 0
+flowStartTime: 2013-04-24 23:53:43
+flowEndTime: 2013-04-24 23:58:02
+flowEndReason: 1
+Protocol: 17
+Octet Total Count: 120
+Rev Octet count: 244
+Packet Total Count: 2
+Rev Packet Total Count: 2
+DNS ID: 32852 Type: 28 RR Section: 0 TTL: 0 Query: www.google.com.
+DNS ID: 32852 Type: 28 RR Section: 1 TTL: 204 RRName: www.google.com. AAAA: 2607:f8b0:400c:0c04::0069 -------------------------------
+Template ID is 45841
+Application Label: 53
+Source IP: 192.168.0.5
+Destination IP: 8.8.8.8
+Source Port: 50845
+Dest Port: 53
+flowStartTime: 2013-04-24 23:58:02
+flowEndTime: 2013-04-24 23:58:02
+flowEndReason: 1
+Protocol: 17
+Octet Total Count: 60
+Rev Octet count: 156
+Packet Total Count: 1
+Rev Packet Total Count: 1
+DNS ID: 21141 Type: 1 RR Section: 0 TTL: 0 Query: www.google.com.
+DNS ID: 21141 Type: 1 RR Section: 1 TTL: 208 RRName: www.google.com. A: 74.125.26.103
+DNS ID: 21141 Type: 1 RR Section: 1 TTL: 208 RRName: www.google.com. A: 74.125.26.99
+DNS ID: 21141 Type: 1 RR Section: 1 TTL: 208 RRName: www.google.com. A: 74.125.26.105
+DNS ID: 21141 Type: 1 RR Section: 1 TTL: 208 RRName: www.google.com. A: 74.125.26.104
+DNS ID: 21141 Type: 1 RR Section: 1 TTL: 208 RRName: www.google.com. A: 74.125.26.106
+DNS ID: 21141 Type: 1 RR Section: 1 TTL: 208 RRName: www.google.com. A: 74.125.26.147
+</code></pre><ol start="10"><li>After you have confirmed that your YaF entries contain records, adda little automation. This will scoop up the files in the directory where the YaF files are being written, place them in the MySQL DBMS and delete the file. Note, if you start seeing &quot;Segmentation Fault&quot; then MySQL maybe closing the connection before all of the records from the YaF file could be written to the DBMS. You can try modifying MySQL parameters or reduce the the size of YaF files being written to disk in order to try mitigating this symptom if it occurs in your environment.</li></ol><pre class="language-code" data-language="code"><code class="language-code">for i in $( ls /data/ipfix/*.yaf ); do /home/user/silk-installs/yaf_silk_mysql_mediator-1.4.0/yaf_silk_mysql_mediator --in-file $i --mysql-host localhost --name username --pass password --database eflows &amp;&amp; sudo rm $i; done
+</code></pre><p>Here is our first query, lets see who has recently made requests for
+<a href="http://www.google.com">www.google.com</a>.</p><pre class="language-code" data-language="code"><code class="language-code">mysql&gt; SELECT rrname,rrval,srcip4,dstip4,flowStartMilliseconds FROM dns d, flows f WHERE f.id = d.id AND rrname LIKE &quot;www.google.com.&quot; GROUP by rrval ORDER BY f.id DESC LIMIT 50;
++-----------------+---------------------------+------------+-----------+-----------------------+
+| rrname | rrval | srcip4 | dstip4 | flowStartMilliseconds |
++-----------------+---------------------------+------------+-----------+-----------------------+
+| www.google.com. | 2001:4860:4001:0802::1012 | 3232235525 | 134744072 | 2013-05-03 17:47:24 |
+| www.google.com. | 2001:4860:4001:0801::1014 | 3232235525 | 134744072 | 2013-05-03 15:35:32 |
+| www.google.com. | 2001:4860:4001:0802::1014 | 3232235525 | 134744072 | 2013-05-03 11:28:42 |
+| www.google.com. | 2001:4860:4001:0801::1010 | 3232235525 | 134744072 | 2013-05-02 16:48:31 |
+| www.google.com. | 2001:4860:4001:0802::1011 | 3232235525 | 134744072 | 2013-05-02 13:33:57 |
+| www.google.com. | 2001:4860:4001:0803::1010 | 3232235525 | 134744072 | 2013-05-02 12:01:56 |
+| www.google.com. | 2607:f8b0:4004:0801::1012 | 3232235525 | 134744072 | 2013-05-01 21:36:55 |
+| www.google.com. | 2001:4860:4001:0802::1010 | 3232235525 | 134744072 | 2013-05-01 12:44:52 |
+| www.google.com. | 74.125.239.80 | 3232235525 | 134744072 | 2013-05-01 10:45:04 |
+| www.google.com. | 74.125.239.83 | 3232235525 | 134744072 | 2013-05-01 10:45:04 |
+| www.google.com. | 74.125.239.82 | 3232235525 | 134744072 | 2013-05-01 10:45:04 |
+| www.google.com. | 74.125.239.81 | 3232235525 | 134744072 | 2013-05-01 10:45:04 |
+| www.google.com. | 74.125.239.84 | 3232235525 | 134744072 | 2013-05-01 10:45:04 |
+| www.google.com. | 2607:f8b0:4004:0802::1010 | 3232235525 | 134744072 | 2013-04-29 19:54:00 |
+| www.google.com. | 2607:f8b0:4005:0802::1010 | 3232235525 | 134744072 | 2013-04-28 15:52:00 |
+| www.google.com. | 2607:f8b0:4004:0803::1013 | 3232235525 | 134744072 | 2013-04-28 15:05:53 |
+| www.google.com. | 2607:f8b0:4005:0802::1011 | 3232235525 | 134744072 | 2013-04-27 14:45:35 |
+| www.google.com. | 2607:f8b0:4004:0801::1013 | 3232235525 | 134744072 | 2013-04-26 18:53:45 |
+| www.google.com. | 2607:f8b0:4005:0802::1012 | 3232235525 | 134744072 | 2013-04-26 13:55:51 |
+| www.google.com. | 2607:f8b0:4005:0802::1013 | 3232235525 | 134744072 | 2013-04-26 12:35:18 |
+| www.google.com. | 74.125.239.145 | 3232235525 | 134744072 | 2013-04-26 12:03:10 |
+| www.google.com. | 74.125.239.148 | 3232235525 | 134744072 | 2013-04-26 12:03:10 |
+| www.google.com. | 74.125.239.146 | 3232235525 | 134744072 | 2013-04-26 12:03:10 |
+| www.google.com. | 74.125.239.147 | 3232235525 | 134744072 | 2013-04-26 12:03:10 |
+| www.google.com. | 74.125.239.144 | 3232235525 | 134744072 | 2013-04-26 12:03:10 |
+| www.google.com. | 2607:f8b0:4005:0802::1014 | 3232235525 | 134744072 | 2013-04-26 11:31:59 |
+| www.google.com. | 74.125.228.112 | 3232235525 | 134744072 | 2013-04-25 16:25:39 |
+| www.google.com. | 74.125.228.114 | 3232235525 | 134744072 | 2013-04-25 16:25:39 |
+| www.google.com. | 74.125.228.113 | 3232235525 | 134744072 | 2013-04-25 16:25:39 |
+| www.google.com. | 74.125.228.115 | 3232235525 | 134744072 | 2013-04-25 16:25:39 |
+| www.google.com. | 74.125.228.116 | 3232235525 | 134744072 | 2013-04-25 16:25:39 |
+| www.google.com. | 2607:f8b0:4004:0802::1012 | 3232235525 | 134744072 | 2013-04-25 11:29:45 |
+| www.google.com. | 2607:f8b0:4004:0803::1014 | 3232235525 | 134744072 | 2013-04-24 20:33:42 |
+| www.google.com. | 2607:f8b0:400e:0c04::006a | 3232235525 | 134744072 | 2013-04-24 18:04:19 |
+| www.google.com. | 2607:f8b0:400e:0c02::006a | 3232235525 | 134744072 | 2013-04-24 15:26:22 |
+| www.google.com. | 74.125.228.20 | 3232235525 | 134744072 | 2013-04-24 12:05:43 |
+| www.google.com. | 74.125.228.16 | 3232235525 | 134744072 | 2013-04-24 12:05:43 |
+| www.google.com. | 74.125.228.18 | 3232235525 | 134744072 | 2013-04-24 12:05:43 |
+| www.google.com. | 74.125.228.19 | 3232235525 | 134744072 | 2013-04-24 12:05:43 |
+| www.google.com. | 74.125.228.17 | 3232235525 | 134744072 | 2013-04-24 12:05:43 |
+| www.google.com. | 2607:f8b0:4004:0801::1014 | 3232235525 | 134744072 | 2013-04-23 20:43:26 |
+| www.google.com. | 74.125.228.50 | 3232235525 | 134744072 | 2013-04-23 20:38:43 |
+| www.google.com. | 74.125.228.51 | 3232235525 | 134744072 | 2013-04-23 20:38:43 |
+| www.google.com. | 74.125.228.52 | 3232235525 | 134744072 | 2013-04-23 20:38:43 |
+| www.google.com. | 74.125.228.48 | 3232235525 | 134744072 | 2013-04-23 20:38:43 |
+| www.google.com. | 74.125.228.49 | 3232235525 | 134744072 | 2013-04-23 20:38:43 |
+| www.google.com. | 2607:f8b0:4004:0801::1011 | 3232235525 | 134744072 | 2013-04-23 18:38:52 |
+| www.google.com. | 2607:f8b0:400e:0c01::0067 | 3232235525 | 134744072 | 2013-04-23 15:57:45 |
+| www.google.com. | 2607:f8b0:4004:0801::1010 | 3232235525 | 134744072 | 2013-04-23 15:07:59 |
+| www.google.com. | 2607:f8b0:400e:0c01::0069 | 3232235525 | 134744072 | 2013-04-23 12:30:28 |
++-----------------+---------------------------+------------+-----------+-----------------------+
+</code></pre><p>Here is a similar query but we want to see any tertiary <a href="http://youtube.com">youtube.com</a> domains and sort by the lookup returned.</p><pre class="language-code" data-language="code"><code class="language-code">mysql&gt; SELECT qr,type,auth,nx,ttl,rrname,rrval from dns WHERE rrname LIKE &quot;%.youtube.com.&quot; GROUP BY rrval LIMIT 50;
++------+------+------+------+------+--------------------------------+----------------+
+| qr | type | auth | nx | ttl | rrname | rrval |
++------+------+------+------+------+--------------------------------+----------------+
+| 0 | 1 | 0 | 0 | 0 | www.youtube.com. | |
+| 1 | 1 | 0 | 0 | 300 | v17.lscache2.c.youtube.com. | 12.216.80.12 |
+| 1 | 1 | 0 | 0 | 1800 | r2.sn-5uu-vgqe.c.youtube.com. | 12.216.80.13 |
+| 1 | 1 | 0 | 0 | 1800 | r3.sn-5uu-vgqe.c.youtube.com. | 12.216.80.14 |
+| 1 | 1 | 0 | 0 | 1800 | r4.att-ord1.c.youtube.com. | 12.216.80.15 |
+| 1 | 1 | 0 | 0 | 1800 | r6.sn-5uu-vgqe.c.youtube.com. | 12.216.80.17 |
+| 1 | 1 | 0 | 0 | 1714 | r8.sn-5uu-vgqe.c.youtube.com. | 12.216.80.19 |
+| 1 | 1 | 0 | 0 | 1741 | r1.sn-5uu-vgql.c.youtube.com. | 12.216.80.44 |
+| 1 | 1 | 0 | 0 | 1800 | r2.sn-5uu-vgql.c.youtube.com. | 12.216.80.45 |
+| 1 | 1 | 0 | 0 | 1800 | r3.sn-5uu-vgql.c.youtube.com. | 12.216.80.46 |
+| 1 | 1 | 0 | 0 | 1279 | r4.sn-5uu-vgql.c.youtube.com. | 12.216.80.47 |
+| 1 | 1 | 0 | 0 | 1800 | r6.sn-5uu-vgql.c.youtube.com. | 12.216.80.49 |
+| 1 | 1 | 0 | 0 | 1800 | r7.sn-5uu-vgql.c.youtube.com. | 12.216.80.50 |
+| 1 | 1 | 0 | 0 | 1739 | r8.sn-5uu-vgql.c.youtube.com. | 12.216.80.51 |
+| 1 | 1 | 0 | 0 | 1800 | r12.sn-hp576nes.c.youtube.com. | 173.194.17.17 |
+| 1 | 1 | 0 | 0 | 1800 | r20.sn-hp576nes.c.youtube.com. | 173.194.17.25 |
+| 1 | 1 | 0 | 0 | 1800 | r6.sn-q4f7dnel.c.youtube.com. | 173.194.24.11 |
+| 1 | 1 | 0 | 0 | 1800 | r1.dfw06s08.c.youtube.com. | 173.194.24.134 |
+| 1 | 1 | 0 | 0 | 1800 | r15.sn-q4f7dn7r.c.youtube.com. | 173.194.24.148 |
+| 1 | 1 | 0 | 0 | 1800 | r18.sn-hp576n7d.c.youtube.com. | 173.194.29.119 |
+| 1 | 1 | 0 | 0 | 1800 | r9.sn-hp576n7z.c.youtube.com. | 173.194.29.46 |
+| 1 | 1 | 0 | 0 | 1800 | r5.sn-ab5e6ner.c.youtube.com. | 173.194.31.10 |
+| 1 | 1 | 0 | 0 | 1800 | r1.sn-ab5e6nle.c.youtube.com. | 173.194.31.102 |
+| 1 | 1 | 0 | 0 | 640 | r2.sn-ab5e6nle.c.youtube.com. | 173.194.31.103 |
+| 1 | 1 | 0 | 0 | 1800 | r3.sn-ab5e6nle.c.youtube.com. | 173.194.31.104 |
+| 1 | 1 | 0 | 0 | 1800 | r4.sn-ab5e6nle.c.youtube.com. | 173.194.31.105 |
+| 1 | 1 | 0 | 0 | 1800 | r5.sn-ab5e6nle.c.youtube.com. | 173.194.31.106 |
+| 1 | 1 | 0 | 0 | 1800 | r6.sn-ab5e6nle.c.youtube.com. | 173.194.31.107 |
+| 1 | 1 | 0 | 0 | 1800 | r7.sn-ab5e6nle.c.youtube.com. | 173.194.31.108 |
+| 1 | 1 | 0 | 0 | 1800 | r8.sn-ab5e6nle.c.youtube.com. | 173.194.31.109 |
+| 1 | 1 | 0 | 0 | 705 | r6.sn-ab5e6ner.c.youtube.com. | 173.194.31.11 |
+| 1 | 1 | 0 | 0 | 1800 | r9.sn-ab5e6nle.c.youtube.com. | 173.194.31.110 |
+| 1 | 1 | 0 | 0 | 1800 | r10.sn-ab5e6nle.c.youtube.com. | 173.194.31.111 |
+| 1 | 1 | 0 | 0 | 292 | r11.sn-ab5e6nle.c.youtube.com. | 173.194.31.112 |
+| 1 | 1 | 0 | 0 | 1800 | r12.sn-ab5e6nle.c.youtube.com. | 173.194.31.113 |
+| 1 | 1 | 0 | 0 | 178 | r13.sn-ab5e6nle.c.youtube.com. | 173.194.31.114 |
+| 1 | 1 | 0 | 0 | 1800 | r14.sn-ab5e6nle.c.youtube.com. | 173.194.31.115 |
+| 1 | 1 | 0 | 0 | 1800 | r15.sn-ab5e6nle.c.youtube.com. | 173.194.31.116 |
+| 1 | 1 | 0 | 0 | 1800 | r16.sn-ab5e6nle.c.youtube.com. | 173.194.31.117 |
+| 1 | 1 | 0 | 0 | 1800 | r17.sn-ab5e6nle.c.youtube.com. | 173.194.31.118 |
+| 1 | 1 | 0 | 0 | 1800 | r18.sn-ab5e6nle.c.youtube.com. | 173.194.31.119 |
+| 1 | 1 | 0 | 0 | 1653 | r7.sn-ab5e6ner.c.youtube.com. | 173.194.31.12 |
+| 1 | 1 | 0 | 0 | 1800 | r19.sn-ab5e6nle.c.youtube.com. | 173.194.31.120 |
+| 1 | 1 | 0 | 0 | 1800 | r20.sn-ab5e6nle.c.youtube.com. | 173.194.31.121 |
+| 1 | 1 | 0 | 0 | 1800 | r8.sn-ab5e6ner.c.youtube.com. | 173.194.31.13 |
+| 1 | 1 | 0 | 0 | 81 | r1.sn-ab5e6nll.c.youtube.com. | 173.194.31.134 |
+| 1 | 1 | 0 | 0 | 1800 | r2.sn-ab5e6nll.c.youtube.com. | 173.194.31.135 |
+| 1 | 1 | 0 | 0 | 1800 | r3.sn-ab5e6nll.c.youtube.com. | 173.194.31.136 |
+| 1 | 1 | 0 | 0 | 1800 | r4.sn-ab5e6nll.c.youtube.com. | 173.194.31.137 |
+| 1 | 1 | 0 | 0 | 1800 | r5.lga15s22.c.youtube.com. | 173.194.31.138 |
++------+------+------+------+------+--------------------------------+----------------+
+50 rows in set (22.17 sec)
+</code></pre><p>An alternative method is to write YaF records directly to mediator, and further the MySQL DBMS rather then writing files to disk although youcan still do this with the appropriate toggles. Here is example usage to start the processes:</p><pre class="language-code" data-language="code"><code class="language-code">$ ./silk-installs/yaf_silk_mysql_mediator-1.4.0/yaf_silk_mysql_mediator --in-host=127.0.0.1 --in-port=18000 --mysql-host=localhost --name=username --pass password --database eflows
+$ sudo /usr/local/bin/yaf --live pcap --in eth1 --out 127.0.0.1 --ipfix-port=18000 --ipfix tcp --log=/var/log/yaf.log --filter=&quot;port 53&quot; --applabel --applabel-rules=/usr/local/etc/yafApplabelRules.conf --max-payload=1000 --plugin-name=/usr/local/lib/yaf/dpacketplugin.la --plugin-opts=&quot;53&quot; &amp;
+</code></pre><p>Ensure YaF and mediator are connected:</p><pre class="language-code" data-language="code"><code class="language-code">$ sudo netstat -tupan|grep yaf
+tcp 0 0 127.0.0.1:18000 0.0.0.0:* LISTEN 6497/yaf_silk_mysql
+tcp 0 0 127.0.0.1:47417 127.0.0.1:18000 ESTABLISHED 6513/yaf
+tcp 0 0 127.0.0.1:18000 127.0.0.1:47417 ESTABLISHED 6497/yaf_silk_mysql
+</code></pre><p>You may use the following MySQL query to see when the table was last updated to ensure records are being inserted on a regular basis:</p><pre class="language-code" data-language="code"><code class="language-code">mysql&gt; SHOW TABLE STATUS in eflows;
+</code></pre><p>After a few minutes of collection, query a domain that has been recently resolved and you should see it in the DBMS.</p><pre class="language-code" data-language="code"><code class="language-code">mysql&gt; SELECT rrname,rrval from dns WHERE rrname LIKE &quot;%rsreese.com.&quot; GROUP BY rrval LIMIT 10;
++--------------+--------------------------------+
+| rrname | rrval |
++--------------+--------------------------------+
+| rsreese.com. | |
+| rsreese.com. | 2600:3c02::f03c:91ff:fe96:f7bd |
+| rsreese.com. | 74.207.234.79 |
+| rsreese.com. | ns1.linode.com. |
+| rsreese.com. | ns2.linode.com. |
+| rsreese.com. | ns3.linode.com. |
+| rsreese.com. | ns4.linode.com. |
+| rsreese.com. | ns5.linode.com. |
++--------------+--------------------------------+
+8 rows in set (18.26 sec)
+</code></pre><p>There are a number of different fields available for query so I leave it to you to come up with whatever is most useful for you. Further, think of how you could write a shiny front-end for analysts to use rather then having to use the MySQL command line interface. Hope you found this useful and leave a comment if you did or have any questions.</p></div><nav class="post-nav" aria-label="Post navigation"><a class="post-nav-card" href="/running-moloch/"><span>Previous</span>Running Moloch</a><a class="post-nav-card post-nav-next" href="/installing-xen-on-centos-6-from-source/"><span>Next</span>Installing Xen on CentOS 6 from source</a></nav></article><script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "BlogPosting", "headline": "Passive DNS collection and analysis using YaF and Mediator", "description": "Passive DNS is a useful tool for any analysts teams toolbox, I have noted several public sensors here but they only see data (queries and responses) that tra…", "datePublished": "2013-05-20T15:12:00.000Z", "dateModified": "2013-05-20T15:12:00.000Z", "author": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.linkedin.com/in/rsreese" }, "publisher": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.rsreese.com" }, "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.rsreese.com/passive-dns-collection-and-analysis-using-yaf-and-mediator/" }
+}
+</script></main><footer class="site-footer-wrap"><div class="site-footer"><p>© Stephen Reese · Built with Eleventy · <a href="https://www.linkedin.com/in/rsreese">LinkedIn</a> · <a href="https://twitter.com/rsreese">Twitter/X</a></p><a class="back-to-top" href="#top" aria-label="Back to top">Back to top ↑</a></div></footer><script>(function(){const root=document.documentElement,btn=document.querySelector('.theme-toggle'),key='rsreese-theme';function preferred(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}function apply(v){const mode=v==='light'||v==='dark'?v:preferred();root.setAttribute('data-theme',mode);root.dataset.themePreference=v||'system';if(btn){btn.setAttribute('aria-label',mode==='dark'?'Switch to light mode':'Switch to dark mode');btn.title=btn.getAttribute('aria-label')}}try{apply(localStorage.getItem(key)||'system')}catch(e){apply('system')}btn&&btn.addEventListener('click',function(){const current=root.getAttribute('data-theme')==='dark'?'dark':'light';const next=current==='dark'?'light':'dark';try{localStorage.setItem(key,next)}catch(e){}apply(next)});window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){try{if(!localStorage.getItem(key))apply('system')}catch(e){apply('system')}})})();</script><script>const navToggle=document.querySelector('.nav-toggle'),primaryNav=document.querySelector('#primary-nav');if(navToggle&&primaryNav){function setOpen(open){navToggle.setAttribute('aria-expanded',String(open));primaryNav.classList.toggle('is-open',open)}navToggle.addEventListener('click',()=>setOpen(navToggle.getAttribute('aria-expanded')!=='true'));primaryNav.addEventListener('click',e=>{if(e.target.matches('a'))setOpen(false)});document.addEventListener('click',e=>{if(!primaryNav.contains(e.target)&&!navToggle.contains(e.target))setOpen(false)});document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)})}</script><script src="/assets/js/code-enhance.js?v=3.0.0" defer></script></body></html>

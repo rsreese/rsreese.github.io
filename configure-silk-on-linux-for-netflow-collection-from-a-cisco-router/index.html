@@ -1,0 +1,156 @@
+<!doctype html><html lang="en" data-theme="auto"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Configure SiLK on Linux for NetFlow collection from a Cisco router</title><meta name="description" content="This guide walks through configuring SiLK from a source install on a Debian 6 host in order to collect NetFlow data from a Cisco router. The guides here and …"><link rel="canonical" href="https://www.rsreese.com/configure-silk-on-linux-for-netflow-collection-from-a-cisco-router/"><meta name="theme-color" content="#11191a"><meta property="og:type" content="article"><meta property="og:title" content="Configure SiLK on Linux for NetFlow collection from a Cisco router"><meta property="og:description" content="This guide walks through configuring SiLK from a source install on a Debian 6 host in order to collect NetFlow data from a Cisco router. The guides here and …"><meta property="og:url" content="https://www.rsreese.com/configure-silk-on-linux-for-netflow-collection-from-a-cisco-router/"><meta property="og:site_name" content="Stephen Reese"><meta property="article:author" content="https://www.linkedin.com/in/rsreese"><meta property="article:published_time" content="2011-08-15T04:43:00.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@rsreese"><meta name="twitter:creator" content="@rsreese"><meta name="twitter:title" content="Configure SiLK on Linux for NetFlow collection from a Cisco router"><meta name="twitter:description" content="This guide walks through configuring SiLK from a source install on a Debian 6 host in order to collect NetFlow data from a Cisco router. The guides here and …"><link rel="me" href="https://www.linkedin.com/in/rsreese"><link rel="me" href="https://twitter.com/rsreese"><script>(function(){try{var saved=localStorage.getItem('rsreese-theme');var dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',saved==='light'||saved==='dark'?saved:(dark?'dark':'light'));}catch(e){}})();</script><style>:root{--bg:#f7f7f4;--panel:#fff;--text:#1d2728;--muted:#667070;--line:#e3e2dc;--accent:#2f6f73;--ink:#11191a;--ink-soft:#dfe8e8;--ink-muted:#a8b7b7;--shadow:0 20px 50px rgba(29,39,40,.08)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:18px/1.65 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:inherit;text-decoration-thickness:.08em;text-underline-offset:.18em}.site-header-wrap{background:var(--ink);color:var(--ink-soft);border-bottom:1px solid rgba(255,255,255,.08)}.site-header{max-width:1120px;margin:0 auto;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{color:#fff;font-weight:800;text-decoration:none;letter-spacing:-.03em}.primary-nav{display:flex;gap:22px;flex-wrap:wrap;font-size:15px}.primary-nav a{color:var(--ink-muted);text-decoration:none}.primary-nav a:hover{color:#fff}.nav-toggle{display:none;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.08);color:#fff;padding:10px 14px;font:inherit;font-size:15px;font-weight:700;cursor:pointer}.nav-toggle-icon{width:10px;height:10px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .2s ease}.nav-toggle[aria-expanded=true] .nav-toggle-icon{transform:rotate(225deg) translateY(-1px)}.container{max-width:1120px;margin:0 auto;padding:24px}.hero{padding:96px 0 84px;max-width:860px}.eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:.12em;font-weight:800;font-size:13px}h1,h2,h3{line-height:1.08;letter-spacing:-.05em;margin:0 0 18px}h1{font-size:clamp(48px,10vw,112px)}h2{font-size:clamp(32px,5vw,54px)}h3{font-size:28px}.lede,.page-intro p{font-size:clamp(22px,3vw,30px);line-height:1.35;color:var(--muted);max-width:760px}.actions{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap}.button{display:inline-flex;padding:13px 18px;border-radius:999px;background:var(--text);color:#fff;text-decoration:none;font-weight:700;font-size:15px}.button-secondary{background:transparent;color:var(--text);border:1px solid var(--line)}.section-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:22px}.post-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.card,.list-card{background:var(--panel);border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:var(--shadow)}.card h3 a,.list-card h2 a{text-decoration:none}.card p,.list-card p,.content p,.content li{color:var(--muted)}.card-meta,.meta{color:var(--muted);font-size:14px;margin:0 0 14px}.page-intro{padding:72px 0 40px}.narrow,.post{max-width:780px}.post{padding:70px 0}.post h1{font-size:clamp(42px,7vw,76px)}.site-footer-wrap{margin-top:72px;background:var(--ink);color:var(--ink-muted)}.site-footer{max-width:1120px;margin:0 auto;padding:36px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:14px}.site-footer p{margin:0}.back-to-top{color:#fff;font-weight:800;text-decoration:none;white-space:nowrap}@media (max-width:800px){.site-header{position:relative;align-items:center;flex-direction:row;padding:18px}.brand{max-width:calc(100% - 108px)}.nav-toggle{display:inline-flex}.primary-nav{display:none;position:absolute;top:calc(100% - 8px);left:18px;right:18px;z-index:10;flex-direction:column;gap:0;padding:10px;background:var(--ink);border:1px solid rgba(255,255,255,.12);border-radius:22px;box-shadow:var(--shadow)}.primary-nav.is-open{display:flex}.primary-nav a{display:block;padding:14px 16px;border-radius:14px;color:#fff;font-weight:700}.primary-nav a:hover,.primary-nav a:focus{background:rgba(255,255,255,.08)}.site-footer{align-items:flex-start;flex-direction:column}.hero{padding-top:54px}.post-grid{grid-template-columns:1fr}}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.hamburger{width:22px;height:16px;display:inline-flex;flex-direction:column;justify-content:space-between}.hamburger span{display:block;height:2px;background:currentColor;border-radius:999px}.nav-toggle-icon{display:none}.theme-toggle{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#fff;width:40px;height:40px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}html[data-theme=dark]{color-scheme:dark;--bg:#0f1415;--panel:#151c1d;--text:#edf5f4;--muted:#a9b5b5;--line:#293334;--accent:#8bcbd3;--ink:#080d0e;--ink-soft:#f2f7f6;--ink-muted:#a9b8b7;--shadow:0 18px 45px rgba(0,0,0,.28)}</style><link rel="preload" href="/assets/css/main.css?v=3.0.0" as="style"><link rel="stylesheet" href="/assets/css/main.css?v=3.0.0" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/assets/css/main.css?v=3.0.0"></noscript><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-JH5ZXYTT84"></script><script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-JH5ZXYTT84'); </script></head><body id="top"><header class="site-header-wrap"><div class="site-header"><a class="brand" href="/">Stephen Reese</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><span class="sr-only">Open navigation</span><span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span></button><nav id="primary-nav" class="primary-nav" aria-label="Primary navigation"><a href="/about/">About</a><a href="/articles/">Articles</a><a href="/web-stack/">Web Stack</a><a href="/contact/">Contact</a></nav><button class="theme-toggle" type="button" aria-label="Toggle light and dark mode" title="Toggle light/dark mode"><span class="theme-toggle-icon" aria-hidden="true">◐</span></button></div></header><main class="container"><article class="post"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/articles/">Articles</a><span aria-hidden="true">/</span><span>Configure SiLK on Linux for NetFlow collection from a Cisco router</span></nav><h1>Configure SiLK on Linux for NetFlow collection from a Cisco router</h1><p class="meta">August 15, 2011 · By Stephen Reese</p><div class="content"><p>This guide walks through configuring <a href="http://tools.netsa.cert.org/silk/index.html">SiLK</a> from a source install on a
+<a href="http://www.debian.org/">Debian</a> 6 host in order to collect <a href="https://www.cisco.com/en/US/products/ps6601/products_ios_protocol_group_home.html">NetFlow</a> data from a Cisco
+router. The guides <a href="http://tools.netsa.cert.org/silk/install-handbook.html#x1-130002">here</a> and <a href="https://tools.netsa.cert.org/confluence/display/tt/Configure+SiLK+for+NetFlow+collection+from+a+Cisco+router">here</a> written by CERT <a href="https://www.cert.org/netsa/">NetSA</a> are
+quite good but lack some detail specific to the Debian distribution
+which required a bit of mucking about to get everything functioning
+correctly. This assumes that you have a Cisco router to send NetFlow
+data to a host on your network, in this case, a Debian host.</p><p>Installation:</p><p>First install a prerequisite.</p><pre class="language-code" data-language="code"><code class="language-code">$ sudo apt-get install libpcap-dev
+</code></pre><p>Next untar and change into the SiLK directory. For Debian I found that
+using the <em>/usr</em> directory worked well. By default the configure script
+uses <em>/usr/local</em> in which it places the binaries, libraries, etc
+outside of Debians default paths.</p><pre class="language-code" data-language="code"><code class="language-code">$ ./configure --prefix=/usr --sysconfdir=/etc/silk --enable-data-rootdir=/netflow --enable-ipv6 --enable-output-compression
+</code></pre><p>Your output should be something along the following:</p><pre class="language-code" data-language="code"><code class="language-code">
+```text
+* Configured package: SiLK 2.4.5
+* Host type: x86_64-unknown-linux-gnu
+* Source files ($top_srcdir): .
+* Install directory: /usr
+* Root of packed data tree: /netflow
+* Packing logic: via run-time plugin
+* Timezone support: UTC
+* Default compression method: SK_COMPMETHOD_ZLIB
+* IPv6 support: YES
+* IPFIX collection support: YES (-pthread -lfixbuf -lgthread-2.0 -lrt -lglib-2.0)
+* Transport encryption support: NO (gnutls not found)
+* IPA support: NO
+* LIBPCAP support: YES (-lpcap)
+* ADNS support: NO
+* Python support: NO
+* Build analysis tools: YES
+* Build packing tools: YES
+* Compiler (CC): gcc
+* Compiler flags (CFLAGS): -I$(srcdir) -I$(top_builddir)/src/include -I$(top_srcdir)/src/include -DNDEBUG -O3 -fno-strict-aliasing -Wall -W -Wmissing-prototypes -Wformat=2 -Wdeclaration-after-statement -Wpointer-arith
+* Linker flags (LDFLAGS):
+* Libraries (LIBS): -lz -ldl -lm
+``` </code></pre><p>Lastly:</p><pre class="language-code" data-language="code"><code class="language-code">$ make
+$ sudo make install
+</code></pre><p>Configuration:</p><p>Example files are available in the tarball that you extracted. Modified
+versions or notes for Debian and similar architectures available below.</p><p><em>/netflow/silk.conf</em> in your data directory, the default is <em>/data</em> but
+I used /netflow as you can see in the configure toggle above. The
+changes I made were to reduce the number of sensors.</p><pre class="language-code" data-language="code"><code class="language-code"># The syntactic format of this file
+# version 2 supports sensor descriptions, but otherwise identical to 1
+version 2 sensor 0 s0 &quot;Description for sensor S0&quot;
+sensor 1 s1 class all ```text
+sensors s0 s1
+``` end class # Editing above this line is sufficient for sensor definition.
+</code></pre><p><em>/etc/silk/sensor.conf</em> is the definition for the data coming in from
+your Cisco router:</p><pre class="language-code" data-language="code"><code class="language-code">probe s0 netflow-v5 ```text
+listen-on-port 9990
+protocol udp
+accept-from-host 172.16.0.1
+``` end probe sensor s0 ```text
+netflow-v5-probes s0
+internal-ipblocks 172.16.0.0/24
+external-ipblocks remainder
+``` end sensor
+</code></pre><p><em>/etc/silk/rwflowpack.conf</em>:</p><pre class="language-code" data-language="code"><code class="language-code">### Packer configuration file -*- sh -*-
+##
+## The canonical pathname for this file is /usr/local/etc/rwflowpack.conf
+##
+## RCSIDENT(&quot;$SiLK: rwflowpack.conf.in 16306 2010-09-15 18:14:41Z mthomas $&quot;)
+##
+## This is a /bin/sh file that gets loaded by the init.d/rwflowpack
+## wrapper script, and this file must follow /bin/sh syntax rules. # Set to non-empty value to enable rwflowpack
+ENABLED=yes # These are convenience variables for setting other values in this
+# configuration file; their use is not required.
+statedirectory=/var/lib/rwflowpack # If CREATE_DIRECTORIES is set to &quot;yes&quot;, the directories named in this
+# file will be created automatically if they do not already exist
+CREATE_DIRECTORIES=yes # Full path of the directory containing the &quot;rwflowpack&quot; program
+BIN_DIR=/usr/sbin # The full path to the sensor configuration file. Used by
+# --sensor-configuration. YOU MUST PROVIDE THIS (the value is ignored
+# when INPUT_MODE is &quot;respool&quot;).
+SENSOR_CONFIG=/etc/silk/sensor.conf # The full path to the root of the tree under which the packed SiLK
+# Flow files will be written. Used by --root-directory.
+DATA_ROOTDIR=/netflow # The full path to the site configuration file. Used by
+# --site-config-file. If not set, defaults to silk.conf in the
+# ${DATA_ROOTDIR}.
+SITE_CONFIG=/netflow/silk.conf # Specify the path to the packing-logic plug-in that rwflowpack should
+# load and use. The plug-in provides functions that determine into
+# which class and type each flow record will be categorized and the
+# format of the files that rwflowpack will write. When SiLK has been
+# configured with hard-coded packing logic (i.e., when
+# --enable-packing-logic was specified to the configure script), this
+# value should be empty. A default value for this switch may be
+# specified in the ${SITE_CONFIG} site configuration file. This value
+# is ignored when INPUT_MODE is &quot;respool&quot;.
+PACKING_LOGIC= # Data input mode. Valid values are:
+# * &quot;stream&quot; mode to read from the network or from probes that have
+# poll-directories
+# * &quot;fcfiles&quot; to process flowcap files on the local disk
+# * &quot;respool&quot; to process SiLK flow files maintaining the sensor and
+# class/type values that already exist on those records.
+INPUT_MODE=stream # Directory in which to look for incoming flowcap files in &quot;fcfiles&quot;
+# mode or for incoming SiLK files in &quot;respool&quot; mode
+INCOMING_DIR=${statedirectory}/incoming # Directory to move input files to after successful processing. When
+# in &quot;stream&quot; mode, these are the files passed to any probe with a
+# poll-directory directive. When in &quot;fcfiles&quot; mode, these are the
+# flowcap files. When in &quot;respool&quot; mode, these are the SiLK Flow
+# files. If not set, the input files are not archived but are deleted
+# instead.
+ARCHIVE_DIR=${statedirectory}/archive # When using the ARCHIVE_DIR, normally files are stored in
+# subdirectories of the ARCHIVE_DIR. If this variable's value is 1,
+# files are stored in ARCHIVE_DIR itself, not in subdirectories of it.
+FLAT_ARCHIVE=0 # Directory to move an input file into if there is a problem opening
+# the file. If this value is not set, rwflowpack will exit when it
+# encounters a problem file. When in &quot;fcfiles&quot; mode, these are the
+# flowcap files. When in &quot;stream&quot; mode, these are the files passed to
+# any probe with a poll-directory directive.
+ERROR_DIR= #${statedirectory}/error # Data output mode. Valid values are &quot;local&quot; and &quot;remote&quot;. &quot;local&quot;
+# writes the hourly data files to the local disk. &quot;remote&quot; creates
+# small files (called incremental files) that must be processed by
+# rwflowappend to create the hourly files.
+OUTPUT_MODE=local # Directory in which the incremental files are written when the
+# OUTPUT_MODE is &quot;remote&quot;. Typically there is an rwsender deamon that
+# polls this directory for new incremental files.
+SENDER_DIR=${statedirectory}/sender-incoming # Temporary directory in which to build incremental files prior to
+# handing them to rwsender. Used only when OUTPUT_MODE is &quot;remote&quot;.
+INCREMENTAL_DIR=${statedirectory}/incremental # The type of compression to use for packed files. Left empty, the
+# value chosen at compilation time will be used. Valid values are
+# &quot;best&quot; and &quot;none&quot;. Other values are system-specific (the available
+# values are listed in the description of the --compression-method
+# switch in the output of rwflowpack --help).
+COMPRESSION_TYPE=best # Interval between attempts to check the INCOMING_DIR or
+# poll-directory probe entries for new files, in seconds. This may be
+# left blank, and will default to 15.
+POLLING_INTERVAL= # Interval between periodic flushes of open SiLK Flow files to disk,
+# in seconds. This may be left blank, and will default to 120.
+FLUSH_TIMEOUT= # Maximum number of SiLK Flow files to have open for writing
+# simultaneously. This may be left blank, and will default to 64
+FILE_CACHE_SIZE= # Whether rwflowpack should use advisory write locks. 1=yes, 0=no.
+# Set to zero if messages like &quot;Cannot get a write lock on file&quot;
+# appear in rwflowpack's log file.
+FILE_LOCKING=1 # Whether rwflowpack should include the input and output SNMP
+# interfaces and the next-hop-ip in the output files. 1=yes, 0=no.
+# The default is no, and these values are not stored to save disk
+# space. (The input and output fields contain VLAN tags when the
+# sensor.conf file contains the attribute &quot;interface-values vlan&quot;.)
+PACK_INTERFACES=0 ### # The type of logging to use. Valid values are &quot;legacy&quot; and &quot;syslog&quot;.
+LOG_TYPE=syslog # The lowest level of logging to actually log. Valid values are:
+# emerg, alert, crit, err, warning, notice, info, debug
+LOG_LEVEL=info # The full path of the directory where the log files will be written
+# when LOG_TYPE is &quot;legacy&quot;.
+LOG_DIR=/var/log # The full path of the directory where the PID file will be written
+PID_DIR=${LOG_DIR} # The user this program runs as; root permission is required only when
+# rwflowpack listens on a privileged port.
+USER=root
+#USER=`whoami` # run as user invoking the script # Extra options to pass to rwflowpack
+EXTRA_OPTIONS=
+</code></pre><p><em>/etc/init.d/rwflowback</em> directory, the only change was to line 38 in
+order to change to the configuration specified in the configure
+statement.</p><pre class="language-text" data-language="text"><code class="language-text">SCRIPT_CONFIG_LOCATION=&quot;/etc/silk&quot; </code></pre><p>With everything installed in their respective locations it is time to
+move on to setting up the Cisco device.</p><pre class="language-text" data-language="text"><code class="language-text">Router(config)# ip cef Router(config)# ip flow-export source Loopback0 Router(config)# ip flow-export version 5 Router(config)# ip flow-export destination x.x.x.x 9990 Router(config)# interface f1/0 Router(config-if)# ip flow ingress Router(config-if)# ip flow egress </code></pre><p>I hope this helps. If you have any comments or questions, leave a
+comment below.</p></div><nav class="post-nav" aria-label="Post navigation"><a class="post-nav-card" href="/setting-google-storage-object-acl-for-authenticated-downloads/"><span>Previous</span>Setting Google Storage object ACL for authenticated downloads</a><a class="post-nav-card post-nav-next" href="/configure-yaf-on-linux-for-netflow-collection-from-a-network-tap-or-span/"><span>Next</span>Configure YAF on Linux for NetFlow collection from a network tap or SPAN</a></nav></article><script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "BlogPosting", "headline": "Configure SiLK on Linux for NetFlow collection from a Cisco router", "description": "This guide walks through configuring SiLK from a source install on a Debian 6 host in order to collect NetFlow data from a Cisco router. The guides here and …", "datePublished": "2011-08-15T04:43:00.000Z", "dateModified": "2011-08-15T04:43:00.000Z", "author": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.linkedin.com/in/rsreese" }, "publisher": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.rsreese.com" }, "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.rsreese.com/configure-silk-on-linux-for-netflow-collection-from-a-cisco-router/" }
+}
+</script></main><footer class="site-footer-wrap"><div class="site-footer"><p>© Stephen Reese · Built with Eleventy · <a href="https://www.linkedin.com/in/rsreese">LinkedIn</a> · <a href="https://twitter.com/rsreese">Twitter/X</a></p><a class="back-to-top" href="#top" aria-label="Back to top">Back to top ↑</a></div></footer><script>(function(){const root=document.documentElement,btn=document.querySelector('.theme-toggle'),key='rsreese-theme';function preferred(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}function apply(v){const mode=v==='light'||v==='dark'?v:preferred();root.setAttribute('data-theme',mode);root.dataset.themePreference=v||'system';if(btn){btn.setAttribute('aria-label',mode==='dark'?'Switch to light mode':'Switch to dark mode');btn.title=btn.getAttribute('aria-label')}}try{apply(localStorage.getItem(key)||'system')}catch(e){apply('system')}btn&&btn.addEventListener('click',function(){const current=root.getAttribute('data-theme')==='dark'?'dark':'light';const next=current==='dark'?'light':'dark';try{localStorage.setItem(key,next)}catch(e){}apply(next)});window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){try{if(!localStorage.getItem(key))apply('system')}catch(e){apply('system')}})})();</script><script>const navToggle=document.querySelector('.nav-toggle'),primaryNav=document.querySelector('#primary-nav');if(navToggle&&primaryNav){function setOpen(open){navToggle.setAttribute('aria-expanded',String(open));primaryNav.classList.toggle('is-open',open)}navToggle.addEventListener('click',()=>setOpen(navToggle.getAttribute('aria-expanded')!=='true'));primaryNav.addEventListener('click',e=>{if(e.target.matches('a'))setOpen(false)});document.addEventListener('click',e=>{if(!primaryNav.contains(e.target)&&!navToggle.contains(e.target))setOpen(false)});document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)})}</script><script src="/assets/js/code-enhance.js?v=3.0.0" defer></script></body></html>

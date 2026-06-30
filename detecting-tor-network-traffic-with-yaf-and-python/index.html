@@ -1,0 +1,118 @@
+<!doctype html><html lang="en" data-theme="auto"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Detecting Tor network traffic with YaF and Python</title><meta name="description" content="This entry continues a series of posts on identifying Tor network traffic and usage. The entry will demonstrate how to parse the output of YaF records via me…"><link rel="canonical" href="https://www.rsreese.com/detecting-tor-network-traffic-with-yaf-and-python/"><meta name="theme-color" content="#11191a"><meta property="og:type" content="article"><meta property="og:title" content="Detecting Tor network traffic with YaF and Python"><meta property="og:description" content="This entry continues a series of posts on identifying Tor network traffic and usage. The entry will demonstrate how to parse the output of YaF records via me…"><meta property="og:url" content="https://www.rsreese.com/detecting-tor-network-traffic-with-yaf-and-python/"><meta property="og:site_name" content="Stephen Reese"><meta property="article:author" content="https://www.linkedin.com/in/rsreese"><meta property="article:published_time" content="2014-02-19T08:36:00.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@rsreese"><meta name="twitter:creator" content="@rsreese"><meta name="twitter:title" content="Detecting Tor network traffic with YaF and Python"><meta name="twitter:description" content="This entry continues a series of posts on identifying Tor network traffic and usage. The entry will demonstrate how to parse the output of YaF records via me…"><link rel="me" href="https://www.linkedin.com/in/rsreese"><link rel="me" href="https://twitter.com/rsreese"><script>(function(){try{var saved=localStorage.getItem('rsreese-theme');var dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',saved==='light'||saved==='dark'?saved:(dark?'dark':'light'));}catch(e){}})();</script><style>:root{--bg:#f7f7f4;--panel:#fff;--text:#1d2728;--muted:#667070;--line:#e3e2dc;--accent:#2f6f73;--ink:#11191a;--ink-soft:#dfe8e8;--ink-muted:#a8b7b7;--shadow:0 20px 50px rgba(29,39,40,.08)}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font:18px/1.65 ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}a{color:inherit;text-decoration-thickness:.08em;text-underline-offset:.18em}.site-header-wrap{background:var(--ink);color:var(--ink-soft);border-bottom:1px solid rgba(255,255,255,.08)}.site-header{max-width:1120px;margin:0 auto;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:24px}.brand{color:#fff;font-weight:800;text-decoration:none;letter-spacing:-.03em}.primary-nav{display:flex;gap:22px;flex-wrap:wrap;font-size:15px}.primary-nav a{color:var(--ink-muted);text-decoration:none}.primary-nav a:hover{color:#fff}.nav-toggle{display:none;align-items:center;gap:10px;border:1px solid rgba(255,255,255,.16);border-radius:999px;background:rgba(255,255,255,.08);color:#fff;padding:10px 14px;font:inherit;font-size:15px;font-weight:700;cursor:pointer}.nav-toggle-icon{width:10px;height:10px;border-right:2px solid currentColor;border-bottom:2px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .2s ease}.nav-toggle[aria-expanded=true] .nav-toggle-icon{transform:rotate(225deg) translateY(-1px)}.container{max-width:1120px;margin:0 auto;padding:24px}.hero{padding:96px 0 84px;max-width:860px}.eyebrow{color:var(--accent);text-transform:uppercase;letter-spacing:.12em;font-weight:800;font-size:13px}h1,h2,h3{line-height:1.08;letter-spacing:-.05em;margin:0 0 18px}h1{font-size:clamp(48px,10vw,112px)}h2{font-size:clamp(32px,5vw,54px)}h3{font-size:28px}.lede,.page-intro p{font-size:clamp(22px,3vw,30px);line-height:1.35;color:var(--muted);max-width:760px}.actions{display:flex;gap:14px;margin-top:32px;flex-wrap:wrap}.button{display:inline-flex;padding:13px 18px;border-radius:999px;background:var(--text);color:#fff;text-decoration:none;font-weight:700;font-size:15px}.button-secondary{background:transparent;color:var(--text);border:1px solid var(--line)}.section-heading{display:flex;align-items:end;justify-content:space-between;gap:24px;margin-bottom:22px}.post-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:22px}.card,.list-card{background:var(--panel);border:1px solid var(--line);border-radius:28px;padding:28px;box-shadow:var(--shadow)}.card h3 a,.list-card h2 a{text-decoration:none}.card p,.list-card p,.content p,.content li{color:var(--muted)}.card-meta,.meta{color:var(--muted);font-size:14px;margin:0 0 14px}.page-intro{padding:72px 0 40px}.narrow,.post{max-width:780px}.post{padding:70px 0}.post h1{font-size:clamp(42px,7vw,76px)}.site-footer-wrap{margin-top:72px;background:var(--ink);color:var(--ink-muted)}.site-footer{max-width:1120px;margin:0 auto;padding:36px 24px;display:flex;align-items:center;justify-content:space-between;gap:20px;font-size:14px}.site-footer p{margin:0}.back-to-top{color:#fff;font-weight:800;text-decoration:none;white-space:nowrap}@media (max-width:800px){.site-header{position:relative;align-items:center;flex-direction:row;padding:18px}.brand{max-width:calc(100% - 108px)}.nav-toggle{display:inline-flex}.primary-nav{display:none;position:absolute;top:calc(100% - 8px);left:18px;right:18px;z-index:10;flex-direction:column;gap:0;padding:10px;background:var(--ink);border:1px solid rgba(255,255,255,.12);border-radius:22px;box-shadow:var(--shadow)}.primary-nav.is-open{display:flex}.primary-nav a{display:block;padding:14px 16px;border-radius:14px;color:#fff;font-weight:700}.primary-nav a:hover,.primary-nav a:focus{background:rgba(255,255,255,.08)}.site-footer{align-items:flex-start;flex-direction:column}.hero{padding-top:54px}.post-grid{grid-template-columns:1fr}}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}.hamburger{width:22px;height:16px;display:inline-flex;flex-direction:column;justify-content:space-between}.hamburger span{display:block;height:2px;background:currentColor;border-radius:999px}.nav-toggle-icon{display:none}.theme-toggle{border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.08);color:#fff;width:40px;height:40px;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center}html[data-theme=dark]{color-scheme:dark;--bg:#0f1415;--panel:#151c1d;--text:#edf5f4;--muted:#a9b5b5;--line:#293334;--accent:#8bcbd3;--ink:#080d0e;--ink-soft:#f2f7f6;--ink-muted:#a9b8b7;--shadow:0 18px 45px rgba(0,0,0,.28)}</style><link rel="preload" href="/assets/css/main.css?v=3.0.0" as="style"><link rel="stylesheet" href="/assets/css/main.css?v=3.0.0" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/assets/css/main.css?v=3.0.0"></noscript><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-JH5ZXYTT84"></script><script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-JH5ZXYTT84'); </script></head><body id="top"><header class="site-header-wrap"><div class="site-header"><a class="brand" href="/">Stephen Reese</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><span class="sr-only">Open navigation</span><span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span></button><nav id="primary-nav" class="primary-nav" aria-label="Primary navigation"><a href="/about/">About</a><a href="/articles/">Articles</a><a href="/web-stack/">Web Stack</a><a href="/contact/">Contact</a></nav><button class="theme-toggle" type="button" aria-label="Toggle light and dark mode" title="Toggle light/dark mode"><span class="theme-toggle-icon" aria-hidden="true">◐</span></button></div></header><main class="container"><article class="post"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/articles/">Articles</a><span aria-hidden="true">/</span><span>Detecting Tor network traffic with YaF and Python</span></nav><h1>Detecting Tor network traffic with YaF and Python</h1><p class="meta">February 19, 2014 · By Stephen Reese</p><div class="content"><p>This entry continues a series of <a href="http://www.rsreese.com/tag/tor/">posts</a> on identifying Tor network
+traffic and usage. The entry will demonstrate how to parse the output of
+YaF records via mediator using a Python script in order to determine if
+the SSL certificate values match the pattern of Tor certificates. It is
+assumed you have downloaded, compiled and installed <a href="http://tools.netsa.cert.org/yaf/">YaF</a>,
+<a href="https://tools.netsa.cert.org/confluence/display/tt/YAF+2.x+IPFIX+File+Mediator">mediator</a>, and <a href="https://tools.netsa.cert.org/fixbuf/">libfixbuf</a>. Please see prior <a href="http://www.rsreese.com/tag/silk/">posts</a> on this
+topic or the respective documentation for installation help if needed.</p><p>We first generate the YaF records from the PCAP we acquired. You can
+grab the example PCAP from <a href="http://www.cloudshark.org/captures/96ed6d98c159">cloudshark</a>.</p><pre class="language-code" data-language="code"><code class="language-code">$ yaf --in tor.pcap --out tor.yaf
+</code></pre><p>Next, parse the YaF output using mediator to disk in a format that we
+can parse. Alternatively, we could output to MySQL verse flat text
+files.</p><pre class="language-code" data-language="code"><code class="language-code">$ yaf_file_mediator-1.1.0/yaf_file_mediator --input tor.yaf --output tor.txt
+**** Total flow count is 29 ****
+**** Stats Total Count is 1 ****
+</code></pre><p>Using Python, we can parse the records for patterns that match Tor SSL
+certificates.</p><pre class="language-java" data-language="java"><code class="language-java">:::python
+#!/usr/bin/python import re
+import sys filename = sys.argv[1]
+myfile = open(filename,'r')
+sourceIP = 'Source IP:'
+destIP = 'Destination IP:'
+issuerID = 'Issuer ID:'
+subjectID = 'Subject ID:'
+for line in myfile.readlines(): line = line.strip() if line.startswith(sourceIP): sourceIPline = line elif line.startswith(destIP): destIPline = line elif line and line.startswith(issuerID): issuerDomain = re.search(r'www.\w+.com', line) elif line and line.startswith(subjectID): subjectDomain = re.search(r'www.\w+.net', line) if issuerDomain and subjectDomain: print (sourceIPline) print (destIPline) print issuerDomain.group() print subjectDomain.group() print
+myfile.close
+</code></pre><p>The following is an example output from the example PCAP provided earlier in this post. The Python regular expression ignores other SSL certificate values as they traditionally do not match the pattern that Tor certificates use, the inclusion of a domain for the Issuer and Subject IDs. That said, false-positives could be introduced.</p><pre class="language-code" data-language="code"><code class="language-code">$ tor-ssl-parser.py tor.txt
+Source IP: 10.0.0.126
+Destination IP: 198.27.97.223
+www.axslhtfqq.com
+www.hkkch64skp7am.net Source IP: 10.0.0.126
+Destination IP: 96.127.153.58
+www.rtqtkopfct767ai.com
+www.facp2b2y5wjffbo5ioy.net Source IP: 10.0.0.126
+Destination IP: 192.151.147.5
+www.5m6ywj2w7zs.com
+www.iolbr3jbfs.net Source IP: 10.0.0.126
+Destination IP: 66.18.12.197
+www.igdpzct5tauwgyqs.com
+www.4tdznzbrfuv.net Source IP: 10.0.0.126
+Destination IP: 64.62.249.222
+www.3pzqe4en5.com
+www.glk3fwiz6.net Source IP: 10.0.0.126
+Destination IP: 212.83.158.173
+www.lvv4l6sx3qafei2s5u.com
+www.vznlngjz7a2fpg.net Source IP: 10.0.0.126
+Destination IP: 212.83.155.250
+www.mbrdx4tz2ob5wlvazlr.com
+www.shxl35n3zt.net Source IP: 10.0.0.126
+Destination IP: 212.83.140.45
+www.3pxivyds.com
+www.nolspqtib3ix.net Source IP: 10.0.0.126
+Destination IP: 212.83.158.50
+www.s426lumoi7.com
+www.ouzbot23a6lw3vvmszx.net Source IP: 10.0.0.126
+Destination IP: 212.83.158.40
+www.3eexfeaw.com
+www.iedhzej4tie4egm.net Source IP: 10.0.0.126
+Destination IP: 212.83.158.5
+www.2fwld67ac2.com
+www.6suxdq3miwwewq4.net Source IP: 10.0.0.126
+Destination IP: 31.7.186.228
+www.5orbut4ufhohm5rlj47.com
+www.orutxjqwf.net Source IP: 10.0.0.126
+Destination IP: 216.66.85.146
+www.6pp7bfbdywvcaicqmfq.com
+www.g6oa3qdobmdgl5tprm.net Source IP: 10.0.0.126
+Destination IP: 178.254.35.132
+www.hbwpqbx4zimtptui.com
+www.77wneeix55t.net Source IP: 10.0.0.126
+Destination IP: 188.40.98.96
+www.ozsx22b4nda.com
+www.lr7s5k3n6ber.net Source IP: 10.0.0.126
+Destination IP: 80.100.45.156
+www.npmxal2ohuefme26yf.com
+www.c7kriuquvh.net Source IP: 10.0.0.126
+Destination IP: 91.143.91.174
+www.zcgg5yiwzajal4.com
+www.55a4kx5jrqxezvk.net Source IP: 10.0.0.126
+Destination IP: 85.17.122.80
+www.plgx26wgyroot37x3ysj.com
+www.xwx5gpj5t2msq3.net Source IP: 10.0.0.126
+Destination IP: 88.159.20.120
+www.s5rc22gpzrwt4e.com
+www.qzsg2ioaoplbs2gaha5.net Source IP: 10.0.0.126
+Destination IP: 37.59.150.178
+www.vywbff5wkza6npkd5l.com
+www.ugdrrog5ro5wdfddj.net Source IP: 10.0.0.126
+Destination IP: 91.219.237.229
+www.twngp3xrqgo4p.com
+www.znskvp5k5pns22y2.net Source IP: 10.0.0.126
+Destination IP: 95.211.225.167
+www.75ba5lymxpbhw3a2kb.com
+www.rnspic4yus5crf6w.net Source IP: 10.0.0.126
+Destination IP: 82.96.35.7
+www.spx5a4e5eyhkdtpt2xj.com
+www.6phyovjhggkfm.net Source IP: 10.0.0.126
+Destination IP: 83.140.59.2
+www.o5qzqtbs.com
+www.bnymkm3nk7jtz3.net Source IP: 10.0.0.126
+Destination IP: 82.96.35.8
+www.7wdf4rkj5mew.com
+www.sd5mkmsmo.net Source IP: 10.0.0.126
+Destination IP: 93.180.156.45
+www.rxy4jiw4wk.com
+www.g66mipkcyhjwumywk4h.net Source IP: 10.0.0.126
+Destination IP: 81.218.109.195
+www.gempmzrnwnk.com
+www.6lrz7wtwprz.net Source IP: 10.0.0.126
+Destination IP: 31.172.30.4
+www.4jvdpoo5wcklhd3usu.com
+www.f4uxyorx2h.net Source IP: 10.0.0.126
+Destination IP: 50.7.194.122
+www.pxznjv3t75.com
+www.wuqq77l634eogfm.net
+</code></pre><p>Please leave a comment if you have any questions.</p></div><nav class="post-nav" aria-label="Post navigation"><a class="post-nav-card" href="/detecting-tor-network-traffic-with-silk/"><span>Previous</span>Detecting Tor network traffic with SiLK</a><a class="post-nav-card post-nav-next" href="/parsing-netflow-using-kibana-via-logstash-to-elasticsearch/"><span>Next</span>Parsing Netflow using Kibana via Logstash to ElasticSearch</a></nav></article><script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "BlogPosting", "headline": "Detecting Tor network traffic with YaF and Python", "description": "This entry continues a series of posts on identifying Tor network traffic and usage. The entry will demonstrate how to parse the output of YaF records via me…", "datePublished": "2014-02-19T08:36:00.000Z", "dateModified": "2014-02-19T08:36:00.000Z", "author": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.linkedin.com/in/rsreese" }, "publisher": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.rsreese.com" }, "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.rsreese.com/detecting-tor-network-traffic-with-yaf-and-python/" }
+}
+</script></main><footer class="site-footer-wrap"><div class="site-footer"><p>© Stephen Reese · Built with Eleventy · <a href="https://www.linkedin.com/in/rsreese">LinkedIn</a> · <a href="https://twitter.com/rsreese">Twitter/X</a></p><a class="back-to-top" href="#top" aria-label="Back to top">Back to top ↑</a></div></footer><script>(function(){const root=document.documentElement,btn=document.querySelector('.theme-toggle'),key='rsreese-theme';function preferred(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}function apply(v){const mode=v==='light'||v==='dark'?v:preferred();root.setAttribute('data-theme',mode);root.dataset.themePreference=v||'system';if(btn){btn.setAttribute('aria-label',mode==='dark'?'Switch to light mode':'Switch to dark mode');btn.title=btn.getAttribute('aria-label')}}try{apply(localStorage.getItem(key)||'system')}catch(e){apply('system')}btn&&btn.addEventListener('click',function(){const current=root.getAttribute('data-theme')==='dark'?'dark':'light';const next=current==='dark'?'light':'dark';try{localStorage.setItem(key,next)}catch(e){}apply(next)});window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){try{if(!localStorage.getItem(key))apply('system')}catch(e){apply('system')}})})();</script><script>const navToggle=document.querySelector('.nav-toggle'),primaryNav=document.querySelector('#primary-nav');if(navToggle&&primaryNav){function setOpen(open){navToggle.setAttribute('aria-expanded',String(open));primaryNav.classList.toggle('is-open',open)}navToggle.addEventListener('click',()=>setOpen(navToggle.getAttribute('aria-expanded')!=='true'));primaryNav.addEventListener('click',e=>{if(e.target.matches('a'))setOpen(false)});document.addEventListener('click',e=>{if(!primaryNav.contains(e.target)&&!navToggle.contains(e.target))setOpen(false)});document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)})}</script><script src="/assets/js/code-enhance.js?v=3.0.0" defer></script></body></html>
