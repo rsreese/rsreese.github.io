@@ -1,0 +1,120 @@
+<!doctype html><html lang="en" data-theme="auto"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Making WordPress Fast</title><meta name="description" content="This site previously used WordPress as a CMS platform. Quite a bit of time was spent tuning in order to get page load times that were consistently less then …"><link rel="canonical" href="https://www.rsreese.com/making-wordpress-fast/"><meta name="theme-color" content="#11191a"><meta property="og:type" content="article"><meta property="og:title" content="Making WordPress Fast"><meta property="og:description" content="This site previously used WordPress as a CMS platform. Quite a bit of time was spent tuning in order to get page load times that were consistently less then …"><meta property="og:url" content="https://www.rsreese.com/making-wordpress-fast/"><meta property="og:site_name" content="Stephen Reese"><meta property="article:author" content="https://www.linkedin.com/in/rsreese"><meta property="article:published_time" content="2014-12-15T17:00:00.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@rsreese"><meta name="twitter:creator" content="@rsreese"><meta name="twitter:title" content="Making WordPress Fast"><meta name="twitter:description" content="This site previously used WordPress as a CMS platform. Quite a bit of time was spent tuning in order to get page load times that were consistently less then …"><link rel="me" href="https://www.linkedin.com/in/rsreese"><link rel="me" href="https://twitter.com/rsreese"><script>(function(){try{var saved=localStorage.getItem('rsreese-theme');var dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',saved==='light'||saved==='dark'?saved:(dark?'dark':'light'));}catch(e){}})();</script><style>/* ====================================================================== Critical CSS — rsreese.com Eleventy Purpose: inline-only first paint styles. Keep this file small. Full component styling belongs in main.css. ====================================================================== */ /* ---------------------------------------------------------------------- 1. Design Tokens ---------------------------------------------------------------------- */
+:root { color-scheme: light dark; --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; --content-width: 760px; --wide-width: 980px; --page-pad: 30px; --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 30px; --space-7: 40px; --space-8: 56px; --space-9: 72px; --bg: #f7f5ef; --surface: #ffffff; --surface-soft: #faf8f2; --text: #181713; --muted: #69645b; --border: #ded8ca; --link: #814b18; --link-hover: #4e2b08; --header-bg: #101718; --header-text: #fff8ea; --footer-bg: #101718; --footer-text: #fff8ea; --radius: 14px; --shadow: 0 12px 35px rgba(23, 18, 10, 0.08); --transition: 180ms ease;
+} [data-theme="dark"] { --bg: #11100d; --surface: #1b1915; --surface-soft: #171511; --text: #f6efe2; --muted: #c8bdab; --border: #3b352b; --link: #f2c078; --link-hover: #ffd99b; --header-bg: #070706; --header-text: #fff8ea; --footer-bg: #070706; --footer-text: #fff8ea; --shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+} @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #11100d; --surface: #1b1915; --surface-soft: #171511; --text: #f6efe2; --muted: #c8bdab; --border: #3b352b; --link: #f2c078; --link-hover: #ffd99b; --header-bg: #070706; --header-text: #fff8ea; --footer-bg: #070706; --footer-text: #fff8ea; --shadow: 0 12px 35px rgba(0, 0, 0, 0.35); }
+} /* ---------------------------------------------------------------------- 2. Base / Sticky Footer ---------------------------------------------------------------------- */
+* { box-sizing: border-box;
+} html { min-height: 100%; scroll-behavior: smooth; text-size-adjust: 100%;
+} body { min-height: 100vh; margin: 0; display: flex; flex-direction: column; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+} main { flex: 1 0 auto;
+} img,
+svg,
+video { max-width: 100%; height: auto;
+} img { border-radius: calc(var(--radius) - 6px);
+} /* ---------------------------------------------------------------------- 3. Typography Essentials ---------------------------------------------------------------------- */
+a { color: var(--link); text-decoration-thickness: 0.08em; text-underline-offset: 0.18em; transition: color var(--transition);
+} a:hover,
+a:focus-visible { color: var(--link-hover);
+} h1,
+h2,
+h3,
+h4 { margin: 0 0 var(--space-4); color: var(--text); line-height: 1.12; letter-spacing: -0.035em; font-weight: 760;
+} h1 { font-size: clamp(2.25rem, 7vw, 4.75rem);
+} h2 { font-size: clamp(1.65rem, 4vw, 2.6rem);
+} h3 { font-size: clamp(1.25rem, 3vw, 1.65rem);
+} p { margin: 0 0 var(--space-5);
+} .lede,
+.hero p,
+.intro p,
+.page-intro p { max-width: 68ch; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.25rem); line-height: 1.65;
+} /* ---------------------------------------------------------------------- 4. Shared Layout ---------------------------------------------------------------------- */
+.container { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .content { width: min(100% - calc(var(--page-pad) * 2), var(--content-width)); margin-inline: auto;
+} .content-wide { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .page-section,
+.hero,
+.intro,
+.page-header,
+.article-header { padding-block: var(--space-6);
+} .page-bottom-space,
+.home-articles,
+.articles-page,
+.article-list-section { padding-bottom: var(--space-8);
+} /* ---------------------------------------------------------------------- 5. Header / Navigation ---------------------------------------------------------------------- */
+.site-header { flex: 0 0 auto; background: var(--header-bg); color: var(--header-text); border-bottom: 1px solid rgba(255, 248, 234, 0.12);
+} .site-header a { color: var(--header-text); text-decoration: none;
+} .header-inner,
+.nav-wrap { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); min-height: 72px; margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
+} .site-title,
+.logo,
+.brand { color: var(--header-text); font-size: 1rem; font-weight: 760; letter-spacing: -0.02em; white-space: nowrap;
+} .primary-nav,
+.site-nav,
+.nav-links { display: flex; align-items: center; gap: var(--space-4);
+} .primary-nav a,
+.site-nav a,
+.nav-links a { color: var(--header-text); opacity: 0.9; font-size: 0.95rem; font-weight: 650;
+} .primary-nav a:hover,
+.primary-nav a:focus-visible,
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.nav-links a:hover,
+.nav-links a:focus-visible { opacity: 1;
+} .nav-toggle,
+.menu-toggle,
+.theme-toggle { display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 248, 234, 0.2); border-radius: 999px; background: transparent; color: var(--header-text); font: inherit; cursor: pointer;
+} .nav-toggle,
+.menu-toggle { display: none; width: 42px; height: 42px;
+} .theme-toggle { min-width: 42px; min-height: 42px; padding-inline: var(--space-3);
+} .hamburger,
+.menu-icon { width: 22px; height: 16px; position: relative; display: inline-flex; flex-direction: column; justify-content: space-between; background: transparent;
+} .hamburger span { display: block; width: 100%; height: 2px; background: currentColor; border-radius: 999px;
+} .menu-icon { height: 2px; display: block; background: currentColor;
+} .menu-icon::before,
+.menu-icon::after { content: ""; position: absolute; left: 0; width: 22px; height: 2px; background: currentColor; border-radius: 999px;
+} .menu-icon::before { top: -7px;
+} .menu-icon::after { top: 7px;
+} /* ---------------------------------------------------------------------- 6. Hero / Intro First Paint ---------------------------------------------------------------------- */
+.hero,
+.intro,
+.page-header { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .hero-inner,
+.intro-inner,
+.page-header-inner { width: min(100%, var(--content-width));
+} .hero-actions,
+.actions,
+.cta-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5);
+} .button,
+.btn,
+.hero a.button,
+.hero a.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--space-4); border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); font-weight: 700; text-decoration: none;
+} .button-primary,
+.btn-primary,
+.hero a:first-child.button,
+.hero a:first-child.btn { background: var(--text); border-color: var(--text); color: var(--bg);
+} [data-theme="dark"] .button-primary,
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] .hero a:first-child.button,
+[data-theme="dark"] .hero a:first-child.btn { background: var(--header-text); border-color: var(--header-text); color: var(--header-bg);
+} /* ---------------------------------------------------------------------- 7. Article Card Shells Above Fold ---------------------------------------------------------------------- */
+.article-list,
+.articles-list,
+.latest-articles { display: grid; gap: var(--space-4);
+} .article-card { width: 100%; margin: 0; padding: var(--space-5); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
+} .article-card h2,
+.article-card h3 { margin-bottom: var(--space-2);
+} .article-card p,
+.article-card time,
+.article-meta { color: var(--muted);
+} /* ---------------------------------------------------------------------- 8. Footer ---------------------------------------------------------------------- */
+.site-footer { flex: 0 0 auto; margin-top: auto; padding-block: var(--space-6); background: var(--footer-bg); color: var(--footer-text); border-top: 1px solid rgba(255, 248, 234, 0.12);
+} .footer-inner { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+} .site-footer a { color: var(--footer-text);
+} .back-to-top { font-weight: 700; text-decoration: none;
+} /* ---------------------------------------------------------------------- 9. Mobile Critical Layout ---------------------------------------------------------------------- */
+@media (max-width: 760px) { :root { --page-pad: 22px; } body { font-size: 16px; } .header-inner, .nav-wrap { min-height: 64px; } .nav-toggle, .menu-toggle { display: inline-flex; } .primary-nav, .site-nav, .nav-links { position: absolute; inset-inline: var(--page-pad); top: 64px; z-index: 50; display: none; flex-direction: column; align-items: stretch; gap: 0; padding: var(--space-3); border: 1px solid rgba(255, 248, 234, 0.14); border-radius: var(--radius); background: var(--header-bg); box-shadow: var(--shadow); } .primary-nav.is-open, .site-nav.is-open, .nav-links.is-open, [data-menu-open="true"] .primary-nav, [data-menu-open="true"] .site-nav, [data-menu-open="true"] .nav-links { display: flex; } .primary-nav a, .site-nav a, .nav-links a { padding: var(--space-3) var(--space-2); } .hero, .intro, .page-header, .article-header { padding-block: var(--space-6); } .hero-actions, .actions, .cta-row { flex-direction: column; align-items: stretch; } .button, .btn { width: 100%; } .article-card { padding: var(--space-4); } .footer-inner { flex-direction: column; align-items: flex-start; } .header-anchor, .direct-link { display: none !important; }
+}
+</style><link rel="preload" href="/assets/css/main.css?v=3.3.0" as="style"><link rel="stylesheet" href="/assets/css/main.css?v=3.3.0" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/assets/css/main.css?v=3.3.0"></noscript><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-JH5ZXYTT84"></script><script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-JH5ZXYTT84'); </script></head><body id="top"><header class="site-header-wrap"><div class="site-header"><a class="brand" href="/">Stephen Reese</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><span class="sr-only">Open navigation</span><span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span></button><nav id="primary-nav" class="primary-nav" aria-label="Primary navigation"><a href="/about/">About</a><a href="/articles/">Articles</a><a href="/contact/">Contact</a></nav><button class="theme-toggle" type="button" aria-label="Toggle light and dark mode" title="Toggle light/dark mode"><span class="theme-toggle-icon" aria-hidden="true">◐</span></button></div></header><main class="container"><article class="post"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/articles/">Articles</a><span aria-hidden="true">/</span><span>Making WordPress Fast</span></nav><h1>Making WordPress Fast</h1><p class="meta">December 15, 2014 · By Stephen Reese</p><div class="content"><p>This site previously used WordPress as a CMS platform. Quite a bit of time was spent tuning in order to get page load times that were consistently less then 500ms although usually closer to 200 to 300ms. The WordPress site was able to burst to around to 2000 users per <a href="https://www.blitz.io/report/904c1ab082af0d106e4be71c0023b2aa">blitz.io</a> although there was an error here or there. I speculate that is a limitation on the outgoing bandwidth of the VPS as the system resources appeared stable. The largest improvements were made by caching, Varnish prevented repeat Apache, PHP and MySQL requests. Real world saturation is a different scenario but not too bad when compared to a stock <a href="http://en.wikipedia.org/wiki/LAMP_%28software_bundle%29">LAMP</a> setup. A stock LAMP setup on my VPS would handle around 50 req/sec before services started to hang up. I have since migrated to a new platform but wanted to keep this around for reference.</p><p>Note that the process flow in the following diagram is approximate and does not necessarily accurate.</p><p><picture><source srcset="/images/web-stack-arch.avif" type="image/avif"><source srcset="/images/web-stack-arch.webp" type="image/webp"><img src="/images/web-stack-arch.png" alt="Web Stack Architecture" loading="lazy" decoding="async"></picture></p><ul><li>Hosted with <a href="http://www.linode.com/?r=6579d0b21f581ea769a6ca4af46de0dad6f88df8">Linode</a> on a <a href="http://wiki.xenproject.org/wiki/Xen_Overview">Xen Hypervisor</a>.</li><li><a href="http://www.debian.org/">Debian</a> Linux Operating System</li><li><a href="http://httpd.apache.org/docs/2.2/mod/worker.html">Apache MPM worker</a> - Multi-Processing Module implementing a hybrid multi-threaded multi-process web server</li><li><a href="https://developers.google.com/speed/pagespeed/mod">Google PageSpeed Apache module</a> backed by Memcached</li><li><a href="http://php-fpm.org/">PHP-FPM</a> (FastCGI Process Manager)</li><li><a href="https://www.varnish-cache.org/">Varnish Cache</a> - a web application accelerator AKA a caching HTTP reverse proxy</li><li><a href="http://memcached.org/">Memcached</a> memory object caching system</li><li><a href="http://wordpress.org/">WordPress</a> running 2010 template</li><li><a href="http://wordpress.org/extend/plugins/batcache/">Batcache</a> plugin using <a href="http://svn.wp-plugins.org/memcached/trunk/">Object Cache</a> backed by Memcached</li></ul><p>If you are looking for a solid do it yourself hosting provider, I recommend you checkout <a href="http://www.linode.com/?r=6579d0b21f581ea769a6ca4af46de0dad6f88df8">Linode</a> and use my referral <a href="http://www.linode.com/?r=6579d0b21f581ea769a6ca4af46de0dad6f88df8">link</a> if you sign up which helps support this site.</p><p><picture><source srcset="/images/wordpress-blitz-report.avif" type="image/avif"><source srcset="/images/wordpress-blitz-report.webp" type="image/webp"><img src="/images/wordpress-blitz-report.png" alt="Blitz Report" loading="lazy" decoding="async"></picture></p></div><nav class="post-nav" aria-label="Post navigation"><a class="post-nav-card" href="/parsing-microsoft-dns-server-logs/"><span>Previous</span>Parsing Microsoft DNS Server Logs</a><a class="post-nav-card post-nav-next" href="/redirect-http-to-https-using-varnish/"><span>Next</span>Redirect HTTP to HTTPS using Varnish</a></nav></article><script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "BlogPosting", "headline": "Making WordPress Fast", "description": "This site previously used WordPress as a CMS platform. Quite a bit of time was spent tuning in order to get page load times that were consistently less then …", "datePublished": "2014-12-15T17:00:00.000Z", "dateModified": "2014-12-15T17:00:00.000Z", "author": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.linkedin.com/in/rsreese" }, "publisher": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.rsreese.com" }, "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.rsreese.com/making-wordpress-fast/" }
+}
+</script></main><footer class="site-footer-wrap"><div class="site-footer"><p>© Stephen Reese · Built with Eleventy · <a href="https://www.linkedin.com/in/rsreese">LinkedIn</a> · <a href="https://twitter.com/rsreese">Twitter/X</a></p><a class="back-to-top" href="#top" aria-label="Back to top">Back to top ↑</a></div></footer><script>(function(){const root=document.documentElement,btn=document.querySelector('.theme-toggle'),key='rsreese-theme';function preferred(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}function apply(v){const mode=v==='light'||v==='dark'?v:preferred();root.setAttribute('data-theme',mode);root.dataset.themePreference=v||'system';if(btn){btn.setAttribute('aria-label',mode==='dark'?'Switch to light mode':'Switch to dark mode');btn.title=btn.getAttribute('aria-label')}}try{apply(localStorage.getItem(key)||'system')}catch(e){apply('system')}btn&&btn.addEventListener('click',function(){const current=root.getAttribute('data-theme')==='dark'?'dark':'light';const next=current==='dark'?'light':'dark';try{localStorage.setItem(key,next)}catch(e){}apply(next)});window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){try{if(!localStorage.getItem(key))apply('system')}catch(e){apply('system')}})})();</script><script>const navToggle=document.querySelector('.nav-toggle'),primaryNav=document.querySelector('#primary-nav');if(navToggle&&primaryNav){function setOpen(open){navToggle.setAttribute('aria-expanded',String(open));primaryNav.classList.toggle('is-open',open)}navToggle.addEventListener('click',()=>setOpen(navToggle.getAttribute('aria-expanded')!=='true'));primaryNav.addEventListener('click',e=>{if(e.target.matches('a'))setOpen(false)});document.addEventListener('click',e=>{if(!primaryNav.contains(e.target)&&!navToggle.contains(e.target))setOpen(false)});document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)})}</script><script src="/assets/js/code-enhance.js?v=3.3.0" defer></script></body></html>

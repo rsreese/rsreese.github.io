@@ -1,0 +1,158 @@
+<!doctype html><html lang="en" data-theme="auto"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Building Apache and ModSecurity from source</title><meta name="description" content="This entry describes settting up ModSecurity on a node in order to protect a few WordPress sites I host. There are a slew of guides out there describing ModS…"><link rel="canonical" href="https://www.rsreese.com/building-apache-and-modsecurity-from-source/"><meta name="theme-color" content="#11191a"><meta property="og:type" content="article"><meta property="og:title" content="Building Apache and ModSecurity from source"><meta property="og:description" content="This entry describes settting up ModSecurity on a node in order to protect a few WordPress sites I host. There are a slew of guides out there describing ModS…"><meta property="og:url" content="https://www.rsreese.com/building-apache-and-modsecurity-from-source/"><meta property="og:site_name" content="Stephen Reese"><meta property="article:author" content="https://www.linkedin.com/in/rsreese"><meta property="article:published_time" content="2015-02-27T13:00:00.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@rsreese"><meta name="twitter:creator" content="@rsreese"><meta name="twitter:title" content="Building Apache and ModSecurity from source"><meta name="twitter:description" content="This entry describes settting up ModSecurity on a node in order to protect a few WordPress sites I host. There are a slew of guides out there describing ModS…"><link rel="me" href="https://www.linkedin.com/in/rsreese"><link rel="me" href="https://twitter.com/rsreese"><script>(function(){try{var saved=localStorage.getItem('rsreese-theme');var dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',saved==='light'||saved==='dark'?saved:(dark?'dark':'light'));}catch(e){}})();</script><style>/* ====================================================================== Critical CSS — rsreese.com Eleventy Purpose: inline-only first paint styles. Keep this file small. Full component styling belongs in main.css. ====================================================================== */ /* ---------------------------------------------------------------------- 1. Design Tokens ---------------------------------------------------------------------- */
+:root { color-scheme: light dark; --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; --content-width: 760px; --wide-width: 980px; --page-pad: 30px; --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 30px; --space-7: 40px; --space-8: 56px; --space-9: 72px; --bg: #f7f5ef; --surface: #ffffff; --surface-soft: #faf8f2; --text: #181713; --muted: #69645b; --border: #ded8ca; --link: #814b18; --link-hover: #4e2b08; --header-bg: #101718; --header-text: #fff8ea; --footer-bg: #101718; --footer-text: #fff8ea; --radius: 14px; --shadow: 0 12px 35px rgba(23, 18, 10, 0.08); --transition: 180ms ease;
+} [data-theme="dark"] { --bg: #11100d; --surface: #1b1915; --surface-soft: #171511; --text: #f6efe2; --muted: #c8bdab; --border: #3b352b; --link: #f2c078; --link-hover: #ffd99b; --header-bg: #070706; --header-text: #fff8ea; --footer-bg: #070706; --footer-text: #fff8ea; --shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+} @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #11100d; --surface: #1b1915; --surface-soft: #171511; --text: #f6efe2; --muted: #c8bdab; --border: #3b352b; --link: #f2c078; --link-hover: #ffd99b; --header-bg: #070706; --header-text: #fff8ea; --footer-bg: #070706; --footer-text: #fff8ea; --shadow: 0 12px 35px rgba(0, 0, 0, 0.35); }
+} /* ---------------------------------------------------------------------- 2. Base / Sticky Footer ---------------------------------------------------------------------- */
+* { box-sizing: border-box;
+} html { min-height: 100%; scroll-behavior: smooth; text-size-adjust: 100%;
+} body { min-height: 100vh; margin: 0; display: flex; flex-direction: column; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+} main { flex: 1 0 auto;
+} img,
+svg,
+video { max-width: 100%; height: auto;
+} img { border-radius: calc(var(--radius) - 6px);
+} /* ---------------------------------------------------------------------- 3. Typography Essentials ---------------------------------------------------------------------- */
+a { color: var(--link); text-decoration-thickness: 0.08em; text-underline-offset: 0.18em; transition: color var(--transition);
+} a:hover,
+a:focus-visible { color: var(--link-hover);
+} h1,
+h2,
+h3,
+h4 { margin: 0 0 var(--space-4); color: var(--text); line-height: 1.12; letter-spacing: -0.035em; font-weight: 760;
+} h1 { font-size: clamp(2.25rem, 7vw, 4.75rem);
+} h2 { font-size: clamp(1.65rem, 4vw, 2.6rem);
+} h3 { font-size: clamp(1.25rem, 3vw, 1.65rem);
+} p { margin: 0 0 var(--space-5);
+} .lede,
+.hero p,
+.intro p,
+.page-intro p { max-width: 68ch; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.25rem); line-height: 1.65;
+} /* ---------------------------------------------------------------------- 4. Shared Layout ---------------------------------------------------------------------- */
+.container { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .content { width: min(100% - calc(var(--page-pad) * 2), var(--content-width)); margin-inline: auto;
+} .content-wide { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .page-section,
+.hero,
+.intro,
+.page-header,
+.article-header { padding-block: var(--space-6);
+} .page-bottom-space,
+.home-articles,
+.articles-page,
+.article-list-section { padding-bottom: var(--space-8);
+} /* ---------------------------------------------------------------------- 5. Header / Navigation ---------------------------------------------------------------------- */
+.site-header { flex: 0 0 auto; background: var(--header-bg); color: var(--header-text); border-bottom: 1px solid rgba(255, 248, 234, 0.12);
+} .site-header a { color: var(--header-text); text-decoration: none;
+} .header-inner,
+.nav-wrap { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); min-height: 72px; margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
+} .site-title,
+.logo,
+.brand { color: var(--header-text); font-size: 1rem; font-weight: 760; letter-spacing: -0.02em; white-space: nowrap;
+} .primary-nav,
+.site-nav,
+.nav-links { display: flex; align-items: center; gap: var(--space-4);
+} .primary-nav a,
+.site-nav a,
+.nav-links a { color: var(--header-text); opacity: 0.9; font-size: 0.95rem; font-weight: 650;
+} .primary-nav a:hover,
+.primary-nav a:focus-visible,
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.nav-links a:hover,
+.nav-links a:focus-visible { opacity: 1;
+} .nav-toggle,
+.menu-toggle,
+.theme-toggle { display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 248, 234, 0.2); border-radius: 999px; background: transparent; color: var(--header-text); font: inherit; cursor: pointer;
+} .nav-toggle,
+.menu-toggle { display: none; width: 42px; height: 42px;
+} .theme-toggle { min-width: 42px; min-height: 42px; padding-inline: var(--space-3);
+} .hamburger,
+.menu-icon { width: 22px; height: 16px; position: relative; display: inline-flex; flex-direction: column; justify-content: space-between; background: transparent;
+} .hamburger span { display: block; width: 100%; height: 2px; background: currentColor; border-radius: 999px;
+} .menu-icon { height: 2px; display: block; background: currentColor;
+} .menu-icon::before,
+.menu-icon::after { content: ""; position: absolute; left: 0; width: 22px; height: 2px; background: currentColor; border-radius: 999px;
+} .menu-icon::before { top: -7px;
+} .menu-icon::after { top: 7px;
+} /* ---------------------------------------------------------------------- 6. Hero / Intro First Paint ---------------------------------------------------------------------- */
+.hero,
+.intro,
+.page-header { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .hero-inner,
+.intro-inner,
+.page-header-inner { width: min(100%, var(--content-width));
+} .hero-actions,
+.actions,
+.cta-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5);
+} .button,
+.btn,
+.hero a.button,
+.hero a.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--space-4); border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); font-weight: 700; text-decoration: none;
+} .button-primary,
+.btn-primary,
+.hero a:first-child.button,
+.hero a:first-child.btn { background: var(--text); border-color: var(--text); color: var(--bg);
+} [data-theme="dark"] .button-primary,
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] .hero a:first-child.button,
+[data-theme="dark"] .hero a:first-child.btn { background: var(--header-text); border-color: var(--header-text); color: var(--header-bg);
+} /* ---------------------------------------------------------------------- 7. Article Card Shells Above Fold ---------------------------------------------------------------------- */
+.article-list,
+.articles-list,
+.latest-articles { display: grid; gap: var(--space-4);
+} .article-card { width: 100%; margin: 0; padding: var(--space-5); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
+} .article-card h2,
+.article-card h3 { margin-bottom: var(--space-2);
+} .article-card p,
+.article-card time,
+.article-meta { color: var(--muted);
+} /* ---------------------------------------------------------------------- 8. Footer ---------------------------------------------------------------------- */
+.site-footer { flex: 0 0 auto; margin-top: auto; padding-block: var(--space-6); background: var(--footer-bg); color: var(--footer-text); border-top: 1px solid rgba(255, 248, 234, 0.12);
+} .footer-inner { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+} .site-footer a { color: var(--footer-text);
+} .back-to-top { font-weight: 700; text-decoration: none;
+} /* ---------------------------------------------------------------------- 9. Mobile Critical Layout ---------------------------------------------------------------------- */
+@media (max-width: 760px) { :root { --page-pad: 22px; } body { font-size: 16px; } .header-inner, .nav-wrap { min-height: 64px; } .nav-toggle, .menu-toggle { display: inline-flex; } .primary-nav, .site-nav, .nav-links { position: absolute; inset-inline: var(--page-pad); top: 64px; z-index: 50; display: none; flex-direction: column; align-items: stretch; gap: 0; padding: var(--space-3); border: 1px solid rgba(255, 248, 234, 0.14); border-radius: var(--radius); background: var(--header-bg); box-shadow: var(--shadow); } .primary-nav.is-open, .site-nav.is-open, .nav-links.is-open, [data-menu-open="true"] .primary-nav, [data-menu-open="true"] .site-nav, [data-menu-open="true"] .nav-links { display: flex; } .primary-nav a, .site-nav a, .nav-links a { padding: var(--space-3) var(--space-2); } .hero, .intro, .page-header, .article-header { padding-block: var(--space-6); } .hero-actions, .actions, .cta-row { flex-direction: column; align-items: stretch; } .button, .btn { width: 100%; } .article-card { padding: var(--space-4); } .footer-inner { flex-direction: column; align-items: flex-start; } .header-anchor, .direct-link { display: none !important; }
+}
+</style><link rel="preload" href="/assets/css/main.css?v=3.3.0" as="style"><link rel="stylesheet" href="/assets/css/main.css?v=3.3.0" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/assets/css/main.css?v=3.3.0"></noscript><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-JH5ZXYTT84"></script><script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-JH5ZXYTT84'); </script></head><body id="top"><header class="site-header-wrap"><div class="site-header"><a class="brand" href="/">Stephen Reese</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><span class="sr-only">Open navigation</span><span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span></button><nav id="primary-nav" class="primary-nav" aria-label="Primary navigation"><a href="/about/">About</a><a href="/articles/">Articles</a><a href="/contact/">Contact</a></nav><button class="theme-toggle" type="button" aria-label="Toggle light and dark mode" title="Toggle light/dark mode"><span class="theme-toggle-icon" aria-hidden="true">◐</span></button></div></header><main class="container"><article class="post"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/articles/">Articles</a><span aria-hidden="true">/</span><span>Building Apache and ModSecurity from source</span></nav><h1>Building Apache and ModSecurity from source</h1><p class="meta">February 27, 2015 · By Stephen Reese</p><div class="content"><p>This entry describes settting up <a href="http://modsecurity.org">ModSecurity</a> on a node in order to protect a few WordPress sites I host. There are a slew of guides out there describing ModSecurity <a href="https://github.com/SpiderLabs/ModSecurity/wiki/Reference-Manual#Installation_for_Apache">builds</a> but I wanted to leverage the latest ModSecurity and Apache MPM Event packages which typically are not included in most Linux distribution repositories. We use a proxy node that passes requests to the backend (origin) server hosting the web application. You may just as easily build ModSecurity on the same host that is serving your content verse using a reverse proxy, i.e. there are a number of ways to architect the setup. In the figure below, a request is first received by the proxy with ModSecurity enabled, and then passed to the origin host serving the actual content if ModSecurity does not intervene. We use Debian but other distributions should be similar.</p><p><picture><source srcset="/images/modsecurity-proxy-figure.avif" type="image/avif"><source srcset="/images/modsecurity-proxy-figure.webp" type="image/webp"><img src="/images/modsecurity-proxy-figure.png" alt="ModSecurity Proxy" loading="lazy" decoding="async"></picture></p><p>Install prerequisite packages:</p><pre class="language-text" data-language="text"><code class="language-text">$ sudo apt-get install gcc libpcre3-dev libxml2-dev libcurl4-gnutls-dev
+</code></pre><p>Download, Build, and Install SSL (enable shared if on 64bit):</p><pre class="language-text" data-language="text"><code class="language-text">$ mkdir install
+$ ./config shared --prefix=/root/openssl-1.0.2a/install/
+$ make depend
+$ make
+$ make test
+$ make install
+</code></pre><p>Download latest Apache, APR, and APR Util packages. Extract APR and APR Util, copy both to Apache src directory, build and install Apache:</p><pre class="language-text" data-language="text"><code class="language-text">$ cp -R apr-util-1.5.4 httpd-2.4.12/srclib/apr-util/
+$ cp -R apr-1.5.1 httpd-2.4.12/srclib/apr/
+$ ./configure --with-included-apr --enable-ssl --enable-ssl-staticlib-deps --with-ssl=/root/openssl-1.0.2/install/ --enable-proxy --with-mpm=event
+$ make
+$ sudo make install
+</code></pre><p>Download, Build and install ModSecurity (optionally install LUA if desired):</p><pre class="language-text" data-language="text"><code class="language-text">$ tar xzf modsecurity-2.9.0.tar.gz
+$ cd modsecurity-2.9.0/
+$ ./configure --with-apxs=/usr/local/apache2/bin/apxs --with-apr=/root/httpd-2.4.12/srclib/apr/ --with-apu=/root/httpd-2.4.12/srclib/apr-util/ --with-lua=/usr/lib/x86_64-linux-gnu/pkgconfig/
+$ make
+$ sudo make install
+</code></pre><p>Grab a rule-set. You may also choose to use GIT to download.</p><pre class="language-text" data-language="text"><code class="language-text">$ wget https://github.com/SpiderLabs/owasp-modsecurity-crs/tarball/master
+$ mv master master.tar.gz
+$ cp -R SpiderLabs-owasp-modsecurity-crs-ebe8790/ /usr/local/apache2/conf/crs/
+$ cd /usr/local/apache2/conf/crs/
+$ mv modsecurity_crs_10_setup.conf.example modsecurity_crs_10_setup.conf
+$ ln -s /usr/local/apache2/conf/crs/modsecurity_crs_10_setup.conf activated_rules/
+$ for f in `ls base_rules/` ; do ln -s /usr/local/apache2/conf/crs/base_rules/$f activated_rules/$f ; done
+$ for f in `ls optional_rules/` ; do ln -s /usr/local/apache2/conf/crs/optional_rules/$f activated_rules/$f ; done
+$ mkdir /etc/modsec
+$ cd
+$ cp modsecurity-2.9.0/modsecurity.conf-recommended /etc/modsec/modsecurity.conf
+$ cp modsecurity-2.9.0/unicode.mapping /etc/modsec/
+$ vim /etc/modsec/whitelist.conf
+</code></pre><p>Setup your Apache site, virtual host, or use proxy pass in order to fetch from a back-end origin node. Add ModSecurity directives to Apache conf file:</p><pre class="language-bash" data-language="bash"><code class="language-bash">LoadModule unique_id_module modules/mod_unique_id.so
+LoadModule security2_module modules/mod_security2.so
+&lt;IfModule security2_module&gt;
+Include /etc/modsec/modsecurity.conf
+Include conf/crs/activated_rules/*.conf
+Include /etc/modsec/whitelist.conf
+SecRule ARGS &quot;mod_security_test&quot; &quot;t:normalisePathWin,id:99999,severity:4,msg:'Drive Access'&quot;
+&lt;/IfModule&gt;
+</code></pre><p>Start Apache and test to validate rules are logging and optionally being enforced. You should see a 403 forbidden response meaning that the malicious requests were blocked. Now you can move to tuning the ruleset to your web application:</p><p><a href="http://waf.rsreese.com/?test=mod_security_test">http://waf.rsreese.com/?test=mod_security_test</a></p><p><picture><source srcset="/images/modsecurity-forbidden.avif" type="image/avif"><source srcset="/images/modsecurity-forbidden.webp" type="image/webp"><img src="/images/modsecurity-forbidden.png" alt="Forbidden" loading="lazy" decoding="async"></picture></p><p>If something is not clear, leave a comment below.</p></div><nav class="post-nav" aria-label="Post navigation"><a class="post-nav-card" href="/redirect-http-to-https-using-varnish/"><span>Previous</span>Redirect HTTP to HTTPS using Varnish</a><a class="post-nav-card post-nav-next" href="/benchmarking-website-domain-name-servers/"><span>Next</span>Benchmarking Website Domain Name Servers</a></nav></article><script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "BlogPosting", "headline": "Building Apache and ModSecurity from source", "description": "This entry describes settting up ModSecurity on a node in order to protect a few WordPress sites I host. There are a slew of guides out there describing ModS…", "datePublished": "2015-02-27T13:00:00.000Z", "dateModified": "2015-02-27T13:00:00.000Z", "author": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.linkedin.com/in/rsreese" }, "publisher": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.rsreese.com" }, "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.rsreese.com/building-apache-and-modsecurity-from-source/" }
+}
+</script></main><footer class="site-footer-wrap"><div class="site-footer"><p>© Stephen Reese · Built with Eleventy · <a href="https://www.linkedin.com/in/rsreese">LinkedIn</a> · <a href="https://twitter.com/rsreese">Twitter/X</a></p><a class="back-to-top" href="#top" aria-label="Back to top">Back to top ↑</a></div></footer><script>(function(){const root=document.documentElement,btn=document.querySelector('.theme-toggle'),key='rsreese-theme';function preferred(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}function apply(v){const mode=v==='light'||v==='dark'?v:preferred();root.setAttribute('data-theme',mode);root.dataset.themePreference=v||'system';if(btn){btn.setAttribute('aria-label',mode==='dark'?'Switch to light mode':'Switch to dark mode');btn.title=btn.getAttribute('aria-label')}}try{apply(localStorage.getItem(key)||'system')}catch(e){apply('system')}btn&&btn.addEventListener('click',function(){const current=root.getAttribute('data-theme')==='dark'?'dark':'light';const next=current==='dark'?'light':'dark';try{localStorage.setItem(key,next)}catch(e){}apply(next)});window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){try{if(!localStorage.getItem(key))apply('system')}catch(e){apply('system')}})})();</script><script>const navToggle=document.querySelector('.nav-toggle'),primaryNav=document.querySelector('#primary-nav');if(navToggle&&primaryNav){function setOpen(open){navToggle.setAttribute('aria-expanded',String(open));primaryNav.classList.toggle('is-open',open)}navToggle.addEventListener('click',()=>setOpen(navToggle.getAttribute('aria-expanded')!=='true'));primaryNav.addEventListener('click',e=>{if(e.target.matches('a'))setOpen(false)});document.addEventListener('click',e=>{if(!primaryNav.contains(e.target)&&!navToggle.contains(e.target))setOpen(false)});document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)})}</script><script src="/assets/js/code-enhance.js?v=3.3.0" defer></script></body></html>

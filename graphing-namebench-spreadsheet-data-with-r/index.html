@@ -1,0 +1,182 @@
+<!doctype html><html lang="en" data-theme="auto"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Graphing Namebench Spreadsheet Data with R</title><meta name="description" content="In the previous post, I described the process of benchmarking domain name servers for a website domain with a modified version of Namebench. Namebench genera…"><link rel="canonical" href="https://www.rsreese.com/graphing-namebench-spreadsheet-data-with-r/"><meta name="theme-color" content="#11191a"><meta property="og:type" content="article"><meta property="og:title" content="Graphing Namebench Spreadsheet Data with R"><meta property="og:description" content="In the previous post, I described the process of benchmarking domain name servers for a website domain with a modified version of Namebench. Namebench genera…"><meta property="og:url" content="https://www.rsreese.com/graphing-namebench-spreadsheet-data-with-r/"><meta property="og:site_name" content="Stephen Reese"><meta property="article:author" content="https://www.linkedin.com/in/rsreese"><meta property="article:published_time" content="2015-07-11T16:00:00.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@rsreese"><meta name="twitter:creator" content="@rsreese"><meta name="twitter:title" content="Graphing Namebench Spreadsheet Data with R"><meta name="twitter:description" content="In the previous post, I described the process of benchmarking domain name servers for a website domain with a modified version of Namebench. Namebench genera…"><link rel="me" href="https://www.linkedin.com/in/rsreese"><link rel="me" href="https://twitter.com/rsreese"><script>(function(){try{var saved=localStorage.getItem('rsreese-theme');var dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',saved==='light'||saved==='dark'?saved:(dark?'dark':'light'));}catch(e){}})();</script><style>/* ====================================================================== Critical CSS — rsreese.com Eleventy Purpose: inline-only first paint styles. Keep this file small. Full component styling belongs in main.css. ====================================================================== */ /* ---------------------------------------------------------------------- 1. Design Tokens ---------------------------------------------------------------------- */
+:root { color-scheme: light dark; --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; --content-width: 760px; --wide-width: 980px; --page-pad: 30px; --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 30px; --space-7: 40px; --space-8: 56px; --space-9: 72px; --bg: #f7f5ef; --surface: #ffffff; --surface-soft: #faf8f2; --text: #181713; --muted: #69645b; --border: #ded8ca; --link: #814b18; --link-hover: #4e2b08; --header-bg: #101718; --header-text: #fff8ea; --footer-bg: #101718; --footer-text: #fff8ea; --radius: 14px; --shadow: 0 12px 35px rgba(23, 18, 10, 0.08); --transition: 180ms ease;
+} [data-theme="dark"] { --bg: #11100d; --surface: #1b1915; --surface-soft: #171511; --text: #f6efe2; --muted: #c8bdab; --border: #3b352b; --link: #f2c078; --link-hover: #ffd99b; --header-bg: #070706; --header-text: #fff8ea; --footer-bg: #070706; --footer-text: #fff8ea; --shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+} @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #11100d; --surface: #1b1915; --surface-soft: #171511; --text: #f6efe2; --muted: #c8bdab; --border: #3b352b; --link: #f2c078; --link-hover: #ffd99b; --header-bg: #070706; --header-text: #fff8ea; --footer-bg: #070706; --footer-text: #fff8ea; --shadow: 0 12px 35px rgba(0, 0, 0, 0.35); }
+} /* ---------------------------------------------------------------------- 2. Base / Sticky Footer ---------------------------------------------------------------------- */
+* { box-sizing: border-box;
+} html { min-height: 100%; scroll-behavior: smooth; text-size-adjust: 100%;
+} body { min-height: 100vh; margin: 0; display: flex; flex-direction: column; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+} main { flex: 1 0 auto;
+} img,
+svg,
+video { max-width: 100%; height: auto;
+} img { border-radius: calc(var(--radius) - 6px);
+} /* ---------------------------------------------------------------------- 3. Typography Essentials ---------------------------------------------------------------------- */
+a { color: var(--link); text-decoration-thickness: 0.08em; text-underline-offset: 0.18em; transition: color var(--transition);
+} a:hover,
+a:focus-visible { color: var(--link-hover);
+} h1,
+h2,
+h3,
+h4 { margin: 0 0 var(--space-4); color: var(--text); line-height: 1.12; letter-spacing: -0.035em; font-weight: 760;
+} h1 { font-size: clamp(2.25rem, 7vw, 4.75rem);
+} h2 { font-size: clamp(1.65rem, 4vw, 2.6rem);
+} h3 { font-size: clamp(1.25rem, 3vw, 1.65rem);
+} p { margin: 0 0 var(--space-5);
+} .lede,
+.hero p,
+.intro p,
+.page-intro p { max-width: 68ch; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.25rem); line-height: 1.65;
+} /* ---------------------------------------------------------------------- 4. Shared Layout ---------------------------------------------------------------------- */
+.container { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .content { width: min(100% - calc(var(--page-pad) * 2), var(--content-width)); margin-inline: auto;
+} .content-wide { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .page-section,
+.hero,
+.intro,
+.page-header,
+.article-header { padding-block: var(--space-6);
+} .page-bottom-space,
+.home-articles,
+.articles-page,
+.article-list-section { padding-bottom: var(--space-8);
+} /* ---------------------------------------------------------------------- 5. Header / Navigation ---------------------------------------------------------------------- */
+.site-header { flex: 0 0 auto; background: var(--header-bg); color: var(--header-text); border-bottom: 1px solid rgba(255, 248, 234, 0.12);
+} .site-header a { color: var(--header-text); text-decoration: none;
+} .header-inner,
+.nav-wrap { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); min-height: 72px; margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
+} .site-title,
+.logo,
+.brand { color: var(--header-text); font-size: 1rem; font-weight: 760; letter-spacing: -0.02em; white-space: nowrap;
+} .primary-nav,
+.site-nav,
+.nav-links { display: flex; align-items: center; gap: var(--space-4);
+} .primary-nav a,
+.site-nav a,
+.nav-links a { color: var(--header-text); opacity: 0.9; font-size: 0.95rem; font-weight: 650;
+} .primary-nav a:hover,
+.primary-nav a:focus-visible,
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.nav-links a:hover,
+.nav-links a:focus-visible { opacity: 1;
+} .nav-toggle,
+.menu-toggle,
+.theme-toggle { display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 248, 234, 0.2); border-radius: 999px; background: transparent; color: var(--header-text); font: inherit; cursor: pointer;
+} .nav-toggle,
+.menu-toggle { display: none; width: 42px; height: 42px;
+} .theme-toggle { min-width: 42px; min-height: 42px; padding-inline: var(--space-3);
+} .hamburger,
+.menu-icon { width: 22px; height: 16px; position: relative; display: inline-flex; flex-direction: column; justify-content: space-between; background: transparent;
+} .hamburger span { display: block; width: 100%; height: 2px; background: currentColor; border-radius: 999px;
+} .menu-icon { height: 2px; display: block; background: currentColor;
+} .menu-icon::before,
+.menu-icon::after { content: ""; position: absolute; left: 0; width: 22px; height: 2px; background: currentColor; border-radius: 999px;
+} .menu-icon::before { top: -7px;
+} .menu-icon::after { top: 7px;
+} /* ---------------------------------------------------------------------- 6. Hero / Intro First Paint ---------------------------------------------------------------------- */
+.hero,
+.intro,
+.page-header { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .hero-inner,
+.intro-inner,
+.page-header-inner { width: min(100%, var(--content-width));
+} .hero-actions,
+.actions,
+.cta-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5);
+} .button,
+.btn,
+.hero a.button,
+.hero a.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--space-4); border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); font-weight: 700; text-decoration: none;
+} .button-primary,
+.btn-primary,
+.hero a:first-child.button,
+.hero a:first-child.btn { background: var(--text); border-color: var(--text); color: var(--bg);
+} [data-theme="dark"] .button-primary,
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] .hero a:first-child.button,
+[data-theme="dark"] .hero a:first-child.btn { background: var(--header-text); border-color: var(--header-text); color: var(--header-bg);
+} /* ---------------------------------------------------------------------- 7. Article Card Shells Above Fold ---------------------------------------------------------------------- */
+.article-list,
+.articles-list,
+.latest-articles { display: grid; gap: var(--space-4);
+} .article-card { width: 100%; margin: 0; padding: var(--space-5); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
+} .article-card h2,
+.article-card h3 { margin-bottom: var(--space-2);
+} .article-card p,
+.article-card time,
+.article-meta { color: var(--muted);
+} /* ---------------------------------------------------------------------- 8. Footer ---------------------------------------------------------------------- */
+.site-footer { flex: 0 0 auto; margin-top: auto; padding-block: var(--space-6); background: var(--footer-bg); color: var(--footer-text); border-top: 1px solid rgba(255, 248, 234, 0.12);
+} .footer-inner { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+} .site-footer a { color: var(--footer-text);
+} .back-to-top { font-weight: 700; text-decoration: none;
+} /* ---------------------------------------------------------------------- 9. Mobile Critical Layout ---------------------------------------------------------------------- */
+@media (max-width: 760px) { :root { --page-pad: 22px; } body { font-size: 16px; } .header-inner, .nav-wrap { min-height: 64px; } .nav-toggle, .menu-toggle { display: inline-flex; } .primary-nav, .site-nav, .nav-links { position: absolute; inset-inline: var(--page-pad); top: 64px; z-index: 50; display: none; flex-direction: column; align-items: stretch; gap: 0; padding: var(--space-3); border: 1px solid rgba(255, 248, 234, 0.14); border-radius: var(--radius); background: var(--header-bg); box-shadow: var(--shadow); } .primary-nav.is-open, .site-nav.is-open, .nav-links.is-open, [data-menu-open="true"] .primary-nav, [data-menu-open="true"] .site-nav, [data-menu-open="true"] .nav-links { display: flex; } .primary-nav a, .site-nav a, .nav-links a { padding: var(--space-3) var(--space-2); } .hero, .intro, .page-header, .article-header { padding-block: var(--space-6); } .hero-actions, .actions, .cta-row { flex-direction: column; align-items: stretch; } .button, .btn { width: 100%; } .article-card { padding: var(--space-4); } .footer-inner { flex-direction: column; align-items: flex-start; } .header-anchor, .direct-link { display: none !important; }
+}
+</style><link rel="preload" href="/assets/css/main.css?v=3.3.0" as="style"><link rel="stylesheet" href="/assets/css/main.css?v=3.3.0" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/assets/css/main.css?v=3.3.0"></noscript><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-JH5ZXYTT84"></script><script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-JH5ZXYTT84'); </script></head><body id="top"><header class="site-header-wrap"><div class="site-header"><a class="brand" href="/">Stephen Reese</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><span class="sr-only">Open navigation</span><span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span></button><nav id="primary-nav" class="primary-nav" aria-label="Primary navigation"><a href="/about/">About</a><a href="/articles/">Articles</a><a href="/contact/">Contact</a></nav><button class="theme-toggle" type="button" aria-label="Toggle light and dark mode" title="Toggle light/dark mode"><span class="theme-toggle-icon" aria-hidden="true">◐</span></button></div></header><main class="container"><article class="post"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/articles/">Articles</a><span aria-hidden="true">/</span><span>Graphing Namebench Spreadsheet Data with R</span></nav><h1>Graphing Namebench Spreadsheet Data with R</h1><p class="meta">July 11, 2015 · By Stephen Reese</p><div class="content"><p>In the previous <a href="/benchmarking-website-domain-name-servers/">post</a>, I described the process of benchmarking domain name servers for a website domain with a modified version of <a href="https://github.com/rsreese/namebench">Namebench</a>. Namebench generates graphs using the Google chart API. This left me wanting a little more therefore decided to explore the data using the <a href="http://www.r-project.org">R Project</a>. This post makes the assumption you are using our <a href="/images/namebench_2015-07-14_1952.csv">data set</a> in order to follow along or else YMMV.</p><p>First, remove trailing commas from each row:</p><pre class="language-text" data-language="text"><code class="language-text">$ sed 's/,[[:space:]]*$//' namebench_2015-07-14_1952.csv &gt; data.csv
+</code></pre><p>Next, we read in the data from the CSV file into the R buffer assuming you are already in the R console:</p><pre class="language-text" data-language="text"><code class="language-text">&gt; data &lt;- read.table(file=&quot;data.csv&quot;,header=TRUE,sep=&quot;,&quot;,row.names=NULL)
+</code></pre><p>If you get errors about a line not having 9 elements, you likely had timeouts in your DNS queries. You can either re-run the test until you do not experience any timeouts or remove the Timeout error message lines. Something like <code>grep -v Timeout data.csv &gt;a.out</code> and copy back to data.csv or whatever filename you would like to work with.</p><p>As an aside, we can also export our data back out:</p><pre class="language-text" data-language="text"><code class="language-text">&gt; write.table(data, 'a.txt', col.names=NA)
+</code></pre><p>Which results in:</p><pre class="language-text" data-language="text"><code class="language-text">&quot;&quot; &quot;IP&quot; &quot;Name&quot; &quot;Test_Num&quot; &quot;Record&quot; &quot;Record_Type&quot; &quot;Duration&quot; &quot;TTL&quot; &quot;Answer_Count&quot; &quot;Response&quot;
+&quot;1&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 76.2228965759277 86400 1 &quot;74.207.234.79&quot;
+&quot;2&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 73.7550258636475 86400 1 &quot;74.207.234.79&quot;
+&quot;3&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 73.4801292419434 86400 1 &quot;74.207.234.79&quot;
+&quot;4&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 76.7168998718262 86400 1 &quot;74.207.234.79&quot;
+&quot;5&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 73.2970237731934 86400 1 &quot;74.207.234.79&quot;
+&quot;6&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 73.3959674835205 86400 1 &quot;74.207.234.79&quot;
+&quot;7&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 72.7560520172119 86400 1 &quot;74.207.234.79&quot;
+&quot;8&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 76.8599510192871 86400 1 &quot;74.207.234.79&quot;
+&quot;9&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 72.8960037231445 86400 1 &quot;74.207.234.79&quot;
+&quot;10&quot; &quot;2600:3c01::a&quot; &quot;Linode 2 IPv6&quot; 0 &quot;www.rsreese.com.&quot; &quot;A&quot; 74.0060806274414 86400 1 &quot;74.207.234.79&quot;
+--snip--
+</code></pre><p>Now that R has our data, we can take a quick look to ensure the columns make sense:</p><pre class="language-text" data-language="text"><code class="language-text">&gt; options(width=150)
+&gt; head(data,n=10)
+&gt; head(data,n=10) IP Name Test_Num Record Record_Type Duration TTL Answer_Count Response
+1 2600:3c01::a Linode 2 IPv6 0 www.rsreese.com. A 76.22290 86400 1 74.207.234.79
+2 2600:3c01::a Linode 2 IPv6 0 www.rsreese.com. A 73.75503 86400 1 74.207.234.79
+3 2600:3c01::a Linode 2 IPv6 0 www.rsreese.com. A 73.48013 86400 1 74.207.234.79
+4 2600:3c01::a Linode 2 IPv6 0 www.rsreese.com. A 76.71690 86400 1 74.207.234.79
+5 2600:3c01::a Linode 2 IPv6 0 www.rsreese.com. A 73.29702 86400 1 74.207.234.79
+6 2600:3c01::a Linode 2 IPv6 0 www.rsreese.com. A 73.39597 86400 1 74.207.234.79
+7 2600:3c01::a Linode 2 IPv6 0 www.rsreese.com. A 72.75605 86400 1 74.207.234.79
+8 2600:3c01::a Linode 2 IPv6 0 www.rsreese.com. A 76.85995 86400 1 74.207.234.79
+9 2600:3c01::a Linode 2 IPv6 0 www.rsreese.com. A 72.89600 86400 1 74.207.234.79
+10 2600:3c01::a Linode 2 IPv6 0 www.rsreese.com. A 74.00608 86400 1 74.207.234.79
+&gt; summary(data$Duration) Min. 1st Qu. Median Mean 3rd Qu. Max. 1.455 2.582 3.836 24.430 47.640 780.500 </code></pre><p>We can create an aggregated table of the data based on mean values:</p><pre class="language-text" data-language="text"><code class="language-text">&gt; aggregate(data$Duration, by=list(data$Name), FUN=mean) Group.1 x
+1 CF Erin 3.752344
+2 CF Ram 6.141772
+3 HE 1 2.563629
+4 HE 2 2.494576
+5 HE 2 IPv6 2.677688
+6 HE 3 5.510935
+7 HE 3 IPv6 3.057263
+8 HE 4 2.982669
+9 HE 4 IPv6 2.626012
+10 HE 5 2.642891
+11 HE 5 IPv6 2.736038
+12 Linode 1 49.536158
+13 Linode 1 IPv6 48.098648
+14 Linode 2 75.840130
+15 Linode 2 IPv6 76.885061
+16 Linode 3 25.727819
+17 Linode 3 IPv6 26.703984
+18 Linode 4 8.020208
+19 Linode 4 IPv6 7.908908
+20 Linode 5 82.185041
+21 Linode 5 IPv6 76.434550
+</code></pre><p>Lets see how a boxplot looks. The graph is representative of the third command listed here, others are for reference/tinkering:</p><pre class="language-text" data-language="text"><code class="language-text">&gt; plot(data$Duration ~ data$Name, horizontal=TRUE, par(las=1))
+&gt; boxplot(data$Duration ~ data$Name, horizontal=TRUE, par(las=1), col=rainbow(10))
+&gt; boxplot(data$Duration ~ data$Name, ylim=c(0,100), horizontal=TRUE, par(las=1), col=rainbow(10))
+</code></pre><p><a href="/images/namebench-boxplot.png"><picture><source srcset="/images/namebench-boxplot.avif" type="image/avif"><source srcset="/images/namebench-boxplot.webp" type="image/webp"><img src="/images/namebench-boxplot.png" alt="namebench-boxplot" loading="lazy" decoding="async"></picture></a></p><p>If we zoom in a little more, the distribution of the more responsive name servers becomes apparent. I believe this graph is the best representation of the fastest name servers in the dataset:</p><pre class="language-text" data-language="text"><code class="language-text">&gt; boxplot(data$Duration ~ data$Name, ylim=c(0,10), horizontal=TRUE, par(las=1), col=rainbow(10))
+</code></pre><p><a href="/images/namebench-boxplot2.png"><picture><source srcset="/images/namebench-boxplot2.avif" type="image/avif"><source srcset="/images/namebench-boxplot2.webp" type="image/webp"><img src="/images/namebench-boxplot2.png" alt="namebench-boxplot2" loading="lazy" decoding="async"></picture></a></p><p>Alternatively, we can plot using ggplot2 if available:</p><pre class="language-text" data-language="text"><code class="language-text">&gt; library(ggplot2)
+&gt; ggplot(data=data, aes(x=Duration, y=Name, group=Name, colour=Name)) + geom_line() + geom_point()
+</code></pre><p><a href="/images/namebench-ggplot2.png"><picture><source srcset="/images/namebench-ggplot2.avif" type="image/avif"><source srcset="/images/namebench-ggplot2.webp" type="image/webp"><img src="/images/namebench-ggplot2.png" alt="namebench-ggplot2" loading="lazy" decoding="async"></picture></a></p><p>Display horizontal bar graph. I did not do a great job with the axis labels here but you get the idea:</p><pre class="language-text" data-language="text"><code class="language-text">&gt; agg &lt;- aggregate(data$Duration, by=list(data$Name), FUN=mean)
+&gt; sorted &lt;- agg[with(agg, order(x)), ]
+&gt; mymat &lt;- t(sorted[-1])
+&gt; colnames(mymat) &lt;- sorted[, 1]
+&gt; barplot(mymat, horiz=TRUE, col=c(&quot;blue&quot;), las=1)
+</code></pre><p><a href="/images/namebench-barplot.png"><picture><source srcset="/images/namebench-barplot.avif" type="image/avif"><source srcset="/images/namebench-barplot.webp" type="image/webp"><img src="/images/namebench-barplot.png" alt="namebench-barplot" loading="lazy" decoding="async"></picture></a></p><p>Finally, we will graph a group of values from the set and display them. We also limit the range so the graph is readable:</p><pre class="language-text" data-language="text"><code class="language-text">&gt; plot(ecdf(data$Duration[data$Name==&quot;Linode 1&quot;]), xlim=c(45,55), ylim=c(0,1))
+</code></pre><p><a href="/images/namebench-line.png"><picture><source srcset="/images/namebench-line.avif" type="image/avif"><source srcset="/images/namebench-line.webp" type="image/webp"><img src="/images/namebench-line.png" alt="namebench-line" loading="lazy" decoding="async"></picture></a></p><p>Please leave any questions you have regarding this post below.</p></div><nav class="post-nav" aria-label="Post navigation"><a class="post-nav-card" href="/benchmarking-website-domain-name-servers/"><span>Previous</span>Benchmarking Website Domain Name Servers</a><a class="post-nav-card post-nav-next" href="/online-information-security-analysis-tools-and-resources/"><span>Next</span>Online Information Security Analysis Tools and Resources</a></nav></article><script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "BlogPosting", "headline": "Graphing Namebench Spreadsheet Data with R", "description": "In the previous post, I described the process of benchmarking domain name servers for a website domain with a modified version of Namebench. Namebench genera…", "datePublished": "2015-07-11T16:00:00.000Z", "dateModified": "2015-07-11T16:00:00.000Z", "author": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.linkedin.com/in/rsreese" }, "publisher": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.rsreese.com" }, "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.rsreese.com/graphing-namebench-spreadsheet-data-with-r/" }
+}
+</script></main><footer class="site-footer-wrap"><div class="site-footer"><p>© Stephen Reese · Built with Eleventy · <a href="https://www.linkedin.com/in/rsreese">LinkedIn</a> · <a href="https://twitter.com/rsreese">Twitter/X</a></p><a class="back-to-top" href="#top" aria-label="Back to top">Back to top ↑</a></div></footer><script>(function(){const root=document.documentElement,btn=document.querySelector('.theme-toggle'),key='rsreese-theme';function preferred(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}function apply(v){const mode=v==='light'||v==='dark'?v:preferred();root.setAttribute('data-theme',mode);root.dataset.themePreference=v||'system';if(btn){btn.setAttribute('aria-label',mode==='dark'?'Switch to light mode':'Switch to dark mode');btn.title=btn.getAttribute('aria-label')}}try{apply(localStorage.getItem(key)||'system')}catch(e){apply('system')}btn&&btn.addEventListener('click',function(){const current=root.getAttribute('data-theme')==='dark'?'dark':'light';const next=current==='dark'?'light':'dark';try{localStorage.setItem(key,next)}catch(e){}apply(next)});window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){try{if(!localStorage.getItem(key))apply('system')}catch(e){apply('system')}})})();</script><script>const navToggle=document.querySelector('.nav-toggle'),primaryNav=document.querySelector('#primary-nav');if(navToggle&&primaryNav){function setOpen(open){navToggle.setAttribute('aria-expanded',String(open));primaryNav.classList.toggle('is-open',open)}navToggle.addEventListener('click',()=>setOpen(navToggle.getAttribute('aria-expanded')!=='true'));primaryNav.addEventListener('click',e=>{if(e.target.matches('a'))setOpen(false)});document.addEventListener('click',e=>{if(!primaryNav.contains(e.target)&&!navToggle.contains(e.target))setOpen(false)});document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)})}</script><script src="/assets/js/code-enhance.js?v=3.3.0" defer></script></body></html>

@@ -1,0 +1,222 @@
+<!doctype html><html lang="en" data-theme="auto"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Detecting Tor traffic with Bro network traffic analyzer</title><meta name="description" content="This entry is a post in a series in order to identify Tor (the onion router) network traffic and usage using Bro Network Security Monitor. To learn more abou…"><link rel="canonical" href="https://www.rsreese.com/detecting-tor-traffic-with-bro-network-traffic-analyzer/"><meta name="theme-color" content="#11191a"><meta property="og:type" content="article"><meta property="og:title" content="Detecting Tor traffic with Bro network traffic analyzer"><meta property="og:description" content="This entry is a post in a series in order to identify Tor (the onion router) network traffic and usage using Bro Network Security Monitor. To learn more abou…"><meta property="og:url" content="https://www.rsreese.com/detecting-tor-traffic-with-bro-network-traffic-analyzer/"><meta property="og:site_name" content="Stephen Reese"><meta property="article:author" content="https://www.linkedin.com/in/rsreese"><meta property="article:published_time" content="2016-01-16T17:00:00.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@rsreese"><meta name="twitter:creator" content="@rsreese"><meta name="twitter:title" content="Detecting Tor traffic with Bro network traffic analyzer"><meta name="twitter:description" content="This entry is a post in a series in order to identify Tor (the onion router) network traffic and usage using Bro Network Security Monitor. To learn more abou…"><link rel="me" href="https://www.linkedin.com/in/rsreese"><link rel="me" href="https://twitter.com/rsreese"><script>(function(){try{var saved=localStorage.getItem('rsreese-theme');var dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',saved==='light'||saved==='dark'?saved:(dark?'dark':'light'));}catch(e){}})();</script><style>/* ====================================================================== Critical CSS — rsreese.com Eleventy Purpose: inline-only first paint styles. Keep this file small. Full component styling belongs in main.css. ====================================================================== */ /* ---------------------------------------------------------------------- 1. Design Tokens ---------------------------------------------------------------------- */
+:root { color-scheme: light dark; --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; --content-width: 760px; --wide-width: 980px; --page-pad: 30px; --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 30px; --space-7: 40px; --space-8: 56px; --space-9: 72px; --bg: #f7f5ef; --surface: #ffffff; --surface-soft: #faf8f2; --text: #181713; --muted: #69645b; --border: #ded8ca; --link: #814b18; --link-hover: #4e2b08; --header-bg: #101718; --header-text: #fff8ea; --footer-bg: #101718; --footer-text: #fff8ea; --radius: 14px; --shadow: 0 12px 35px rgba(23, 18, 10, 0.08); --transition: 180ms ease;
+} [data-theme="dark"] { --bg: #11100d; --surface: #1b1915; --surface-soft: #171511; --text: #f6efe2; --muted: #c8bdab; --border: #3b352b; --link: #f2c078; --link-hover: #ffd99b; --header-bg: #070706; --header-text: #fff8ea; --footer-bg: #070706; --footer-text: #fff8ea; --shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+} @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #11100d; --surface: #1b1915; --surface-soft: #171511; --text: #f6efe2; --muted: #c8bdab; --border: #3b352b; --link: #f2c078; --link-hover: #ffd99b; --header-bg: #070706; --header-text: #fff8ea; --footer-bg: #070706; --footer-text: #fff8ea; --shadow: 0 12px 35px rgba(0, 0, 0, 0.35); }
+} /* ---------------------------------------------------------------------- 2. Base / Sticky Footer ---------------------------------------------------------------------- */
+* { box-sizing: border-box;
+} html { min-height: 100%; scroll-behavior: smooth; text-size-adjust: 100%;
+} body { min-height: 100vh; margin: 0; display: flex; flex-direction: column; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+} main { flex: 1 0 auto;
+} img,
+svg,
+video { max-width: 100%; height: auto;
+} img { border-radius: calc(var(--radius) - 6px);
+} /* ---------------------------------------------------------------------- 3. Typography Essentials ---------------------------------------------------------------------- */
+a { color: var(--link); text-decoration-thickness: 0.08em; text-underline-offset: 0.18em; transition: color var(--transition);
+} a:hover,
+a:focus-visible { color: var(--link-hover);
+} h1,
+h2,
+h3,
+h4 { margin: 0 0 var(--space-4); color: var(--text); line-height: 1.12; letter-spacing: -0.035em; font-weight: 760;
+} h1 { font-size: clamp(2.25rem, 7vw, 4.75rem);
+} h2 { font-size: clamp(1.65rem, 4vw, 2.6rem);
+} h3 { font-size: clamp(1.25rem, 3vw, 1.65rem);
+} p { margin: 0 0 var(--space-5);
+} .lede,
+.hero p,
+.intro p,
+.page-intro p { max-width: 68ch; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.25rem); line-height: 1.65;
+} /* ---------------------------------------------------------------------- 4. Shared Layout ---------------------------------------------------------------------- */
+.container { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .content { width: min(100% - calc(var(--page-pad) * 2), var(--content-width)); margin-inline: auto;
+} .content-wide { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .page-section,
+.hero,
+.intro,
+.page-header,
+.article-header { padding-block: var(--space-6);
+} .page-bottom-space,
+.home-articles,
+.articles-page,
+.article-list-section { padding-bottom: var(--space-8);
+} /* ---------------------------------------------------------------------- 5. Header / Navigation ---------------------------------------------------------------------- */
+.site-header { flex: 0 0 auto; background: var(--header-bg); color: var(--header-text); border-bottom: 1px solid rgba(255, 248, 234, 0.12);
+} .site-header a { color: var(--header-text); text-decoration: none;
+} .header-inner,
+.nav-wrap { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); min-height: 72px; margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
+} .site-title,
+.logo,
+.brand { color: var(--header-text); font-size: 1rem; font-weight: 760; letter-spacing: -0.02em; white-space: nowrap;
+} .primary-nav,
+.site-nav,
+.nav-links { display: flex; align-items: center; gap: var(--space-4);
+} .primary-nav a,
+.site-nav a,
+.nav-links a { color: var(--header-text); opacity: 0.9; font-size: 0.95rem; font-weight: 650;
+} .primary-nav a:hover,
+.primary-nav a:focus-visible,
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.nav-links a:hover,
+.nav-links a:focus-visible { opacity: 1;
+} .nav-toggle,
+.menu-toggle,
+.theme-toggle { display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 248, 234, 0.2); border-radius: 999px; background: transparent; color: var(--header-text); font: inherit; cursor: pointer;
+} .nav-toggle,
+.menu-toggle { display: none; width: 42px; height: 42px;
+} .theme-toggle { min-width: 42px; min-height: 42px; padding-inline: var(--space-3);
+} .hamburger,
+.menu-icon { width: 22px; height: 16px; position: relative; display: inline-flex; flex-direction: column; justify-content: space-between; background: transparent;
+} .hamburger span { display: block; width: 100%; height: 2px; background: currentColor; border-radius: 999px;
+} .menu-icon { height: 2px; display: block; background: currentColor;
+} .menu-icon::before,
+.menu-icon::after { content: ""; position: absolute; left: 0; width: 22px; height: 2px; background: currentColor; border-radius: 999px;
+} .menu-icon::before { top: -7px;
+} .menu-icon::after { top: 7px;
+} /* ---------------------------------------------------------------------- 6. Hero / Intro First Paint ---------------------------------------------------------------------- */
+.hero,
+.intro,
+.page-header { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .hero-inner,
+.intro-inner,
+.page-header-inner { width: min(100%, var(--content-width));
+} .hero-actions,
+.actions,
+.cta-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5);
+} .button,
+.btn,
+.hero a.button,
+.hero a.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--space-4); border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); font-weight: 700; text-decoration: none;
+} .button-primary,
+.btn-primary,
+.hero a:first-child.button,
+.hero a:first-child.btn { background: var(--text); border-color: var(--text); color: var(--bg);
+} [data-theme="dark"] .button-primary,
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] .hero a:first-child.button,
+[data-theme="dark"] .hero a:first-child.btn { background: var(--header-text); border-color: var(--header-text); color: var(--header-bg);
+} /* ---------------------------------------------------------------------- 7. Article Card Shells Above Fold ---------------------------------------------------------------------- */
+.article-list,
+.articles-list,
+.latest-articles { display: grid; gap: var(--space-4);
+} .article-card { width: 100%; margin: 0; padding: var(--space-5); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
+} .article-card h2,
+.article-card h3 { margin-bottom: var(--space-2);
+} .article-card p,
+.article-card time,
+.article-meta { color: var(--muted);
+} /* ---------------------------------------------------------------------- 8. Footer ---------------------------------------------------------------------- */
+.site-footer { flex: 0 0 auto; margin-top: auto; padding-block: var(--space-6); background: var(--footer-bg); color: var(--footer-text); border-top: 1px solid rgba(255, 248, 234, 0.12);
+} .footer-inner { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+} .site-footer a { color: var(--footer-text);
+} .back-to-top { font-weight: 700; text-decoration: none;
+} /* ---------------------------------------------------------------------- 9. Mobile Critical Layout ---------------------------------------------------------------------- */
+@media (max-width: 760px) { :root { --page-pad: 22px; } body { font-size: 16px; } .header-inner, .nav-wrap { min-height: 64px; } .nav-toggle, .menu-toggle { display: inline-flex; } .primary-nav, .site-nav, .nav-links { position: absolute; inset-inline: var(--page-pad); top: 64px; z-index: 50; display: none; flex-direction: column; align-items: stretch; gap: 0; padding: var(--space-3); border: 1px solid rgba(255, 248, 234, 0.14); border-radius: var(--radius); background: var(--header-bg); box-shadow: var(--shadow); } .primary-nav.is-open, .site-nav.is-open, .nav-links.is-open, [data-menu-open="true"] .primary-nav, [data-menu-open="true"] .site-nav, [data-menu-open="true"] .nav-links { display: flex; } .primary-nav a, .site-nav a, .nav-links a { padding: var(--space-3) var(--space-2); } .hero, .intro, .page-header, .article-header { padding-block: var(--space-6); } .hero-actions, .actions, .cta-row { flex-direction: column; align-items: stretch; } .button, .btn { width: 100%; } .article-card { padding: var(--space-4); } .footer-inner { flex-direction: column; align-items: flex-start; } .header-anchor, .direct-link { display: none !important; }
+}
+</style><link rel="preload" href="/assets/css/main.css?v=3.3.0" as="style"><link rel="stylesheet" href="/assets/css/main.css?v=3.3.0" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/assets/css/main.css?v=3.3.0"></noscript><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-JH5ZXYTT84"></script><script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-JH5ZXYTT84'); </script></head><body id="top"><header class="site-header-wrap"><div class="site-header"><a class="brand" href="/">Stephen Reese</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><span class="sr-only">Open navigation</span><span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span></button><nav id="primary-nav" class="primary-nav" aria-label="Primary navigation"><a href="/about/">About</a><a href="/articles/">Articles</a><a href="/contact/">Contact</a></nav><button class="theme-toggle" type="button" aria-label="Toggle light and dark mode" title="Toggle light/dark mode"><span class="theme-toggle-icon" aria-hidden="true">◐</span></button></div></header><main class="container"><article class="post"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/articles/">Articles</a><span aria-hidden="true">/</span><span>Detecting Tor traffic with Bro network traffic analyzer</span></nav><h1>Detecting Tor traffic with Bro network traffic analyzer</h1><p class="meta">January 16, 2016 · By Stephen Reese</p><div class="content"><p>This entry is a post in a <a href="http://www.rsreese.com/tag/tor/">series</a> in order to identify <a href="https://www.torproject.org/about/overview.html.en">Tor</a> (the onion router) network traffic and usage using <a href="https://www.bro.org/sphinx/intro/index.html">Bro Network Security Monitor</a>. To learn more about both projects, please visit the aforementioned links. This post is not to argue the merits of allowing Tor to run on a network. Due to malware variants taking advantage of Tor for its <a href="http://threatpost.com/huge-botnet-found-using-tor-network-for-communications/102179">botnet</a> command and control (C2), I wanted to be able to effectively identify Tor usage in hopes of identifying hosts that may be using Tor for C2 purposes.</p><p>A method folks often use to identify communication with Tor relays is to compare the current list of known Tor <a href="https://www.dan.me.uk/torlist/">servers</a> with the traffic from their network. While this does work, some relays may host other legitimate services which could introduce false-positives. The goal was to find a method to augment the parsing network traffic for Tor server matches which is sometimes done retrospectively.</p><p>If we take a look at the Tor certificates, we see an interesting pattern for the Issuer and Subject ID form a pattern.</p><p><a href="/images/tor-wireshark.png"><picture><source srcset="/images/tor-wireshark-thumb.avif" type="image/avif"><source srcset="/images/tor-wireshark-thumb.webp" type="image/webp"><img src="/images/tor-wireshark-thumb.png" alt="Screen Shot" loading="lazy" decoding="async"></picture></a></p><p>Using tshark, it the Issuer and Subject ID patterns are a little more apparent.</p><pre class="language-code" data-language="code"><code class="language-code">$ tshark -r tor.pcap -T fields -R &quot;ssl.handshake.certificate&quot; -e x509af.utcTime -e x509sat.uTF8String 13-10-15 00:00:00 (UTC),14-02-11 23:59:59 (UTC) www.axslhtfqq.com,www.hkkch64skp7am.net
+13-12-30 18:32:48 (UTC),14-12-30 18:32:48 (UTC) www.igdpzct5tauwgyqs.com,www.4tdznzbrfuv.net
+13-10-04 00:00:00 (UTC),14-04-22 00:00:00 (UTC) www.3pxivyds.com,www.nolspqtib3ix.net
+13-11-17 00:00:00 (UTC),14-06-22 00:00:00 (UTC) www.3pzqe4en5.com,www.glk3fwiz6.net
+13-06-19 00:00:00 (UTC),14-04-20 00:00:00 (UTC) www.5orbut4ufhohm5rlj47.com,www.orutxjqwf.net
+13-06-15 00:00:00 (UTC),14-02-04 00:00:00 (UTC) www.7wdf4rkj5mew.com,www.sd5mkmsmo.net
+13-11-19 00:00:00 (UTC),14-02-05 23:59:59 (UTC) www.75ba5lymxpbhw3a2kb.com,www.rnspic4yus5crf6w.net
+13-12-30 19:54:02 (UTC),14-12-30 19:54:02 (UTC) www.s5rc22gpzrwt4e.com,www.qzsg2ioaoplbs2gaha5.net
+13-08-12 00:00:00 (UTC),14-04-16 23:59:59 (UTC) www.2fwld67ac2.com,www.6suxdq3miwwewq4.net
+13-12-18 00:00:00 (UTC),14-02-14 23:59:59 (UTC) www.npmxal2ohuefme26yf.com,www.c7kriuquvh.net
+13-10-18 00:00:00 (UTC),14-06-16 00:00:00 (UTC) www.s426lumoi7.com,www.ouzbot23a6lw3vvmszx.net
+13-12-31 00:00:00 (UTC),14-02-01 23:59:59 (UTC) www.vywbff5wkza6npkd5l.com,www.ugdrrog5ro5wdfddj.net
+13-11-27 00:00:00 (UTC),14-08-13 00:00:00 (UTC) www.ozsx22b4nda.com,www.lr7s5k3n6ber.net
+13-03-31 00:00:00 (UTC),14-01-06 23:59:59 (UTC) www.plgx26wgyroot37x3ysj.com,www.xwx5gpj5t2msq3.net
+13-12-18 00:00:00 (UTC),14-02-20 00:00:00 (UTC) www.gempmzrnwnk.com,www.6lrz7wtwprz.net
+13-08-16 00:00:00 (UTC),14-01-26 23:59:59 (UTC) www.rxy4jiw4wk.com,www.g66mipkcyhjwumywk4h.net
+13-12-30 19:07:41 (UTC),14-12-30 19:07:41 (UTC) www.o5qzqtbs.com,www.bnymkm3nk7jtz3.net
+13-07-27 00:00:00 (UTC),14-01-18 00:00:00 (UTC) www.rtqtkopfct767ai.com,www.facp2b2y5wjffbo5ioy.net
+13-09-09 00:00:00 (UTC),14-02-26 00:00:00 (UTC) www.lvv4l6sx3qafei2s5u.com,www.vznlngjz7a2fpg.net
+13-12-21 00:00:00 (UTC),14-02-08 00:00:00 (UTC) www.mbrdx4tz2ob5wlvazlr.com,www.shxl35n3zt.net
+13-12-12 00:00:00 (UTC),14-01-15 00:00:00 (UTC) www.4jvdpoo5wcklhd3usu.com,www.f4uxyorx2h.net
+13-10-17 00:00:00 (UTC),14-05-05 00:00:00 (UTC) www.zcgg5yiwzajal4.com,www.55a4kx5jrqxezvk.net
+13-05-18 00:00:00 (UTC),14-04-07 23:59:59 (UTC) www.3eexfeaw.com,www.iedhzej4tie4egm.net
+13-12-23 00:00:00 (UTC),14-01-22 23:59:59 (UTC) www.5m6ywj2w7zs.com,www.iolbr3jbfs.net
+13-03-09 00:00:00 (UTC),14-01-01 23:59:59 (UTC) www.hbwpqbx4zimtptui.com,www.77wneeix55t.net
+13-12-26 00:00:00 (UTC),14-04-19 00:00:00 (UTC) www.pxznjv3t75.com,www.wuqq77l634eogfm.net
+13-12-07 00:00:00 (UTC),14-03-17 23:59:59 (UTC) www.6pp7bfbdywvcaicqmfq.com,www.g6oa3qdobmdgl5tprm.net
+13-12-30 19:42:49 (UTC),14-12-30 19:42:49 (UTC) www.twngp3xrqgo4p.com,www.znskvp5k5pns22y2.net
+13-02-14 00:00:00 (UTC),14-01-14 00:00:00 (UTC) www.spx5a4e5eyhkdtpt2xj.com,www.6phyovjhggkfm.net
+</code></pre><p>So with this knowledge I started looking to see if there were any current methods of identifying the anomalous certificate identifiers. Lucky for Bro users, <a href="https://github.com/sethhall/">Seth Hall</a> created a <a href="https://raw.github.com/sethhall/bro-junk-drawer/master/detect-tor.bro">detect-tor.bro</a> script to do just that. I <a href="http://www.bro.org/download/">downloaded</a> the latest Bro 2.4 source package and built it on my Ubuntu VM. I also pulled down the aforementioned detect-tor.bro script. I was greeted with a warning and did not see the expected logs:</p><pre class="language-code" data-language="code"><code class="language-code">$ sudo /usr/local/bro/bin/bro -r tor.pcap detect-tor.bro
+warning in /usr/local/bro/share/bro/base/misc/find-checksum-offloading.bro, line 54: Your trace file likely has invalid TCP checksums, most likely from NIC checksum offloading. By default, packets with invalid checksums are discarded by Bro unless using the -C command-line option or toggling the 'ignore_checksums' variable. Alternatively, disable checksum offloading by the network adapter to ensure Bro analyzes the actual checksums that are transmitted.
+</code></pre><p>This was quickly fixed by including the <code>-C</code> toggle in order to ignore checksums.</p><pre class="language-code" data-language="code"><code class="language-code">$ sudo /usr/local/bro/bin/bro -C -r tor.pcap detect-tor.bro
+</code></pre><p>After parsing the Tor traffic collected via Wireshark or tcpdump, Bro should have generated some logs. At first glace, we see an alert from the detect-tor.bro script. While the event is pretty self explanatory, note the destination IP addresses are not included because Tor will usually have multiple servers, i.e. destination IP addresses.</p><pre class="language-code" data-language="code"><code class="language-code">$ more notice.log
+#separator \x09
+#set_separator ,
+#empty_field (empty)
+#unset_field -
+#path notice
+#open 2014-01-03-14-12-05
+#fields ts uid id.orig_h id.orig_p id.resp_h id.resp_p fuid file_mime_type file_desc proto note msg sub src dst p n peer_descr actions suppress_for dropped remote_location.country_code remote_location.region remote_location.city remote_locatio
+n.latitude remote_location.longitude
+#types time string addr port addr port string string string enum enum string string addr addr port count string table[enum] interval bool string string string double double
+1388434821.597322 - - - - - - - - - DetectTor::Found 10.0.0.126 was found using Tor by connecting t
+o servers with at least 10 unique weird certs - 10.0.0.126 - - - bro Notice::ACTION_LOG 3600.000000 F - - -- -
+#close 2014-01-03-14-12-05
+</code></pre><p>We can cut down column noise by specifying only what we want to see:</p><pre class="language-code" data-language="code"><code class="language-code">$ cat notice.log|/usr/local/bro/bin/bro-cut -c -d note msg src dst actions suppress_for dropped
+#separator \x09
+#set_separator ,
+#empty_field (empty)
+#unset_field -
+#path notice
+#open 2014-01-03-14-12-05
+#fields note msg src dst actions suppress_for dropped
+#types string string addr addr table[enum] interval bool
+DetectTor::Found 10.0.0.126 was found using Tor by connecting to servers with at least 10 unique weird certs 10.0.0.126 - Notice::ACTION_LOG 3600.000000 F
+</code></pre><p>After seeing the alert in the <code>notice.log</code>, we look in the <code>ssl.log</code> file as well in order to determine what traffic caused the alert to fire.</p><pre class="language-code" data-language="code"><code class="language-code">$ more ssl.log
+#separator \x09
+#set_separator ,
+#empty_field (empty)
+#unset_field -
+#path ssl
+#open 2014-01-03-14-12-05
+#fields ts uid id.orig_h id.orig_p id.resp_h id.resp_p version cipher server_name session_id subject issuer_subject not_va
+lid_before not_valid_after last_alert client_subject client_issuer_subject
+#types time string addr port addr port string string string string string string time time string string string
+1388434821.514935 CwRHlF31djcMrO7Z98 10.0.0.126 51191 199.36.221.196 9001 TLSv10 TLS_DHE_RSA_WITH_AES_256_CBC_SHA www.wplgkqpnteb.com -CN=www.ri6ufvqioii5se5tzbgt.net CN=www.dyyp6enzivlm46.com 1388447336.000000 1419983336.000000 - - -
+1388434821.482053 Ck1Mgy4ubChMFyneFc 10.0.0.126 38946 198.27.97.223 443 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.p65b.com - CN=www.hkkch64skp7am.net CN=www.axslhtfqq.com 1381809600.000000 1392181199.000000 - - -
+1388434821.533291 CZOEio3mxlQgpmVD2i 10.0.0.126 36715 149.9.0.60 9001 TLSv10 TLS_DHE_RSA_WITH_AES_256_CBC_SHA www.dpvdl3n6yzwv.com -CN=www.anojueopqlpgsj.net CN=www.u2rsltgpogir6t.com 1384405200.000000 1398830399.000000 - - -
+1388434821.484476 CnU0VyJcJHaeCaxh8 10.0.0.126 49341 66.18.12.197 443 TLSv10 TLS_DHE_RSA_WITH_AES_256_CBC_SHA www.6kyx72vjlrwxcmxnj4
+we7n.com - CN=www.4tdznzbrfuv.net CN=www.igdpzct5tauwgyqs.com 1388446368.000000 1419982368.000000 - - -
+1388434821.484255 Cc00yR3kKWb2GstwXf 10.0.0.126 40742 64.62.249.222 443 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.de5v2whiex3xxy.com ```text - CN=www.glk3fwiz6.net CN=www.3pzqe4en5.com 1384664400.000000 1403409600.000000 - - -
+``` 1388434821.583284 CuVFNK14saFKjGVhfh 10.0.0.126 54393 50.115.122.68 9001 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.ojj4rbje7z7.com -CN=www.qexiojanju56.net CN=www.nnfslkrseh.com 1387342800.000000 1390280400.000000 - - -
+1388434821.482585 CROLl5Vd0jUzvvwn 10.0.0.126 46797 212.83.140.45 443 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.esd7jqvwpbwebf.com ```text - CN=www.nolspqtib3ix.net CN=www.3pxivyds.com 1380859200.000000 1398139200.000000 - - -
+``` 1388434821.597288 CXemGQ4G0PFf5DvUf 10.0.0.126 34887 72.52.91.30 5901 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.igyewbs5.com -CN=www.bnlln35al.net CN=www.henq76fjat2ozl2537.com 1376020800.000000 1403841600.000000 - - -
+1388434821.597322 CFrNiH22BOLl917zjl 10.0.0.126 56135 144.76.109.178 9081 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.57xl.com - CN=www.3rvuayihf4t35h.net CN=www.viw7rvktu36ov.com 1386651600.000000 1388811600.000000 - - -
+1388434821.489984 CxEp7Xmn9AOlkxn0e 10.0.0.126 44997 31.7.186.228 443 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.ewrk2xtmr.com -CN=www.orutxjqwf.net CN=www.5orbut4ufhohm5rlj47.com 1371614400.000000 1397966400.000000 - - -
+</code></pre><p>Again, we can select the fields we want to see in order to minimize output.</p><pre class="language-code" data-language="code"><code class="language-code">$ cat ssl.log|/usr/local/bro/bin/bro-cut -c -d ts uid id.orig_h id.orig_p id.resp_h id.resp_p version cipher server_name subject issuer_subject not_valid_before not_valid_after
+#separator \x09
+#set_separator ,
+#empty_field (empty)
+#unset_field -
+#path ssl
+#open 2014-01-03-14-12-05
+#fields ts uid id.orig_h id.orig_p id.resp_h id.resp_p version cipher server_name subject issuer_subject not_valid_before not_valid_after
+#types string string addr port addr port string string string string string time string
+2013-12-30T15:20:21-0500 CwRHlF31djcMrO7Z98 10.0.0.126 51191 199.36.221.196 9001 TLSv10 TLS_DHE_RSA_WITH_AES_256_CBC_SHA www.wplgkqpnteb.com CN=www.ri6ufvqioii5se5tzbgt.net CN=www.dyyp6enzivlm46.com 2013-12-30T18:48:56-0500 2014-12-30T18:48:56-0500
+2013-12-30T15:20:21-0500 Ck1Mgy4ubChMFyneFc 10.0.0.126 38946 198.27.97.223 443 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.p65b.com CN=www.hkkch64skp7am.net CN=www.axslhtfqq.com 2013-10-15T00:00:00-0400 2014-02-11T23:59:59-0500
+2013-12-30T15:20:21-0500 CZOEio3mxlQgpmVD2i 10.0.0.126 36715 149.9.0.60 9001 TLSv10 TLS_DHE_RSA_WITH_AES_256_CBC_SHA www.dpvdl3n6yzwv.com CN=www.anojueopqlpgsj.net CN=www.u2rsltgpogir6t.com 2013-11-14T00:00:00-0500 2014-04-29T23:59:59-0400
+2013-12-30T15:20:21-0500 CnU0VyJcJHaeCaxh8 10.0.0.126 49341 66.18.12.197 443 TLSv10 TLS_DHE_RSA_WITH_AES_256_CBC_SHA www.6kyx72vjlrwxcmxnj4we7n.com CN=www.4tdznzbrfuv.net CN=www.igdpzct5tauwgyqs.com 2013-12-30T18:32:48-0500 2014-12-30T18:32:48-0500
+2013-12-30T15:20:21-0500 Cc00yR3kKWb2GstwXf 10.0.0.126 40742 64.62.249.222 443 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.de5v2whiex3xxy.com CN=www.glk3fwiz6.net CN=www.3pzqe4en5.com 2013-11-17T00:00:00-0500 2014-06-22T00:00:00-0400
+2013-12-30T15:20:21-0500 CuVFNK14saFKjGVhfh 10.0.0.126 54393 50.115.122.68 9001 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.ojj4rbje7z7.com CN=www.qexiojanju56.net CN=www.nnfslkrseh.com 2013-12-18T00:00:00-0500 2014-01-21T00:00:00-0500
+2013-12-30T15:20:21-0500 CROLl5Vd0jUzvvwn 10.0.0.126 46797 212.83.140.45 443 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.esd7jqvwpbwebf.com CN=www.nolspqtib3ix.net CN=www.3pxivyds.com 2013-10-04T00:00:00-0400 2014-04-22T00:00:00-0400
+2013-12-30T15:20:21-0500 CXemGQ4G0PFf5DvUf 10.0.0.126 34887 72.52.91.30 5901 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.igyewbs5.com CN=www.bnlln35al.net CN=www.henq76fjat2ozl2537.com 2013-08-09T00:00:00-0400 2014-06-27T00:00:00-0400
+2013-12-30T15:20:21-0500 CFrNiH22BOLl917zjl 10.0.0.126 56135 144.76.109.178 9081 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.57xl.com CN=www.3rvuayihf4t35h.net CN=www.viw7rvktu36ov.com 2013-12-10T00:00:00-0500 2014-01-04T00:00:00-0500
+2013-12-30T15:20:21-0500 CxEp7Xmn9AOlkxn0e 10.0.0.126 44997 31.7.186.228 443 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.ewrk2xtmr.com CN=www.orutxjqwf.net CN=www.5orbut4ufhohm5rlj47.com 2013-06-19T00:00:00-0400 2014-04-20T00:00:00-0400
+2013-12-30T15:20:21-0500 CwzpD92UikR0USUErj 10.0.0.126 58912 91.121.113.70 9001 TLSv10 TLS_DHE_RSA_WITH_AES_256_CBC_SHA www.dv2nzruzkuf2ncqzpxh5vpg.com CN=www.an2nldahkafrkz6qx.net CN=www.ejybbncghc3qjraztwpr.com 2013-12-30T19:35:37-0500 2014-12-30T19:35:37-0500
+2013-12-30T15:20:21-0500 CqAdrg1JryZY3kTrZ5 10.0.0.126 46649 5.135.187.167 9001 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.3h2eyn3jwsjkggg3.com CN=www.mt5unawhy.net CN=www.nexscb2bdms.com 2013-12-16T00:00:00-0500 2014-01-10T23:59:59-0500
+2013-12-30T15:20:21-0500 CWYgR82bEI9IjcHp7a 10.0.0.126 37960 212.83.158.5 443 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.w5wtl.comCN=www.6suxdq3miwwewq4.net CN=www.2fwld67ac2.com 2013-08-12T00:00:00-0400 2014-04-16T23:59:59-0400
+2013-12-30T15:20:21-0500 CpGUEo3d5jBpzI6L04 10.0.0.126 50935 212.83.158.50 443 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.lm6zdbm5w2jd5wxtmsfpkn.com CN=www.ouzbot23a6lw3vvmszx.net CN=www.s426lumoi7.com 2013-10-18T00:00:00-0400 2014-06-16T00:00:00-0400
+2013-12-30T15:20:21-0500 CYocU22O3RREM4dfnl 10.0.0.126 49609 88.159.20.120 443 TLSv10 TLS_DHE_RSA_WITH_AES_256_CBC_SHA www.exr2poqlv774jn4ddyvf5vvv.com CN=www.qzsg2ioaoplbs2gaha5.net CN=www.s5rc22gpzrwt4e.com 2013-12-30T19:54:02-0500 2014-12-30T19:54:02-0500
+2013-12-30T15:20:21-0500 CxG1gw2N7G5uvDpiD2 10.0.0.126 57656 95.211.225.167 443 TLSv10 TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA www.mwqdszwnojnepwmw4souyw.com CN=www.rnspic4yus5crf6w.net CN=www.75ba5lymxpbhw3a2kb.com 2013-11-19T00:00:00-0500 2014-02-05T23:59:59-0500
+2013-12-30T15:20:21-0500 CcVZHF3a5TkT9byG2e 10.0.0.126 60680 80.100.45.156 443 TLSv10 TLS_DHE_RSA_WITH_AES_128_CBC_SHA www.emqfcc55o7a4u4ecq3w63.com CN=www.c7kriuquvh.net CN=www.npmxal2ohuefme26yf.com 2013-12-18T00:00:00-0500 2014-02-14T23:59:59-0500
+</code></pre><p>Pretty straight forward process to identify Tor usage on a network. This could be coupled with matching the destination addresses with the Tor server list available <a href="https://www.dan.me.uk/torlist/">servers</a> or <a href="https://exonerator.torproject.org">here</a> in order to provide further validation of Tor traffic.</p></div><nav class="post-nav" aria-label="Post navigation"><a class="post-nav-card" href="/silk-network-traffic-analysis-visualization-with-r-and-rayon/"><span>Previous</span>SiLK Network Traffic Analysis Visualization with R and Rayon</a><a class="post-nav-card post-nav-next" href="/benchmarking-websites-with-ab-and-tsung/"><span>Next</span>Benchmarking Websites with ab and tsung</a></nav></article><script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "BlogPosting", "headline": "Detecting Tor traffic with Bro network traffic analyzer", "description": "This entry is a post in a series in order to identify Tor (the onion router) network traffic and usage using Bro Network Security Monitor. To learn more abou…", "datePublished": "2016-01-16T17:00:00.000Z", "dateModified": "2016-01-16T17:00:00.000Z", "author": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.linkedin.com/in/rsreese" }, "publisher": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.rsreese.com" }, "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.rsreese.com/detecting-tor-traffic-with-bro-network-traffic-analyzer/" }
+}
+</script></main><footer class="site-footer-wrap"><div class="site-footer"><p>© Stephen Reese · Built with Eleventy · <a href="https://www.linkedin.com/in/rsreese">LinkedIn</a> · <a href="https://twitter.com/rsreese">Twitter/X</a></p><a class="back-to-top" href="#top" aria-label="Back to top">Back to top ↑</a></div></footer><script>(function(){const root=document.documentElement,btn=document.querySelector('.theme-toggle'),key='rsreese-theme';function preferred(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}function apply(v){const mode=v==='light'||v==='dark'?v:preferred();root.setAttribute('data-theme',mode);root.dataset.themePreference=v||'system';if(btn){btn.setAttribute('aria-label',mode==='dark'?'Switch to light mode':'Switch to dark mode');btn.title=btn.getAttribute('aria-label')}}try{apply(localStorage.getItem(key)||'system')}catch(e){apply('system')}btn&&btn.addEventListener('click',function(){const current=root.getAttribute('data-theme')==='dark'?'dark':'light';const next=current==='dark'?'light':'dark';try{localStorage.setItem(key,next)}catch(e){}apply(next)});window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){try{if(!localStorage.getItem(key))apply('system')}catch(e){apply('system')}})})();</script><script>const navToggle=document.querySelector('.nav-toggle'),primaryNav=document.querySelector('#primary-nav');if(navToggle&&primaryNav){function setOpen(open){navToggle.setAttribute('aria-expanded',String(open));primaryNav.classList.toggle('is-open',open)}navToggle.addEventListener('click',()=>setOpen(navToggle.getAttribute('aria-expanded')!=='true'));primaryNav.addEventListener('click',e=>{if(e.target.matches('a'))setOpen(false)});document.addEventListener('click',e=>{if(!primaryNav.contains(e.target)&&!navToggle.contains(e.target))setOpen(false)});document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)})}</script><script src="/assets/js/code-enhance.js?v=3.3.0" defer></script></body></html>

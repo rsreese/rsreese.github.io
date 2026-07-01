@@ -1,0 +1,177 @@
+<!doctype html><html lang="en" data-theme="auto"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>How I got started in information technology</title><meta name="description" content="Every once in a while someone asks me how I got started in working in the information technology realm. Usually someone that is not in the industry or they a…"><link rel="canonical" href="https://www.rsreese.com/how-i-got-started-in-information-technology/"><meta name="theme-color" content="#11191a"><meta property="og:type" content="article"><meta property="og:title" content="How I got started in information technology"><meta property="og:description" content="Every once in a while someone asks me how I got started in working in the information technology realm. Usually someone that is not in the industry or they a…"><meta property="og:url" content="https://www.rsreese.com/how-i-got-started-in-information-technology/"><meta property="og:site_name" content="Stephen Reese"><meta property="article:author" content="https://www.linkedin.com/in/rsreese"><meta property="article:published_time" content="2010-08-17T18:29:00.000Z"><meta name="twitter:card" content="summary_large_image"><meta name="twitter:site" content="@rsreese"><meta name="twitter:creator" content="@rsreese"><meta name="twitter:title" content="How I got started in information technology"><meta name="twitter:description" content="Every once in a while someone asks me how I got started in working in the information technology realm. Usually someone that is not in the industry or they a…"><link rel="me" href="https://www.linkedin.com/in/rsreese"><link rel="me" href="https://twitter.com/rsreese"><script>(function(){try{var saved=localStorage.getItem('rsreese-theme');var dark=window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.setAttribute('data-theme',saved==='light'||saved==='dark'?saved:(dark?'dark':'light'));}catch(e){}})();</script><style>/* ====================================================================== Critical CSS — rsreese.com Eleventy Purpose: inline-only first paint styles. Keep this file small. Full component styling belongs in main.css. ====================================================================== */ /* ---------------------------------------------------------------------- 1. Design Tokens ---------------------------------------------------------------------- */
+:root { color-scheme: light dark; --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace; --content-width: 760px; --wide-width: 980px; --page-pad: 30px; --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px; --space-5: 24px; --space-6: 30px; --space-7: 40px; --space-8: 56px; --space-9: 72px; --bg: #f7f5ef; --surface: #ffffff; --surface-soft: #faf8f2; --text: #181713; --muted: #69645b; --border: #ded8ca; --link: #814b18; --link-hover: #4e2b08; --header-bg: #101718; --header-text: #fff8ea; --footer-bg: #101718; --footer-text: #fff8ea; --radius: 14px; --shadow: 0 12px 35px rgba(23, 18, 10, 0.08); --transition: 180ms ease;
+} [data-theme="dark"] { --bg: #11100d; --surface: #1b1915; --surface-soft: #171511; --text: #f6efe2; --muted: #c8bdab; --border: #3b352b; --link: #f2c078; --link-hover: #ffd99b; --header-bg: #070706; --header-text: #fff8ea; --footer-bg: #070706; --footer-text: #fff8ea; --shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+} @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #11100d; --surface: #1b1915; --surface-soft: #171511; --text: #f6efe2; --muted: #c8bdab; --border: #3b352b; --link: #f2c078; --link-hover: #ffd99b; --header-bg: #070706; --header-text: #fff8ea; --footer-bg: #070706; --footer-text: #fff8ea; --shadow: 0 12px 35px rgba(0, 0, 0, 0.35); }
+} /* ---------------------------------------------------------------------- 2. Base / Sticky Footer ---------------------------------------------------------------------- */
+* { box-sizing: border-box;
+} html { min-height: 100%; scroll-behavior: smooth; text-size-adjust: 100%;
+} body { min-height: 100vh; margin: 0; display: flex; flex-direction: column; background: var(--bg); color: var(--text); font-family: var(--font-sans); font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased; text-rendering: optimizeLegibility;
+} main { flex: 1 0 auto;
+} img,
+svg,
+video { max-width: 100%; height: auto;
+} img { border-radius: calc(var(--radius) - 6px);
+} /* ---------------------------------------------------------------------- 3. Typography Essentials ---------------------------------------------------------------------- */
+a { color: var(--link); text-decoration-thickness: 0.08em; text-underline-offset: 0.18em; transition: color var(--transition);
+} a:hover,
+a:focus-visible { color: var(--link-hover);
+} h1,
+h2,
+h3,
+h4 { margin: 0 0 var(--space-4); color: var(--text); line-height: 1.12; letter-spacing: -0.035em; font-weight: 760;
+} h1 { font-size: clamp(2.25rem, 7vw, 4.75rem);
+} h2 { font-size: clamp(1.65rem, 4vw, 2.6rem);
+} h3 { font-size: clamp(1.25rem, 3vw, 1.65rem);
+} p { margin: 0 0 var(--space-5);
+} .lede,
+.hero p,
+.intro p,
+.page-intro p { max-width: 68ch; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.25rem); line-height: 1.65;
+} /* ---------------------------------------------------------------------- 4. Shared Layout ---------------------------------------------------------------------- */
+.container { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .content { width: min(100% - calc(var(--page-pad) * 2), var(--content-width)); margin-inline: auto;
+} .content-wide { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .page-section,
+.hero,
+.intro,
+.page-header,
+.article-header { padding-block: var(--space-6);
+} .page-bottom-space,
+.home-articles,
+.articles-page,
+.article-list-section { padding-bottom: var(--space-8);
+} /* ---------------------------------------------------------------------- 5. Header / Navigation ---------------------------------------------------------------------- */
+.site-header { flex: 0 0 auto; background: var(--header-bg); color: var(--header-text); border-bottom: 1px solid rgba(255, 248, 234, 0.12);
+} .site-header a { color: var(--header-text); text-decoration: none;
+} .header-inner,
+.nav-wrap { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); min-height: 72px; margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
+} .site-title,
+.logo,
+.brand { color: var(--header-text); font-size: 1rem; font-weight: 760; letter-spacing: -0.02em; white-space: nowrap;
+} .primary-nav,
+.site-nav,
+.nav-links { display: flex; align-items: center; gap: var(--space-4);
+} .primary-nav a,
+.site-nav a,
+.nav-links a { color: var(--header-text); opacity: 0.9; font-size: 0.95rem; font-weight: 650;
+} .primary-nav a:hover,
+.primary-nav a:focus-visible,
+.site-nav a:hover,
+.site-nav a:focus-visible,
+.nav-links a:hover,
+.nav-links a:focus-visible { opacity: 1;
+} .nav-toggle,
+.menu-toggle,
+.theme-toggle { display: inline-flex; align-items: center; justify-content: center; border: 1px solid rgba(255, 248, 234, 0.2); border-radius: 999px; background: transparent; color: var(--header-text); font: inherit; cursor: pointer;
+} .nav-toggle,
+.menu-toggle { display: none; width: 42px; height: 42px;
+} .theme-toggle { min-width: 42px; min-height: 42px; padding-inline: var(--space-3);
+} .hamburger,
+.menu-icon { width: 22px; height: 16px; position: relative; display: inline-flex; flex-direction: column; justify-content: space-between; background: transparent;
+} .hamburger span { display: block; width: 100%; height: 2px; background: currentColor; border-radius: 999px;
+} .menu-icon { height: 2px; display: block; background: currentColor;
+} .menu-icon::before,
+.menu-icon::after { content: ""; position: absolute; left: 0; width: 22px; height: 2px; background: currentColor; border-radius: 999px;
+} .menu-icon::before { top: -7px;
+} .menu-icon::after { top: 7px;
+} /* ---------------------------------------------------------------------- 6. Hero / Intro First Paint ---------------------------------------------------------------------- */
+.hero,
+.intro,
+.page-header { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto;
+} .hero-inner,
+.intro-inner,
+.page-header-inner { width: min(100%, var(--content-width));
+} .hero-actions,
+.actions,
+.cta-row { display: flex; flex-wrap: wrap; gap: var(--space-3); margin-top: var(--space-5);
+} .button,
+.btn,
+.hero a.button,
+.hero a.btn { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 var(--space-4); border: 1px solid var(--border); border-radius: 999px; background: var(--surface); color: var(--text); font-weight: 700; text-decoration: none;
+} .button-primary,
+.btn-primary,
+.hero a:first-child.button,
+.hero a:first-child.btn { background: var(--text); border-color: var(--text); color: var(--bg);
+} [data-theme="dark"] .button-primary,
+[data-theme="dark"] .btn-primary,
+[data-theme="dark"] .hero a:first-child.button,
+[data-theme="dark"] .hero a:first-child.btn { background: var(--header-text); border-color: var(--header-text); color: var(--header-bg);
+} /* ---------------------------------------------------------------------- 7. Article Card Shells Above Fold ---------------------------------------------------------------------- */
+.article-list,
+.articles-list,
+.latest-articles { display: grid; gap: var(--space-4);
+} .article-card { width: 100%; margin: 0; padding: var(--space-5); border: 1px solid var(--border); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow);
+} .article-card h2,
+.article-card h3 { margin-bottom: var(--space-2);
+} .article-card p,
+.article-card time,
+.article-meta { color: var(--muted);
+} /* ---------------------------------------------------------------------- 8. Footer ---------------------------------------------------------------------- */
+.site-footer { flex: 0 0 auto; margin-top: auto; padding-block: var(--space-6); background: var(--footer-bg); color: var(--footer-text); border-top: 1px solid rgba(255, 248, 234, 0.12);
+} .footer-inner { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-4);
+} .site-footer a { color: var(--footer-text);
+} .back-to-top { font-weight: 700; text-decoration: none;
+} /* ---------------------------------------------------------------------- 9. Mobile Critical Layout ---------------------------------------------------------------------- */
+@media (max-width: 760px) { :root { --page-pad: 22px; } body { font-size: 16px; } .header-inner, .nav-wrap { min-height: 64px; } .nav-toggle, .menu-toggle { display: inline-flex; } .primary-nav, .site-nav, .nav-links { position: absolute; inset-inline: var(--page-pad); top: 64px; z-index: 50; display: none; flex-direction: column; align-items: stretch; gap: 0; padding: var(--space-3); border: 1px solid rgba(255, 248, 234, 0.14); border-radius: var(--radius); background: var(--header-bg); box-shadow: var(--shadow); } .primary-nav.is-open, .site-nav.is-open, .nav-links.is-open, [data-menu-open="true"] .primary-nav, [data-menu-open="true"] .site-nav, [data-menu-open="true"] .nav-links { display: flex; } .primary-nav a, .site-nav a, .nav-links a { padding: var(--space-3) var(--space-2); } .hero, .intro, .page-header, .article-header { padding-block: var(--space-6); } .hero-actions, .actions, .cta-row { flex-direction: column; align-items: stretch; } .button, .btn { width: 100%; } .article-card { padding: var(--space-4); } .footer-inner { flex-direction: column; align-items: flex-start; } .header-anchor, .direct-link { display: none !important; }
+}
+</style><link rel="preload" href="/assets/css/main.css?v=3.3.0" as="style"><link rel="stylesheet" href="/assets/css/main.css?v=3.3.0" media="print" onload="this.media='all'"><noscript><link rel="stylesheet" href="/assets/css/main.css?v=3.3.0"></noscript><!-- Google tag (gtag.js) --><script async src="https://www.googletagmanager.com/gtag/js?id=G-JH5ZXYTT84"></script><script> window.dataLayer = window.dataLayer || []; function gtag(){dataLayer.push(arguments);} gtag('js', new Date()); gtag('config', 'G-JH5ZXYTT84'); </script></head><body id="top"><header class="site-header-wrap"><div class="site-header"><a class="brand" href="/">Stephen Reese</a><button class="nav-toggle" type="button" aria-expanded="false" aria-controls="primary-nav"><span class="sr-only">Open navigation</span><span class="hamburger" aria-hidden="true"><span></span><span></span><span></span></span></button><nav id="primary-nav" class="primary-nav" aria-label="Primary navigation"><a href="/about/">About</a><a href="/articles/">Articles</a><a href="/contact/">Contact</a></nav><button class="theme-toggle" type="button" aria-label="Toggle light and dark mode" title="Toggle light/dark mode"><span class="theme-toggle-icon" aria-hidden="true">◐</span></button></div></header><main class="container"><article class="post"><nav class="breadcrumbs" aria-label="Breadcrumb"><a href="/">Home</a><span aria-hidden="true">/</span><a href="/articles/">Articles</a><span aria-hidden="true">/</span><span>How I got started in information technology</span></nav><h1>How I got started in information technology</h1><p class="meta">August 17, 2010 · By Stephen Reese</p><div class="content"><p>Every once in a while someone asks me how I got started in working in
+the information technology realm. Usually someone that is not in the
+industry or they are interested in working with computers as a career
+and are not really sure where to start. I do not think I have been able
+to come up with a great answer but here is how it has worked for me thus
+far.</p><p>I have always had a mechanical inclination. I was one of those kids that
+would rather take apart their toys (read break) then play with them. I
+originally had a love affair with cars, especially engines. I would have
+one of my parent’s take me to the junk yard (before I could drive) just
+so I could pull old V8’s and bring them home to disassemble them. This
+was entertaining but then our family got a new computer. I had worked
+with friend’s computers but was careful not to break them as I knew
+their cost. You can imagine my dad’s face when he brought home our first
+computer and shortly thereafter I had the internals of it laid out
+across the floor. Lucky for me I somehow was able to put it back
+together and it still worked. I was hooked as there seemed like an
+endless amount of possibilities to keep me occupied.</p><p>I continued on my quest of learning more by installing other operating
+systems such as Redhat 6 besides the Windows 95 install as a dual boot
+installation. Not a very interesting feat now but at the time it was
+amazing for me. Fast forward a few years and I had gotten various jobs
+working for firms setting up and maintaining computer systems. I
+eventually got bit but the security bug while working at a university. I
+find the aspect of securing computer systems quite interesting as not
+only are you concerned with how information systems are implemented but
+also what vectors may be used to attack them and so much more. Enough
+about that here’s what I told the last person that was interested in
+getting into the technology scene. Opinions vary greatly here.</p><p>It depends upon what you see yourself doing in 10, 20 years from now.
+Computer Science (CS) degrees are great and they usually cover the
+spectrum when it comes to the world of computing. I was going to get a
+CS degree but was undecided the first two years and by the time I pulled
+it together I realized I would need two years of Calculus and Physics
+before most universities would even consider me for their programs. I
+instead went the Computer Information Science (CIS) route. This worked
+well for me as they are well recognized and the prerequisites were less
+demanding and time consuming.</p><p>Many universities now offer a number of programs such as Decision
+Information Science (DIS), this example focuses on more of the business
+perspective. I know one person whom has gone this route but they have
+done well. Most jobs will say they want a technology oriented degree
+though are not always specific. Regardless do your research. This
+ultimately depends upon what you expect to do and where you want to
+work. If you know the type of position you might see yourself in then
+look a position descriptions and figure out what the firms desire in
+that field. There are plenty of jobs out there but just more competition
+for them.</p><p>Due to competition in the market I would definitely recommend three
+things. One, if feasible, regardless of the bachelors program get a
+masters, these seems to open more doors and some schools have 3/2
+programs that allow you to pretty much get a masters and bachelors at
+almost the same time. Two, get an internship and/or job working with
+computers, helpdesk at a university or work for a small company
+maintaining their network, etc. Besides education, experience is highly
+regarded in the industry regardless of your concentration and this will
+help you figure out what you want to do career wise. Three, look into
+certifications such as a CCNA, Security+, MCSA. Even entry level
+certifications may help get you in the door though this is debatable by
+some.</p><p>I will state that I know people that rely purely upon their experience
+and others that are more academically focused. I do not think there is a
+sure fire method but for me a combination of both has worked fairly
+well.</p></div><nav class="post-nav" aria-label="Post navigation"><a class="post-nav-card" href="/finally-migrated-from-blogger-to-wordpress/"><span>Previous</span>Finally migrated from Blogger to WordPress</a><a class="post-nav-card post-nav-next" href="/creating-vmware-vmdk-files-from-dd-images-using-live-view/"><span>Next</span>Creating VMware VMDK files from DD images using Live View</a></nav></article><script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "BlogPosting", "headline": "How I got started in information technology", "description": "Every once in a while someone asks me how I got started in working in the information technology realm. Usually someone that is not in the industry or they a…", "datePublished": "2010-08-17T18:29:00.000Z", "dateModified": "2010-08-17T18:29:00.000Z", "author": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.linkedin.com/in/rsreese" }, "publisher": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.rsreese.com" }, "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.rsreese.com/how-i-got-started-in-information-technology/" }
+}
+</script></main><footer class="site-footer-wrap"><div class="site-footer"><p>© Stephen Reese · Built with Eleventy · <a href="https://www.linkedin.com/in/rsreese">LinkedIn</a> · <a href="https://twitter.com/rsreese">Twitter/X</a></p><a class="back-to-top" href="#top" aria-label="Back to top">Back to top ↑</a></div></footer><script>(function(){const root=document.documentElement,btn=document.querySelector('.theme-toggle'),key='rsreese-theme';function preferred(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}function apply(v){const mode=v==='light'||v==='dark'?v:preferred();root.setAttribute('data-theme',mode);root.dataset.themePreference=v||'system';if(btn){btn.setAttribute('aria-label',mode==='dark'?'Switch to light mode':'Switch to dark mode');btn.title=btn.getAttribute('aria-label')}}try{apply(localStorage.getItem(key)||'system')}catch(e){apply('system')}btn&&btn.addEventListener('click',function(){const current=root.getAttribute('data-theme')==='dark'?'dark':'light';const next=current==='dark'?'light':'dark';try{localStorage.setItem(key,next)}catch(e){}apply(next)});window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){try{if(!localStorage.getItem(key))apply('system')}catch(e){apply('system')}})})();</script><script>const navToggle=document.querySelector('.nav-toggle'),primaryNav=document.querySelector('#primary-nav');if(navToggle&&primaryNav){function setOpen(open){navToggle.setAttribute('aria-expanded',String(open));primaryNav.classList.toggle('is-open',open)}navToggle.addEventListener('click',()=>setOpen(navToggle.getAttribute('aria-expanded')!=='true'));primaryNav.addEventListener('click',e=>{if(e.target.matches('a'))setOpen(false)});document.addEventListener('click',e=>{if(!primaryNav.contains(e.target)&&!navToggle.contains(e.target))setOpen(false)});document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)})}</script><script src="/assets/js/code-enhance.js?v=3.3.0" defer></script></body></html>
