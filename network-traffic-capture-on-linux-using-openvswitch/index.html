@@ -41,7 +41,8 @@ h4 { margin: 0 0 var(--space-4); color: var(--text); line-height: 1.12; letter-s
 .articles-page,
 .article-list-section { padding-bottom: var(--space-8);
 } /* ---------------------------------------------------------------------- 5. Header / Navigation ---------------------------------------------------------------------- */
-.site-header { flex: 0 0 auto; background: var(--header-bg); color: var(--header-text); border-bottom: 1px solid rgba(255, 248, 234, 0.12);
+.site-header-wrap { flex: 0 0 auto; min-height: 83px; background: var(--header-bg); color: var(--header-text); border-bottom: 1px solid rgba(255, 248, 234, 0.12);
+} .site-header { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); min-height: 83px; margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-5); background: transparent; color: var(--header-text); border-bottom: 0;
 } .site-header a { color: var(--header-text); text-decoration: none;
 } .header-inner,
 .nav-wrap { width: min(100% - calc(var(--page-pad) * 2), var(--wide-width)); min-height: 72px; margin-inline: auto; display: flex; align-items: center; justify-content: space-between; gap: var(--space-5);
