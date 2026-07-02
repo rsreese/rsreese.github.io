@@ -160,17 +160,31 @@ p { margin: 0 0 24px; }
 
 /* 5. Header / navigation ------------------------------------------------- */
 .site-header-wrap {
-  background: var(--ink);
-  color: var(--ink-soft);
-  border-bottom: 1px solid rgba(255, 255, 255, .08);
+  flex: 0 0 auto;
+  min-height: 83px;
+  background: var(--header-bg);
+  color: var(--header-text);
+  border-bottom: 1px solid rgba(255, 248, 234, 0.12);
 }
+
 .site-header {
-  padding-block: 20px;
-  display: grid;
-  grid-template-columns: 1fr auto auto;
+  width: min(100% - calc(var(--page-pad) * 2), var(--wide-width));
+  min-height: 83px;
+  margin-inline: auto;
+  display: flex;
   align-items: center;
-  gap: 20px;
+  justify-content: space-between;
+  gap: var(--space-5);
+  background: transparent;
+  color: var(--header-text);
+  border-bottom: 0;
 }
+
+.site-header a {
+  color: var(--header-text);
+  text-decoration: none;
+}
+
 .brand {
   color: #fff;
   font-weight: 800;
