@@ -170,7 +170,7 @@ p { margin: 0 0 24px; }
 .site-header-wrap {
   flex: 0 0 auto;
   min-height: 83px;
-  background: var(--header-bg);
+  background-color: var(--header-bg);
   color: var(--header-text);
   border-bottom: 1px solid rgba(255, 248, 234, 0.12);
 }
