@@ -217,16 +217,6 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/about/</loc>
-    <lastmod>2010-02-06T19:45:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/contact/</loc>
-    <lastmod>2010-02-07T03:40:00.000Z</lastmod>
-  </url>
-
-  <url>
     <loc>https://www.rsreese.com/setting-up-maildrop-with-courier-mta/</loc>
     <lastmod>2010-02-08T05:05:00.000Z</lastmod>
   </url>
@@ -469,6 +459,16 @@
   <url>
     <loc>https://www.rsreese.com/articles/</loc>
     <lastmod>2026-07-01T01:20:02.000Z</lastmod>
+  </url>
+
+  <url>
+    <loc>https://www.rsreese.com/contact/</loc>
+    <lastmod>2026-07-03T03:40:00.000Z</lastmod>
+  </url>
+
+  <url>
+    <loc>https://www.rsreese.com/about/</loc>
+    <lastmod>2026-07-03T19:45:00.000Z</lastmod>
   </url>
 
 </urlset>
