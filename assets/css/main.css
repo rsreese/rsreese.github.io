@@ -20,6 +20,10 @@
   --ink-muted: #a9b8b7;
   --code-bg: #0d1719;
   --code-text: #eef7f7;
+  --header-bg: #101718;
+  --header-text: #fff8ea;
+  --footer-bg: #101718;
+  --footer-text: #fff8ea;
   --shadow: 0 18px 45px rgba(24, 32, 33, .075);
 
   --site-width: 1080px;
@@ -60,6 +64,10 @@ html[data-theme="dark"] {
   --ink-muted: #a9b8b7;
   --code-bg: #071012;
   --code-text: #edf7f7;
+  --header-bg: #070706;
+  --header-text: #fff8ea;
+  --footer-bg: #070706;
+  --footer-text: #fff8ea;
   --shadow: 0 18px 45px rgba(0, 0, 0, .28);
 }
 
@@ -186,7 +194,7 @@ p { margin: 0 0 24px; }
 }
 
 .brand {
-  color: #fff;
+  color: var(--header-text);
   font-weight: 800;
   font-size: 18px;
   letter-spacing: -.02em;
@@ -200,20 +208,25 @@ p { margin: 0 0 24px; }
   font-size: 15px;
 }
 .primary-nav a {
-  color: var(--ink-muted);
+  color: var(--header-text);
+  opacity: .9;
   font-weight: 700;
   text-decoration: none;
 }
 .primary-nav a:hover,
-.primary-nav a:focus { color: #fff; }
+.primary-nav a:focus {
+  color: var(--header-text);
+  opacity: 1;
+}
 .nav-toggle,
 .theme-toggle {
-  border: 1px solid rgba(255, 255, 255, .16);
+  border: 1px solid rgba(255, 248, 234, .2);
   border-radius: var(--radius-pill);
-  background: rgba(255, 255, 255, .08);
-  color: #fff;
+  background: transparent;
+  color: var(--header-text);
   cursor: pointer;
 }
+
 .nav-toggle {
   display: none;
   width: 42px;
