@@ -179,12 +179,12 @@ p { margin: 0 0 24px; }
   width: min(100% - calc(var(--page-pad) * 2), var(--wide-width));
   min-height: 83px;
   margin-inline: auto;
-  display: flex;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-5);
   background: transparent;
-  color: var(--header-text);
+  color: inherit;
   border-bottom: 0;
 }
 
@@ -203,9 +203,11 @@ p { margin: 0 0 24px; }
 .primary-nav {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   gap: 20px;
   flex-wrap: wrap;
   font-size: 15px;
+  justify-self: end;
 }
 .primary-nav a {
   color: var(--header-text);
@@ -610,23 +612,32 @@ html[data-theme="dark"] .button.button-secondary:focus {
   }
 
   .site-header {
-    position: relative;
     grid-template-columns: 1fr auto auto;
     gap: 12px;
     padding-block: 18px;
+    position: relative;
   }
 
-  .nav-toggle { display: inline-flex; }
+  .nav-toggle {
+    display: inline-flex;
+    order: 2;
+  }
 
+  .theme-toggle {
+    order: 3;
+  }
+  
   .primary-nav {
     display: none;
     position: absolute;
     top: calc(100% + 4px);
-    left: 0;
     right: 0;
+    left: auto;
     z-index: 10;
+    width: min(280px, calc(100vw - calc(var(--page-pad) * 2)));
     flex-direction: column;
     align-items: stretch;
+    justify-content: flex-start;
     gap: 0;
     padding: 10px;
     background: var(--ink);
