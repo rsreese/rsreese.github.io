@@ -2,11 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://www.rsreese.com/using-common-sense-to-secure-your-information/</loc>
-    <lastmod>2006-12-20T05:53:00.000Z</lastmod>
-  </url>
-
-  <url>
     <loc>https://www.rsreese.com/sql-injection-attack-on-a-postgresql-database-t_jiaozhu/</loc>
     <lastmod>2007-03-28T15:22:00.000Z</lastmod>
   </url>
@@ -42,11 +37,6 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/a-few-simple-computing-tips/</loc>
-    <lastmod>2009-02-10T01:46:00.000Z</lastmod>
-  </url>
-
-  <url>
     <loc>https://www.rsreese.com/debian-backup-script/</loc>
     <lastmod>2009-03-02T01:30:00.000Z</lastmod>
   </url>
@@ -64,11 +54,6 @@
   <url>
     <loc>https://www.rsreese.com/god-mode-an-easier-way-to-access-microsoft-windows-settings/</loc>
     <lastmod>2010-01-06T03:45:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/pseudo-gmail-address-obfuscation/</loc>
-    <lastmod>2011-01-10T02:35:00.000Z</lastmod>
   </url>
 
   <url>
