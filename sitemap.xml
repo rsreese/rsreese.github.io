@@ -17,38 +17,8 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/compare-directory-contents-on-linux/</loc>
-    <lastmod>2008-02-01T02:02:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/courier-vacation-notice/</loc>
-    <lastmod>2008-02-04T06:09:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/getting-samba-to-play-nicely-with-selinux-on-rhel/</loc>
-    <lastmod>2008-02-04T06:31:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/adding-a-character-to-a-line-using-perl/</loc>
-    <lastmod>2008-02-04T06:46:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/running-processes-in-the-background-on-linux/</loc>
-    <lastmod>2008-02-12T03:30:00.000Z</lastmod>
-  </url>
-
-  <url>
     <loc>https://www.rsreese.com/edit-group-policy-on-remote-computer/</loc>
     <lastmod>2008-02-12T03:32:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/configuring-sendmail-to-accept-mail/</loc>
-    <lastmod>2008-02-12T03:34:00.000Z</lastmod>
   </url>
 
   <url>
@@ -57,43 +27,18 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/kicking-a-user-off-a-linux-system/</loc>
-    <lastmod>2008-02-12T03:46:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/converting-microsoft-os-to-vmware-guest/</loc>
-    <lastmod>2008-07-30T01:03:00.000Z</lastmod>
-  </url>
-
-  <url>
     <loc>https://www.rsreese.com/mounting-read-only-drive-volumes-in-microsoft-windows/</loc>
     <lastmod>2008-08-05T21:35:00.000Z</lastmod>
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/gentoo-linux-auto-update-script/</loc>
-    <lastmod>2008-09-08T04:14:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/erase-slack-space-on-microsoft-vista/</loc>
+    <loc>https://www.rsreese.com/erase-slack-space-on-microsoft-windows/</loc>
     <lastmod>2008-10-03T04:34:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/using-metasploit-to-pwn-ms06-067/</loc>
-    <lastmod>2008-10-10T00:02:00.000Z</lastmod>
   </url>
 
   <url>
     <loc>https://www.rsreese.com/using-session-monitor-to-span-ports-as-an-aggregation-tap/</loc>
     <lastmod>2008-10-17T20:13:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/truecrypt-on-my-dell-notebook/</loc>
-    <lastmod>2008-12-19T00:23:00.000Z</lastmod>
   </url>
 
   <url>
@@ -107,28 +52,8 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/installing-sun-java-on-debian-lenny/</loc>
-    <lastmod>2009-05-15T15:04:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/facebook-gets-linked-account-support/</loc>
-    <lastmod>2009-05-20T03:04:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/trouble-accessing-gmail-or-internal-chat-client/</loc>
-    <lastmod>2009-09-10T01:58:00.000Z</lastmod>
-  </url>
-
-  <url>
     <loc>https://www.rsreese.com/python-file-uploader/</loc>
     <lastmod>2009-10-17T14:21:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/problem-with-raid-volume-larger-then-2tb-on-dell-workstations/</loc>
-    <lastmod>2009-10-21T14:35:00.000Z</lastmod>
   </url>
 
   <url>
@@ -137,33 +62,8 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/god-mode-give-windows-users-an-easier-way-to-destory-their-computers/</loc>
+    <loc>https://www.rsreese.com/god-mode-an-easier-way-to-access-microsoft-windows-settings/</loc>
     <lastmod>2010-01-06T03:45:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/migrating-from-blogger-to-wordpress/</loc>
-    <lastmod>2010-02-04T01:06:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/setting-up-maildrop-with-courier-mta/</loc>
-    <lastmod>2010-02-08T05:05:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/a-few-tools-that-may-help-rid-of-malware/</loc>
-    <lastmod>2010-02-09T03:22:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/redirect-blogger-url-using-mod-rewrite-and-shell-scripting-fu/</loc>
-    <lastmod>2010-02-13T01:07:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/finally-migrated-from-blogger-to-wordpress/</loc>
-    <lastmod>2010-05-23T18:35:00.000Z</lastmod>
   </url>
 
   <url>
@@ -192,21 +92,6 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/block-irc-and-other-communications-with-mcafee-virusscan/</loc>
-    <lastmod>2011-10-15T05:01:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/amazon-s3-server-side-encryption-using-gsutil/</loc>
-    <lastmod>2011-10-29T14:39:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/block-command-and-control-requests-using-asa-5500/</loc>
-    <lastmod>2011-12-10T02:26:00.000Z</lastmod>
-  </url>
-
-  <url>
     <loc>https://www.rsreese.com/how-to-setup-an-upside-down-ternet/</loc>
     <lastmod>2012-02-11T03:07:00.000Z</lastmod>
   </url>
@@ -214,11 +99,6 @@
   <url>
     <loc>https://www.rsreese.com/decoding-xor-payload-using-first-few-bytes-as-key/</loc>
     <lastmod>2012-07-24T04:07:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/running-snortad/</loc>
-    <lastmod>2013-01-10T03:00:00.000Z</lastmod>
   </url>
 
   <url>
@@ -299,11 +179,6 @@
   <url>
     <loc>https://www.rsreese.com/graphing-namebench-spreadsheet-data-with-r/</loc>
     <lastmod>2015-07-11T12:00:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/online-information-security-analysis-tools-and-resources/</loc>
-    <lastmod>2015-10-18T12:00:00.000Z</lastmod>
   </url>
 
   <url>
