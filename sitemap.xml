@@ -2,23 +2,8 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
-    <loc>https://www.rsreese.com/new-phishing-techniques-to-fool-online-users/</loc>
-    <lastmod>2006-02-14T07:04:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/botnets-that-make-money-but-at-whos-expense/</loc>
-    <lastmod>2006-03-22T19:08:00.000Z</lastmod>
-  </url>
-
-  <url>
     <loc>https://www.rsreese.com/using-common-sense-to-secure-your-information/</loc>
     <lastmod>2006-12-20T05:53:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/running-uac-and-some-other-tricks-to-keep-your-computer-running-smoothly/</loc>
-    <lastmod>2007-03-07T04:47:00.000Z</lastmod>
   </url>
 
   <url>
@@ -39,11 +24,6 @@
   <url>
     <loc>https://www.rsreese.com/courier-vacation-notice/</loc>
     <lastmod>2008-02-04T06:09:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/remove-index-php-from-wiki-url/</loc>
-    <lastmod>2008-02-04T06:22:00.000Z</lastmod>
   </url>
 
   <url>
@@ -82,37 +62,12 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/disable-fast-user-switching-on-vista/</loc>
-    <lastmod>2008-02-12T03:49:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/force-outlook-to-open-all-email-in-plain-text/</loc>
-    <lastmod>2008-02-12T03:51:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/encrypting-a-secondary-drive-pgp-or-truecrypt/</loc>
-    <lastmod>2008-05-15T00:05:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/domain-registrars-spamming-sub-domains/</loc>
-    <lastmod>2008-07-03T02:31:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/converting-microsoft-vista-from-one-version-to-another/</loc>
-    <lastmod>2008-07-19T04:37:00.000Z</lastmod>
-  </url>
-
-  <url>
     <loc>https://www.rsreese.com/converting-microsoft-os-to-vmware-guest/</loc>
     <lastmod>2008-07-30T01:03:00.000Z</lastmod>
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/mounting-drivesvolumes-read-only-in-microsoft-windows-vista/</loc>
+    <loc>https://www.rsreese.com/mounting-read-only-drive-volumes-in-microsoft-windows/</loc>
     <lastmod>2008-08-05T21:35:00.000Z</lastmod>
   </url>
 
@@ -212,48 +167,13 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/how-i-got-started-in-information-technology/</loc>
-    <lastmod>2010-08-17T14:29:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/creating-vmware-vmdk-files-from-dd-images-using-live-view/</loc>
-    <lastmod>2010-11-07T01:18:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/keeping-your-hardware-safe-and-avoiding-the-evil-maid/</loc>
-    <lastmod>2010-11-23T21:17:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/insecure-library-loading-could-allow-remote-code-execution/</loc>
-    <lastmod>2010-11-23T21:26:00.000Z</lastmod>
-  </url>
-
-  <url>
     <loc>https://www.rsreese.com/pseudo-gmail-address-obfuscation/</loc>
     <lastmod>2011-01-10T02:35:00.000Z</lastmod>
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/blocking-evil-with-the-enhanced-mitigation-experience-toolkit-emet/</loc>
-    <lastmod>2011-01-29T03:18:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/use-facebook-cdn-to-host-website-photo-gallerys/</loc>
-    <lastmod>2011-04-19T23:23:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/running-nix-retina-and-nessus-vulnerability-scans-with-least-privileges/</loc>
+    <loc>https://www.rsreese.com/running-linux-retina-and-nessus-vulnerability-scans-with-least-privileges/</loc>
     <lastmod>2011-06-17T02:46:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/setting-google-storage-object-acl-for-authenticated-downloads/</loc>
-    <lastmod>2011-07-17T03:06:00.000Z</lastmod>
   </url>
 
   <url>
@@ -292,23 +212,8 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/world-ipv6-day/</loc>
-    <lastmod>2012-06-07T01:29:00.000Z</lastmod>
-  </url>
-
-  <url>
     <loc>https://www.rsreese.com/decoding-xor-payload-using-first-few-bytes-as-key/</loc>
     <lastmod>2012-07-24T04:07:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/podcasts/</loc>
-    <lastmod>2012-09-10T04:29:00.000Z</lastmod>
-  </url>
-
-  <url>
-    <loc>https://www.rsreese.com/mailing-lists/</loc>
-    <lastmod>2012-11-10T04:27:00.000Z</lastmod>
   </url>
 
   <url>
@@ -438,12 +343,12 @@
 
   <url>
     <loc>https://www.rsreese.com/contact/</loc>
-    <lastmod>2026-07-03T03:40:00.000Z</lastmod>
+    <lastmod>2026-07-11T03:40:00.000Z</lastmod>
   </url>
 
   <url>
     <loc>https://www.rsreese.com/about/</loc>
-    <lastmod>2026-07-03T19:45:00.000Z</lastmod>
+    <lastmod>2026-07-11T19:45:00.000Z</lastmod>
   </url>
 
 </urlset>
