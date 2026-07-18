@@ -29,10 +29,8 @@ requirements in the following configuration file:</p><pre class="language-code" 
 will need a netflow configuration file. This configuration file says
 that we expect to receive network flow on UDP port 12345. Secondly, we
 output to STDOUT and the ElasticSearch entry, the former output is for
-testing.</p><pre class="language-code" data-language="code"><code class="language-code">input { udp { ```text
-port =&gt; 12345
-codec =&gt; netflow
-``` }
+testing.</p><pre class="language-code" data-language="code"><code class="language-code">input { udp { port =&gt; 12345
+codec =&gt; netflow }
 }
 output { stdout { } elasticsearch { host =&gt; &quot;127.0.0.1&quot; }
 }

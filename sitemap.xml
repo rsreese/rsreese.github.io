@@ -17,7 +17,7 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/authenicating-kerberos-against-active-directory/</loc>
+    <loc>https://www.rsreese.com/authenticating-kerberos-against-active-directory/</loc>
     <lastmod>2008-02-12T03:37:00.000Z</lastmod>
   </url>
 
@@ -47,7 +47,7 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/google-namebench-helps-find-happy-nameservers/</loc>
+    <loc>https://www.rsreese.com/google-namebench-to-find-optimal-nameservers/</loc>
     <lastmod>2009-12-15T03:22:00.000Z</lastmod>
   </url>
 
@@ -82,7 +82,7 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/decoding-xor-payload-using-first-few-bytes-as-key/</loc>
+    <loc>https://www.rsreese.com/decoding-an-xor-encoded-payload-using-its-first-few-bytes-as-key/</loc>
     <lastmod>2012-07-24T04:07:00.000Z</lastmod>
   </url>
 
@@ -107,7 +107,7 @@
   </url>
 
   <url>
-    <loc>https://www.rsreese.com/creating-debian-guests-on-xen-using-partition-based-filesystem/</loc>
+    <loc>https://www.rsreese.com/creating-a-debian-guest-on-xen-using-a-partition-based-filesystem/</loc>
     <lastmod>2013-06-29T17:47:00.000Z</lastmod>
   </url>
 

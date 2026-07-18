@@ -7,24 +7,24 @@ me. Here is the first difference between the two data sources.</p><pre class="la
 INPUT: 675 Records for 1 Bin and 675 Total Records
 OUTPUT: Top 5 Bins by Records
 pro| Records| %Records| cumul_%| 6| 675|100.000000|100.000000|
-$ rwfilter --start-date=$today --end-date=$today --proto=0-255 --pass=stdout --sensor=s1 | rwstats --protocol --top --count=5 --flows
+</code></pre><pre class="language-code" data-language="code"><code class="language-code">$ rwfilter --start-date=$today --end-date=$today --proto=0-255 --pass=stdout --sensor=s1 | rwstats --protocol --top --count=5 --flows
 INPUT: 2640 Records for 3 Bins and 2640 Total Records
 OUTPUT: Top 5 Bins by Records
 pro| Records| %Records| cumul_%| 17| 1927| 72.992424| 72.992424| 6| 712| 26.969697| 99.962121| 1| 1| 0.037879|100.000000|
 </code></pre><p>The difference between the flow data here is the v5 data only shows TCP
 connections at this point where as the tap is seeing ICMP, TCP and UDP.
 The next set of queries are from a streaming movie which the output has
-been cut for brevity.</p><pre class="language-code" data-language="code"><code class="language-code">$ rwfilter --start-date=$today --end-date=$today --sensor=s0 --type=all --proto=1,6,17 --pass=stdout --daddress=172.16.0.10 | rwsort --fields=bytes | rwcut --fields=sip,sport,dip,dport,bytes ```text 69.241.37.66| 80| 172.16.0.10|65184| 57713601| 69.241.37.66| 80| 172.16.0.10|65183| 58666986| 69.241.37.66| 80| 172.16.0.10|65183| 146904926| 69.241.37.66| 80| 172.16.0.10|65184| 153098218|
-``` $ rwfilter --start-date=$today --end-date=$today --sensor=s1 --type=all --proto=1,6,17 --pass=stdout --daddress=172.16.0.10 | rwsort --fields=bytes | rwcut --fields=sip,sport,dip,dport,bytes ```text 69.241.37.66| 80| 172.16.0.10|65183| 110759034| 69.241.37.66| 80| 172.16.0.10|65184| 111370758| 69.241.37.66| 80| 172.16.0.10|65183| 148760315| 69.241.37.66| 80| 172.16.0.10|65184| 150597449|
-``` </code></pre><p>The item to note here is the v5 netflow is reporting more bytes than the
+been cut for brevity.</p><pre class="language-code" data-language="code"><code class="language-code">$ rwfilter --start-date=$today --end-date=$today --sensor=s0 --type=all --proto=1,6,17 --pass=stdout --daddress=172.16.0.10 | rwsort --fields=bytes | rwcut --fields=sip,sport,dip,dport,bytes 69.241.37.66| 80| 172.16.0.10|65184| 57713601| 69.241.37.66| 80| 172.16.0.10|65183| 58666986| 69.241.37.66| 80| 172.16.0.10|65183| 146904926| 69.241.37.66| 80| 172.16.0.10|65184| 153098218|
+</code></pre><pre class="language-code" data-language="code"><code class="language-code">$ rwfilter --start-date=$today --end-date=$today --sensor=s1 --type=all --proto=1,6,17 --pass=stdout --daddress=172.16.0.10 | rwsort --fields=bytes | rwcut --fields=sip,sport,dip,dport,bytes 69.241.37.66| 80| 172.16.0.10|65183| 110759034| 69.241.37.66| 80| 172.16.0.10|65184| 111370758| 69.241.37.66| 80| 172.16.0.10|65183| 148760315| 69.241.37.66| 80| 172.16.0.10|65184| 150597449|
+</code></pre><p>The item to note here is the v5 netflow is reporting more bytes than the
 network tap for similar source and IP addresses for the respective
 destination IP addresses. Same results with the next filter.</p><pre class="language-code" data-language="code"><code class="language-code">$ rwfilter --start-date=$today --end-date=$today --protocol=1,6,17 --sensor=s0 --type=all --pass=stdout --saddress=69.241.37.66 --daddress=172.16.0.10 | rwstats --count=10 --fields=sip,dip,scc,bytes,sport
 INPUT: 4 Records for 4 Bins and 4 Total Records
-OUTPUT: Top 10 Bins by Records ```text sIP| dIP|scc| bytes|sPort| Records| %Records| cumul_%| 69.241.37.66| 172.16.0.10| us| 111370758| 80| 1| 25.000000| 25.000000| 69.241.37.66| 172.16.0.10| us| 150597449| 80| 1| 25.000000| 50.000000| 69.241.37.66| 172.16.0.10| us| 110759034| 80| 1| 25.000000| 75.000000| 69.241.37.66| 172.16.0.10| us| 148760315| 80| 1| 25.000000|100.000000|
-``` $ rwfilter --start-date=$today --end-date=$today --protocol=1,6,17 --sensor=s1 --type=all --pass=stdout --saddress=69.241.37.66 --daddress=172.16.0.10 | rwstats --count=10 --fields=sip,dip,scc,bytes,sport
+OUTPUT: Top 10 Bins by Records sIP| dIP|scc| bytes|sPort| Records| %Records| cumul_%| 69.241.37.66| 172.16.0.10| us| 111370758| 80| 1| 25.000000| 25.000000| 69.241.37.66| 172.16.0.10| us| 150597449| 80| 1| 25.000000| 50.000000| 69.241.37.66| 172.16.0.10| us| 110759034| 80| 1| 25.000000| 75.000000| 69.241.37.66| 172.16.0.10| us| 148760315| 80| 1| 25.000000|100.000000|
+</code></pre><pre class="language-code" data-language="code"><code class="language-code">$ rwfilter --start-date=$today --end-date=$today --protocol=1,6,17 --sensor=s1 --type=all --pass=stdout --saddress=69.241.37.66 --daddress=172.16.0.10 | rwstats --count=10 --fields=sip,dip,scc,bytes,sport
 INPUT: 4 Records for 4 Bins and 4 Total Records
-OUTPUT: Top 10 Bins by Records ```text sIP| dIP|scc| bytes|sPort| Records| %Records| cumul_%| 69.241.37.66| 172.16.0.10| us| 57713601| 80| 1| 25.000000| 25.000000| 69.241.37.66| 172.16.0.10| us| 153098218| 80| 1| 25.000000| 50.000000| 69.241.37.66| 172.16.0.10| us| 146904926| 80| 1| 25.000000| 75.000000| 69.241.37.66| 172.16.0.10| us| 58666986| 80| 1| 25.000000|100.000000|
-``` </code></pre><p>The output difference between the two sensors is minimal in most cases
+OUTPUT: Top 10 Bins by Records sIP| dIP|scc| bytes|sPort| Records| %Records| cumul_%| 69.241.37.66| 172.16.0.10| us| 57713601| 80| 1| 25.000000| 25.000000| 69.241.37.66| 172.16.0.10| us| 153098218| 80| 1| 25.000000| 50.000000| 69.241.37.66| 172.16.0.10| us| 146904926| 80| 1| 25.000000| 75.000000| 69.241.37.66| 172.16.0.10| us| 58666986| 80| 1| 25.000000|100.000000|
+</code></pre><p>The output difference between the two sensors is minimal in most cases
 and a large portion could be due to traffic that the tap may have better
 insight to report though more analysis needs to be done using tcpdump or
 Wireshark. Nevertheless this should be considered when determining the
