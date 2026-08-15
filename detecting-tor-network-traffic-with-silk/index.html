@@ -4,7 +4,7 @@ file. We then extract the destination IP addresses and use <code>rwsetbuild</cod
 # Fetch the list of known Tor servers (from an existing Tor server) and
 # display some of the basic info for each router. use LWP::Simple; # Hostname of an existing Tor router. We use one of the directory authorities
 # since that's pretty much what they're for.
-$INITIAL_TOR_SERVER = &quot;193.23.244.244&quot;; # http://dannenberg.ccc.de/tor/status/all
+$INITIAL_TOR_SERVER = &quot;193.23.244.244&quot;;
 $DIR_PORT = 80; # Fetch the list of servers
 $content = get(&quot;http://$INITIAL_TOR_SERVER:$DIR_PORT/tor/status/all&quot;);
 @lines = split /\n/,$content; foreach $router (@lines) { if($router =~ m/^r\s+(\S+)\s+(\S+)\s+(\S+)\s+(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})\s+(\S+)\s+(\d+)\s+(\d+)$/) { ($name, $address, $or_port, $directory_port, $update_time) = ($1, $5, $6, $7, $4); print &quot;$name | $address | $or_port | $directory_port | $update_time\n&quot;; }
