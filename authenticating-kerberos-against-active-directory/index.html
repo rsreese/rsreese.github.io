@@ -22,57 +22,16 @@ must be accurate or else it will not work correctly.</p><pre class="language-cod
 </code></pre><p>Next you need to run kinit to make sure that you can contact the kerberos
 server, if it returns nothing then you should be good.</p><pre class="language-code" data-language="code"><code class="language-code">$ kinitPassword for rsreese@AD.DOMAIN.EDU: blahblah
 </code></pre><p>Next setup two cron entries to keep the time up to date and kinit
-alive:<br>
+alive:
 $ sudo crontab -e</p><pre class="language-code" data-language="code"><code class="language-code">0 23 * * 1,3,5 /usr/sbin/ntpdate time.nrc.ca0 */4 * * * kinit -R
 </code></pre><p>The /etc/samba/smb.conf file needs to be setup.</p><pre class="language-code" data-language="code"><code class="language-code"># grep -Ev '#|;|^$' /etc/samba/smb.conf[global] workgroup = UFAD realm = AD.DOMAIN.EDU server string = SRVV-SERV hosts allow = 10.242. 10.228. load printers = no log file = /var/log/samba/%m.log max log size = 50 security = ads idmap uid = 10000 - 20000 idmap gid = 10000 - 20000winbind enum users=yeswinbind enum groups=yes template homedir = /home/%U template shell = /bin/bashclient use spnego = yes winbind use default domain = no encrypt passwords = yes smb passwd file = /etc/samba/smbpasswd socket options = TCP_NODELAY SO_RCVBUF=8192 SO_SNDBUF=8192 local master = no dns proxy = no[homes] comment = %U Home Directory browseable = no path = %H valid users = %U writable = yes create mode = 0664 directory mode = 0775[printers] comment = All Printers path = /var/spool/samba browseable = no guest ok = no writable = no printable = yes
-</code></pre><p>Now add the computer object to the domain via the Active directory
-&quot;Users and Computers&quot;</p><p>You need to join the linux machine to the domain. First create an
+</code></pre><p>Now add the computer object to the domain via the Active directory &quot;Users and Computers&quot;</p><p>You need to join the linux machine to the domain. First create an
 account on the domain for the machine as mentioned in the beginning or
-this will fail.<br>
-# net ads join -U administrator</p><p>SElinux needs to be told to let Samba play nicely<br>
-# setsebool -P samba_enable_home_dirs=1</p><p>~~~~~~~~~~~~~~~~~~~NOT
-NEEDED~~~~~~~~~~~~~~~~~~~~~~~~<br>
-The /etc/ldap.conf looks like this:</p><p>host 10.241.28.100<br>
-base dc=domain,dc=edu<br>
-uri ldap://ad.domain.edu/<br>
-binddn <a href="mailto:rsreese@domain.edu">rsreese@domain.edu</a><br>
-bindpw<br>
-scope sub<br>
-pam_filter objectclass=User<br>
-pam_login_attribute sAMAccountName<br>
-pam_lookup_policy yes<br>
-nss_base_passwd dc=edu?sub<br>
-nss_base_shadow dc=edu?sub<br>
-nss_base_group dc=edu?sub<br>
-nss_map_objectclass posixAccount user<br>
-nss_map_objectclass shadowAccount user<br>
-nss_map_attribute uid sAMAccountName<br>
-nss_map_attribute homeDirectory unixHomeDirectory<br>
-nss_map_attribute shadowLastChange pwdLastSet<br>
-nss_map_objectclass posixGroup group<br>
-nss_map_attribute uniqueMember member<br>
-pam_login_attribute sAMAccountName<br>
-pam_filter objectclass=User<br>
-pam_password ad<br>
-ssl no<br>
-tls_cacertdir /etc/openldap/cacerts<br>
-pam_password md5</p><p>~~~~~~~~~~~~~~~~~~~NOT
-NEEDED~~~~~~~~~~~~~~~~~~~~~~~~<br>
-Next I edit the /etc/nsswitch.conf to add ldap support:</p><p>passwd: files ldap<br>
-shadow: files<br>
-group: files ldap<br>
-hosts: files dns<br>
-bootparams: nisplus [NOTFOUND=return] files<br>
-ethers: files<br>
-netmasks: files<br>
-networks: files<br>
-protocols: files<br>
-rpc: files<br>
-services: files<br>
-netgroup: files<br>
-publickey: nisplus<br>
-automount: files<br>
-aliases: files nisplus</p></div><nav class="post-nav" aria-label="Post navigation"><a class="post-nav-card" href="/edit-group-policy-on-remote-computer/"><span>Previous</span>Edit group policy on remote computer</a><a class="post-nav-card post-nav-next" href="/mounting-read-only-drive-volumes-in-microsoft-windows/"><span>Next</span>Mounting read-only drive volumes in Microsoft Windows</a></nav></article><script type="application/ld+json">
+this will fail.</p><pre class="language-code" data-language="code"><code class="language-code"># net ads join -U administrator
+</code></pre><p>SElinux needs to be told to let Samba play nicely</p><pre class="language-code" data-language="code"><code class="language-code"># setsebool -P samba_enable_home_dirs=1
+</code></pre><p>Edit <em>/etc/ldap.conf</em> looks like this:</p><pre class="language-code" data-language="code"><code class="language-code">host 10.241.28.100 base dc=domain,dc=edu uri ldap://ad.domain.edu/ binddn rsreese@domain.edu bindpw scope sub pam\_filter objectclass=User pam\_login\_attribute sAMAccountName pam\_lookup\_policy yes nss\_base\_passwd dc=edu?sub nss\_base\_shadow dc=edu?sub nss\_base\_group dc=edu?sub nss\_map\_objectclass posixAccount user nss\_map\_objectclass shadowAccount user nss\_map\_attribute uid sAMAccountName nss\_map\_attribute homeDirectory unixHomeDirectory nss\_map\_attribute shadowLastChange pwdLastSet nss\_map\_objectclass posixGroup group nss\_map\_attribute uniqueMember member pam\_login\_attribute sAMAccountName pam\_filter objectclass=User pam\_password ad ssl no tls\_cacertdir /etc/openldap/cacerts pam\_password md5
+</code></pre><p>Next, edit the /etc/nsswitch.conf to add ldap support:</p><pre class="language-code" data-language="code"><code class="language-code">passwd: files ldap shadow: files group: files ldap hosts: files dns bootparams: nisplus [NOTFOUND=return] files ethers: files netmasks: files networks: files protocols: files rpc: files services: files netgroup: files publickey: nisplus automount: files aliases: files nisplus
+</code></pre></div><nav class="post-nav" aria-label="Post navigation"><a class="post-nav-card" href="/edit-group-policy-on-remote-computer/"><span>Previous</span>Edit group policy on remote computer</a><a class="post-nav-card post-nav-next" href="/mounting-read-only-drive-volumes-in-microsoft-windows/"><span>Next</span>Mounting read-only drive volumes in Microsoft Windows</a></nav></article><script type="application/ld+json">
 { "@context": "https://schema.org", "@type": "BlogPosting", "headline": "Authenticating kerberos against active directory", "description": "Your /etc/pam.d/system-auth is created with the command \"authconfig\" on a RHEL5 machine though you may have to manually edit it with other distributions…", "datePublished": "2008-02-12T08:37:00.000Z", "dateModified": "2008-02-12T08:37:00.000Z", "author": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.linkedin.com/in/rsreese" }, "publisher": { "@type": "Person", "name": "Stephen Reese", "url": "https://www.rsreese.com" }, "mainEntityOfPage": { "@type": "WebPage", "@id": "https://www.rsreese.com/authenticating-kerberos-against-active-directory/" }
 }
 </script></main><footer class="site-footer-wrap"><div class="site-footer"><p>© Stephen Reese · <a href="https://www.linkedin.com/in/rsreese">LinkedIn</a> · <a href="https://twitter.com/rsreese">Twitter/X</a></p><a class="back-to-top" href="#top" aria-label="Back to top">Back to top ↑</a></div></footer><script>(function(){const root=document.documentElement,btn=document.querySelector('.theme-toggle'),key='rsreese-theme';function preferred(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'}function apply(v){const mode=v==='light'||v==='dark'?v:preferred();root.setAttribute('data-theme',mode);root.dataset.themePreference=v||'system';if(btn){btn.setAttribute('aria-label',mode==='dark'?'Switch to light mode':'Switch to dark mode');btn.title=btn.getAttribute('aria-label')}}try{apply(localStorage.getItem(key)||'system')}catch(e){apply('system')}btn&&btn.addEventListener('click',function(){const current=root.getAttribute('data-theme')==='dark'?'dark':'light';const next=current==='dark'?'light':'dark';try{localStorage.setItem(key,next)}catch(e){}apply(next)});window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){try{if(!localStorage.getItem(key))apply('system')}catch(e){apply('system')}})})();</script><script>const navToggle=document.querySelector('.nav-toggle'),primaryNav=document.querySelector('#primary-nav');if(navToggle&&primaryNav){function setOpen(open){navToggle.setAttribute('aria-expanded',String(open));primaryNav.classList.toggle('is-open',open)}navToggle.addEventListener('click',()=>setOpen(navToggle.getAttribute('aria-expanded')!=='true'));primaryNav.addEventListener('click',e=>{if(e.target.matches('a'))setOpen(false)});document.addEventListener('click',e=>{if(!primaryNav.contains(e.target)&&!navToggle.contains(e.target))setOpen(false)});document.addEventListener('keydown',e=>{if(e.key==='Escape')setOpen(false)})}</script><script src="/assets/js/code-enhance.js?v=3.4.0" defer></script></body></html>
